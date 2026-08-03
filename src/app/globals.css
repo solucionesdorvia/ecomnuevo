@@ -1,15 +1,17 @@
 @import "tailwindcss";
 
-/* Identidad visual — ver CLAUDE.md. La paleta no se toca sin hablarlo antes. */
+/* Identidad visual Traelo — ver CLAUDE.md. La paleta no se toca sin hablarlo antes. */
 :root {
-  --background: #faf7f2; /* crema cálido */
+  --background: #f4f6f2; /* sal — fondo cálido y fresco, no blanco puro */
   --surface: #ffffff; /* cards, para que las fotos exploten */
-  --foreground: #14171f; /* tinta */
-  --muted: #5b6472; /* texto secundario */
-  --primary: #2541b2; /* azul cobalto — navegación, links, botones secundarios */
-  --accent: #ff6b45; /* coral — SOLO precio final, badges de ahorro y CTA de compra */
+  --foreground: #0c2136; /* tinta oceánica */
+  --muted: #5e7183; /* texto secundario, azul-grisáceo */
+  --primary: #0c2136; /* tinta oceánica — navegación, chips activos, botones secundarios */
+  --accent: #ff5a1f; /* naranja contenedor — SOLO precio final, badges de ahorro, CTA de compra y el punto de la marca */
+  --celeste: #8fcdeb; /* celeste — apoyo suave: info de envío, decorativo */
+  --celeste-soft: #bfe2f2;
   --success: #1fa97a;
-  --border: #e8e3da;
+  --border: #e2e7e5;
 }
 
 @theme inline {
@@ -19,9 +21,11 @@
   --color-muted: var(--muted);
   --color-primary: var(--primary);
   --color-accent: var(--accent);
+  --color-celeste: var(--celeste);
+  --color-celeste-soft: var(--celeste-soft);
   --color-success: var(--success);
   --color-border: var(--border);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-outfit);
 }
 
 body {

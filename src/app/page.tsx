@@ -38,12 +38,12 @@ export default async function Home() {
     <div className="flex flex-col gap-12 py-8">
       {/* Hero */}
       <section className="flex flex-col items-start gap-4 py-6 sm:py-10">
-        <h1 className="max-w-2xl text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
-          Comprá afuera, <span className="text-primary">recibí en tu casa.</span>
+        <h1 className="max-w-2xl text-3xl font-black leading-[1.05] tracking-tight sm:text-5xl">
+          Lo viste afuera. <span className="whitespace-nowrap">Traelo<span className="text-accent">.</span></span>
         </h1>
         <p className="max-w-xl text-lg text-muted">
-          Productos directo de proveedores del exterior, en dólares. El precio que ves es
-          final: producto, envío e impuestos incluidos. Nada más que pagar.
+          Comprá directo a proveedores del exterior. El precio que ves es final: producto,
+          envío e impuestos incluidos. Te llega a tu casa. Nada más que pagar.
         </p>
         <Link
           href="/catalogo"

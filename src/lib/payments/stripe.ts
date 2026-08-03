@@ -25,7 +25,7 @@ export class StripeProvider implements PaymentProvider {
           price_data: {
             currency: "usd",
             unit_amount: Math.round(input.totalUsd * 100),
-            product_data: { name: `Pedido #${input.orderNumber} — Ecomex Market` },
+            product_data: { name: `Pedido #${input.orderNumber} — Traelo` },
           },
           quantity: 1,
         },

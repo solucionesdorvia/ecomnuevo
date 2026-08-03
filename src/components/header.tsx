@@ -9,8 +9,12 @@ export function Header({ user, cartCount }: { user: User | null; cartCount: numb
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
-        <Link href="/" className="shrink-0 text-lg font-bold tracking-tight text-primary">
-          Ecomex<span className="text-foreground"> Market</span>
+        <Link
+          href="/"
+          className="shrink-0 text-2xl font-black lowercase tracking-tight text-foreground"
+          aria-label="Traelo — inicio"
+        >
+          traelo<span className="text-accent">.</span>
         </Link>
 
         <SearchBox className="hidden flex-1 sm:block" />

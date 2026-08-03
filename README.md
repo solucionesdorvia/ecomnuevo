@@ -1,6 +1,7 @@
-# Ecomex Market
+# Traelo
 
-Marketplace de compra directa a proveedores del exterior para Argentina.
+Marketplace de compra directa a proveedores del exterior para Argentina
+(marca de cara al cliente: **Traelo**; Ecomex es la empresa).
 El usuario compra en dólares con tarjeta y recibe en su casa; el precio que ve
 es **final** (producto + flete marítimo + impuestos). Detrás, un equipo de
 operadores compra cada pedido al proveedor y gestiona la logística consolidada

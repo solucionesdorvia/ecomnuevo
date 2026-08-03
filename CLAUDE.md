@@ -55,22 +55,26 @@ si el paquete va a llegar. Eso no se resuelve con un tema de shadcn por default.
 
 Si dudás entre una feature nueva o pulir uno de estos seis puntos, pulí esto primero.
 
-## Identidad visual
-**Paleta**
-- Fondo `#FAF7F2` (crema cálido, no blanco puro)
-- Superficies/cards `#FFFFFF` (para que las fotos de producto exploten en contraste)
-- Tinta `#14171F` · Texto secundario `#5B6472`
-- **Primario** `#2541B2` (azul cobalto) — navegación, botones secundarios, links.
-  Es plata en dólares yéndose al exterior: el color comunica seriedad, no urgencia.
-- **Acento** `#FF6B45` (coral cálido) — reservado casi exclusivamente para precio
-  final, badges de ahorro y el botón principal de compra. Usado en todos lados pierde
-  el significado.
-- Éxito `#1FA97A` · Borde sutil `#E8E3DA`
+## Identidad visual — marca "Traelo" (definida por Andy, 20/7/2026)
+Nombre de la marca de cara al cliente: **Traelo** (siempre en minúscula, con el
+punto naranja: `traelo.`). Tagline: "Lo viste afuera. Traelo." Ecomex es la
+empresa/cliente; Traelo es el marketplace.
 
-**Tipografía:** una sola familia variable de alto rendimiento (Inter o Geist) para
-todo — títulos, cuerpo, precios. Nada de 2-3 fuentes: acá la velocidad de carga
-importa más que la personalidad tipográfica, y los precios tienen que verse
-impecables en tabular figures.
+**Paleta** (tokens en `src/app/globals.css` — no tocar sin hablarlo)
+- Fondo `#F4F6F2` (sal — cálido y fresco, no blanco puro)
+- Superficies/cards `#FFFFFF` (para que las fotos de producto exploten en contraste)
+- Tinta oceánica `#0C2136` · Texto secundario `#5E7183`
+- **Primario** `#0C2136` (tinta oceánica) — navegación, chips activos, botones
+  secundarios. La estructura seria, "el mar".
+- **Acento** `#FF5A1F` (naranja contenedor) — reservado casi exclusivamente para
+  precio final, badges de ahorro, el botón principal de compra y el punto de la
+  marca. Usado en todos lados pierde el significado.
+- Celeste `#8FCDEB` / `#BFE2F2` — apoyo suave (info de envío, decorativo).
+- Éxito `#1FA97A` · Borde sutil `#E2E7E5`
+
+**Tipografía:** **Outfit** (geométrica, redondeada, limpia) para todo — vía
+`next/font/google`, self-hosteada. Una sola familia: la velocidad de carga importa
+más que la personalidad, y los precios tienen que verse impecables en tabular figures.
 
 **Estética general:** grilla de producto limpia, mucho aire, jerarquía clara entre
 precio-final / producto / CTA.

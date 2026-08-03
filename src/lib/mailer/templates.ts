@@ -13,7 +13,7 @@ export function paymentConfirmedMail(args: {
 }): Mail {
   return {
     to: args.to,
-    subject: `Pedido #${args.orderNumber} confirmado — Ecomex Market`,
+    subject: `Pedido #${args.orderNumber} confirmado — Traelo`,
     text: [
       `Hola ${args.name},`,
       "",
@@ -25,7 +25,7 @@ export function paymentConfirmedMail(args: {
       "",
       `Seguí tu pedido en ${appUrl()}/mis-pedidos`,
       "",
-      "Ecomex Market",
+      "Traelo",
     ].join("\n"),
   };
 }
@@ -44,10 +44,10 @@ export function stateChangedMail(args: {
     STATE_DESCRIPTION[args.newState],
   ];
   if (args.note) lines.push("", `Nota del equipo: ${args.note}`);
-  lines.push("", `Ver el detalle: ${appUrl()}/mis-pedidos`, "", "Ecomex Market");
+  lines.push("", `Ver el detalle: ${appUrl()}/mis-pedidos`, "", "Traelo");
   return {
     to: args.to,
-    subject: `Pedido #${args.orderNumber}: ${STATE_LABEL[args.newState]} — Ecomex Market`,
+    subject: `Pedido #${args.orderNumber}: ${STATE_LABEL[args.newState]} — Traelo`,
     text: lines.join("\n"),
   };
 }
@@ -55,7 +55,7 @@ export function stateChangedMail(args: {
 export function passwordResetMail(args: { to: string; name: string; token: string }): Mail {
   return {
     to: args.to,
-    subject: "Recuperá tu contraseña — Ecomex Market",
+    subject: "Recuperá tu contraseña — Traelo",
     text: [
       `Hola ${args.name},`,
       "",
@@ -64,7 +64,7 @@ export function passwordResetMail(args: { to: string; name: string; token: strin
       "",
       "Si no fuiste vos, ignorá este email.",
       "",
-      "Ecomex Market",
+      "Traelo",
     ].join("\n"),
   };
 }

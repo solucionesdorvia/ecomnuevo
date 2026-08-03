@@ -5,12 +5,12 @@ export function Footer() {
     <footer className="mt-16 border-t border-border bg-surface">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-3">
         <div>
-          <p className="text-lg font-bold text-primary">
-            Ecomex<span className="text-foreground"> Market</span>
+          <p className="text-xl font-black lowercase tracking-tight text-foreground">
+            traelo<span className="text-accent">.</span>
           </p>
           <p className="mt-2 text-sm text-muted">
-            Comprá directo a proveedores del exterior, en dólares, con precio final sin
-            sorpresas. Tu compra viaja en barco y entra al país a tu nombre.
+            Comprá directo a proveedores del exterior, con precio final sin sorpresas.
+            Tu compra viaja en barco y entra al país a tu nombre. Lo viste afuera, traelo.
           </p>
         </div>
         <div className="text-sm">
