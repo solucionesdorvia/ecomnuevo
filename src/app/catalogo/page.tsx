@@ -1,0 +1,178 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { Prisma } from "@prisma/client";
+import { db } from "@/lib/db";
+import { getFavoriteIds } from "@/lib/favoritos";
+import { CATEGORY_BY_KEY, CATEGORY_LABEL } from "@/lib/categorias";
+import { cn } from "@/lib/utils";
+import { ProductCard } from "@/components/product-card";
+import { FilterBar } from "@/components/filter-bar";
+
+export const metadata: Metadata = { title: "Catálogo" };
+
+const PAGE_SIZE = 24;
+
+type Params = {
+  q?: string;
+  categoria?: string;
+  origen?: string;
+  precio_min?: string;
+  precio_max?: string;
+  orden?: string;
+  pagina?: string;
+};
+
+export default async function CatalogoPage({
+  searchParams,
+}: {
+  searchParams: Promise<Params>;
+}) {
+  const params = await searchParams;
+  const q = params.q?.trim();
+  const category = params.categoria ? CATEGORY_BY_KEY[params.categoria] : undefined;
+  const origen = params.origen?.trim();
+  const min = Number(params.precio_min) || undefined;
+  const max = Number(params.precio_max) || undefined;
+  const orden = params.orden ?? "novedad";
+  const page = Math.max(1, Number(params.pagina) || 1);
+
+  const where: Prisma.ProductWhereInput = {
+    active: true,
+    ...(category ? { category } : {}),
+    ...(q
+      ? {
+          OR: [
+            { title: { contains: q, mode: "insensitive" } },
+            { description: { contains: q, mode: "insensitive" } },
+          ],
+        }
+      : {}),
+    ...(origen ? { supplier: { country: origen } } : {}),
+    ...(min || max ? { priceUsd: { ...(min ? { gte: min } : {}), ...(max ? { lte: max } : {}) } } : {}),
+  };
+
+  const orderBy: Prisma.ProductOrderByWithRelationInput =
+    orden === "precio_asc" ? { priceUsd: "asc" } : orden === "precio_desc" ? { priceUsd: "desc" } : { createdAt: "desc" };
+
+  const [products, total, countries, favIds] = await Promise.all([
+    db.product.findMany({
+      where,
+      orderBy,
+      include: { supplier: { select: { country: true } } },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    db.product.count({ where }),
+    db.supplier.findMany({ select: { country: true }, distinct: ["country"], orderBy: { country: "asc" } }),
+    getFavoriteIds(),
+  ]);
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const title = category ? CATEGORY_LABEL[category] : q ? `Resultados para “${q}”` : "Catálogo completo";
+
+  const pageHref = (n: number) => {
+    const p = new URLSearchParams();
+    if (q) p.set("q", q);
+    if (params.categoria) p.set("categoria", params.categoria);
+    if (origen) p.set("origen", origen);
+    if (params.precio_min) p.set("precio_min", params.precio_min);
+    if (params.precio_max) p.set("precio_max", params.precio_max);
+    if (orden !== "novedad") p.set("orden", orden);
+    if (n > 1) p.set("pagina", String(n));
+    const s = p.toString();
+    return `/catalogo${s ? `?${s}` : ""}`;
+  };
+
+  return (
+    <div className="py-6">
+      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+        <div>
+          <h1 className="text-2xl font-semibold">{title}</h1>
+          <p className="text-sm text-muted">
+            {total} {total === 1 ? "producto" : "productos"} · precio final, nada más que pagar
+          </p>
+        </div>
+      </div>
+
+      <FilterBar countries={countries.map((c) => c.country)} />
+
+      {products.length === 0 ? (
+        <div className="rounded-xl border border-border bg-surface py-16 text-center">
+          <p className="font-medium">No encontramos productos para esta búsqueda.</p>
+          <p className="mx-auto mt-1 max-w-sm text-sm text-muted">
+            Probá con menos filtros o con otra palabra — todo el catálogo tiene precio final.
+          </p>
+          <Link
+            href="/catalogo"
+            className="mt-4 inline-block rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90"
+          >
+            Ver todo el catálogo
+          </Link>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+          {products.map((p) => (
+            <ProductCard
+              key={p.id}
+              isFav={favIds.has(p.id)}
+              product={{
+                id: p.id,
+                slug: p.slug,
+                title: p.title,
+                images: p.images,
+                priceUsd: p.priceUsd,
+                referencePriceUsd: p.referencePriceUsd,
+                originCountry: p.supplier.country,
+                deliveryDaysMin: p.deliveryDaysMin,
+                deliveryDaysMax: p.deliveryDaysMax,
+                createdAt: p.createdAt,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Paginación */}
+      {totalPages > 1 && (
+        <nav aria-label="Paginación" className="mt-8 flex items-center justify-center gap-2">
+          <Link
+            href={pageHref(Math.max(1, page - 1))}
+            aria-disabled={page === 1}
+            className={cn(
+              "flex size-9 items-center justify-center rounded-lg border border-border bg-surface hover:bg-background",
+              page === 1 && "pointer-events-none opacity-40",
+            )}
+            aria-label="Página anterior"
+          >
+            <ChevronLeft className="size-4" />
+          </Link>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+            <Link
+              key={n}
+              href={pageHref(n)}
+              aria-current={n === page ? "page" : undefined}
+              className={cn(
+                "flex size-9 items-center justify-center rounded-lg border text-sm",
+                n === page ? "border-primary bg-primary text-white" : "border-border bg-surface hover:bg-background",
+              )}
+            >
+              {n}
+            </Link>
+          ))}
+          <Link
+            href={pageHref(Math.min(totalPages, page + 1))}
+            aria-disabled={page === totalPages}
+            className={cn(
+              "flex size-9 items-center justify-center rounded-lg border border-border bg-surface hover:bg-background",
+              page === totalPages && "pointer-events-none opacity-40",
+            )}
+            aria-label="Página siguiente"
+          >
+            <ChevronRight className="size-4" />
+          </Link>
+        </nav>
+      )}
+    </div>
+  );
+}

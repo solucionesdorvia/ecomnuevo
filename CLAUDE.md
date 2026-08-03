@@ -75,51 +75,36 @@ impecables en tabular figures.
 **Estética general:** grilla de producto limpia, mucho aire, jerarquía clara entre
 precio-final / producto / CTA.
 
-## Alcance de Fase 1 (lo único que hay que construir)
-1. **Catálogo curado**: productos reales de proveedores reales del exterior, cargados
-   por el equipo (no scraping, no conexión en vivo a plataformas externas todavía).
-   Cada producto con precio final ya calculado (producto + flete + impuestos).
-2. **Marketplace público**: búsqueda, filtros, ficha de producto, carrito. Sin login
-   de comprador si se puede evitar.
-3. **Checkout real en tarjeta de crédito, en dólares** (Stripe u otro procesador con
-   soporte de cuenta internacional — confirmar cuál antes de integrar). El pago es
-   real: entra plata de verdad a una cuenta de la plataforma.
-4. **Panel de operador** (con login): lista de pedidos pagados. El equipo marca
-   manualmente el estado de cada uno a medida que compra afuera y liquida al
-   proveedor correspondiente. Sin automatización de compra ni de pago a proveedores
-   todavía — eso es fase 2/3.
+## Alcance de Fase 1 (construido — ver README.md para setup y credenciales demo)
+1. **Catálogo curado**: productos cargados por el equipo desde `/admin` (desglose
+   de costos, peso/volumen, proveedor, variantes). Búsqueda, filtros, ficha.
+2. **Marketplace público**: carrito sin login, con topes courier visibles.
+3. **Checkout real con tarjeta en dólares**, con captura y validación de
+   **DNI (7-8 dígitos) o CUIT (11, con dígito verificador)** — el comprador es
+   el importador — y **validación dura de 50 kg / USD 3.000 por pedido**
+   (en UI y re-validado en servidor). Pagos detrás de la interfaz
+   `PaymentProvider` (mock en dev, Stripe test; Mercado Pago u otro se enchufa
+   sin tocar el resto).
+4. **Panel de operador** (`/operador`): cola de pedidos pagados, avance manual
+   de estados (solo transiciones válidas del enum, cancelación con motivo),
+   historial auditable (`StatusEvent`).
+5. **"Mis pedidos"** para el cliente con timeline de estados, y **email al
+   cliente en cada cambio de estado** (capa `Mailer`; consola en dev).
+6. **Admin** (`/admin`): dashboard mínimo + CRUD de productos y proveedores con
+   cálculo asistido del precio final.
+
+Estados: PAGADO → COMPRADO_EN_ORIGEN → RECIBIDO_DEPOSITO_EXTERIOR → EMBARCADO →
+EN_ADUANA → ENTREGADO (+ CANCELADO antes de EMBARCADO, con motivo).
 
 **Criterio de éxito:** un pedido real, pagado en dólares, visible en el panel,
 comprado afuera y despachado. Nada más que eso.
 
-## Supuestos confirmados por el dueño (19/7/2026) — no inventar sobre esto
-- Quiere la experiencia de compra directa desde el día uno (no "catálogo propio"
-  como destino final — es un paso intermedio hacia eso).
-- Pago: tarjeta de crédito, en dólares. La cuenta de la plataforma recibe el total y
-  el equipo liquida a cada proveedor (a mano en fase 1).
-- No existe ningún sistema de casillas, stock ni tracking hoy — el depósito fiscal y
-  los depósitos en el exterior operan como consolidador mayorista (B2B), no aplican
-  a este servicio. Todo lo que se construye acá es nuevo.
-- No hay stock propio: el modelo es comprar contra pedido a fábrica/proveedor (esto
-  es fase 2, pero no diseñar fase 1 asumiendo gestión de inventario).
-- Orden de prioridad del dueño: 1) marketplace, 2) compras/consolidación, 3) tracking
-  — por eso fase 1 es 100% marketplace + checkout, nada de tracking todavía.
-
-## Fuera de scope — NO construir en esta fase
-- Scraping o integración en vivo con plataformas externas (Fase 4, a cotizar aparte).
-- Compra automática a proveedores (Fase 4).
-- Sistema de inventario/stock en depósitos (no aplica — no hay stock propio).
-- Compras a fábrica + consolidación de envíos automatizada (Fase 2).
-- Tracking para el comprador — estados de envío, notificaciones (Fase 3).
-- Reparto automático de pagos a múltiples proveedores / Stripe Connect (Fase 3) — en
-  fase 1 el pago entra a una cuenta única y se liquida a mano.
-- Login de comprador, salvo que sea imprescindible para el checkout.
-- Cualquier feature "porque ya que estamos" que no esté en la lista de arriba.
-
-## Stack sugerido
-Next.js + Supabase (Postgres, Auth para el panel de operador, Storage para imágenes
-de producto). Pagos: Stripe (confirmar soporte de cuenta internacional antes de
-integrar — es dinero real, no simulado). Deploy: Vercel o Railway.
+## Stack (el implementado)
+Next.js 16 (App Router) + TypeScript + Tailwind v4 + PostgreSQL + Prisma 6.
+Auth propia con sesiones en DB (scrypt + cookie httpOnly), roles CLIENTE /
+OPERADOR / ADMIN. Pagos: interfaz `PaymentProvider` (mock | stripe). Emails:
+interfaz `Mailer` (console en dev). DB local: docker `superplataforma-pg`,
+puerto 54340. Comandos y credenciales demo: README.md.
 
 ## Cómo trabajar
 - Alcance de fase, no de producto entero — si algo no está en "Alcance de Fase 1",

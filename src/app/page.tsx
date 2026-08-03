@@ -1,65 +1,179 @@
-import Image from "next/image";
+import Link from "next/link";
+import { PackageCheck, Ship, ShieldCheck } from "lucide-react";
+import { db } from "@/lib/db";
+import { getFavoriteIds } from "@/lib/favoritos";
+import { getRecentlyViewedSlugs } from "@/lib/vistos";
+import { ProductCard } from "@/components/product-card";
 
-export default function Home() {
+const CATEGORIES = [
+  { key: "electronica", label: "Electrónica", emoji: "🎧" },
+  { key: "hogar", label: "Hogar", emoji: "🏠" },
+  { key: "indumentaria", label: "Indumentaria", emoji: "🧥" },
+  { key: "herramientas", label: "Herramientas", emoji: "🔧" },
+];
+
+export default async function Home() {
+  const [featured, favIds, recentSlugs] = await Promise.all([
+    db.product.findMany({
+      where: { active: true, featured: true },
+      include: { supplier: { select: { country: true } } },
+      take: 8,
+      orderBy: { createdAt: "desc" },
+    }),
+    getFavoriteIds(),
+    getRecentlyViewedSlugs(),
+  ]);
+
+  // "Seguí mirando": vistos recientemente, en el orden de la cookie
+  const recentProducts =
+    recentSlugs.length > 0
+      ? await db.product.findMany({
+          where: { active: true, slug: { in: recentSlugs } },
+          include: { supplier: { select: { country: true } } },
+        })
+      : [];
+  recentProducts.sort((a, b) => recentSlugs.indexOf(a.slug) - recentSlugs.indexOf(b.slug));
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="flex flex-col gap-12 py-8">
+      {/* Hero */}
+      <section className="flex flex-col items-start gap-4 py-6 sm:py-10">
+        <h1 className="max-w-2xl text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
+          Comprá afuera, <span className="text-primary">recibí en tu casa.</span>
+        </h1>
+        <p className="max-w-xl text-lg text-muted">
+          Productos directo de proveedores del exterior, en dólares. El precio que ves es
+          final: producto, envío e impuestos incluidos. Nada más que pagar.
+        </p>
+        <Link
+          href="/catalogo"
+          className="rounded-lg bg-primary px-6 py-3 font-medium text-white transition-colors hover:bg-primary/90"
+        >
+          Ver catálogo
+        </Link>
+        <div className="mt-4 grid gap-3 text-sm text-muted sm:grid-cols-3">
+          <p className="flex items-center gap-2">
+            <ShieldCheck className="size-5 shrink-0 text-success" />
+            Precio final puesto en tu casa
+          </p>
+          <p className="flex items-center gap-2">
+            <PackageCheck className="size-5 shrink-0 text-success" />
+            Comprás directo al proveedor
+          </p>
+          <p className="flex items-center gap-2">
+            <Ship className="size-5 shrink-0 text-success" />
+            Seguimiento en cada paso
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* Destacados */}
+      <section>
+        <div className="mb-4 flex items-baseline justify-between">
+          <h2 className="text-xl font-semibold">Destacados</h2>
+          <Link href="/catalogo" className="text-sm text-primary hover:underline">
+            Ver todos →
+          </Link>
         </div>
-      </main>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+          {featured.map((p) => (
+            <ProductCard
+              key={p.id}
+              isFav={favIds.has(p.id)}
+              product={{
+                id: p.id,
+                slug: p.slug,
+                title: p.title,
+                images: p.images,
+                priceUsd: p.priceUsd,
+                referencePriceUsd: p.referencePriceUsd,
+                originCountry: p.supplier.country,
+                deliveryDaysMin: p.deliveryDaysMin,
+                deliveryDaysMax: p.deliveryDaysMax,
+                createdAt: p.createdAt,
+              }}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* Seguí mirando */}
+      {recentProducts.length > 0 && (
+        <section>
+          <h2 className="mb-4 text-xl font-semibold">Seguí mirando</h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+            {recentProducts.slice(0, 4).map((p) => (
+              <ProductCard
+                key={p.id}
+                isFav={favIds.has(p.id)}
+                product={{
+                  id: p.id,
+                  slug: p.slug,
+                  title: p.title,
+                  images: p.images,
+                  priceUsd: p.priceUsd,
+                  referencePriceUsd: p.referencePriceUsd,
+                  originCountry: p.supplier.country,
+                  deliveryDaysMin: p.deliveryDaysMin,
+                  deliveryDaysMax: p.deliveryDaysMax,
+                  createdAt: p.createdAt,
+                }}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Categorías */}
+      <section>
+        <h2 className="mb-4 text-xl font-semibold">Explorá por categoría</h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {CATEGORIES.map((c) => (
+            <Link
+              key={c.key}
+              href={`/catalogo?categoria=${c.key}`}
+              className="flex items-center gap-3 rounded-xl border border-border bg-surface p-4 transition-shadow hover:shadow-md"
+            >
+              <span className="text-2xl">{c.emoji}</span>
+              <span className="font-medium">{c.label}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Cómo funciona */}
+      <section className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
+        <h2 className="mb-6 text-xl font-semibold">¿Cómo funciona?</h2>
+        <ol className="grid gap-6 sm:grid-cols-3">
+          {[
+            {
+              n: 1,
+              t: "Elegís y pagás el precio final",
+              d: "En dólares, con tarjeta. El precio ya incluye producto, envío marítimo e impuestos.",
+            },
+            {
+              n: 2,
+              t: "Compramos y embarcamos tu pedido",
+              d: "Nuestro equipo lo compra al proveedor y lo despacha por barco, consolidado.",
+            },
+            {
+              n: 3,
+              t: "Te llega a tu casa",
+              d: "En 45–60 días, a tu nombre. Seguís cada paso desde tu cuenta. Nada más que pagar.",
+            },
+          ].map((s) => (
+            <li key={s.n} className="flex gap-4">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary font-bold text-white">
+                {s.n}
+              </span>
+              <div>
+                <p className="font-medium">{s.t}</p>
+                <p className="mt-1 text-sm text-muted">{s.d}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
     </div>
   );
 }

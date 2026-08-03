@@ -1,0 +1,286 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Usuarios y auth ─────────────────────────────────────────────────────────
+
+enum Role {
+  CLIENTE
+  OPERADOR
+  ADMIN
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  role         Role      @default(CLIENTE)
+  // Documento por defecto del usuario; cada pedido guarda además el usado en esa compra
+  docType      DocType?
+  docNumber    String?
+  createdAt    DateTime  @default(now())
+
+  sessions       Session[]
+  addresses      Address[]
+  orders         Order[]
+  statusEvents   StatusEvent[]
+  passwordResets PasswordReset[]
+  favorites      Favorite[]
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+}
+
+enum DocType {
+  DNI
+  CUIT
+}
+
+model Address {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  street    String // calle y número
+  apartment String? // piso / depto
+  city      String
+  province  String
+  zipCode   String
+  phone     String
+  isDefault Boolean @default(false)
+
+  orders Order[]
+}
+
+// ─── Catálogo ────────────────────────────────────────────────────────────────
+
+model Supplier {
+  id          String  @id @default(cuid())
+  name        String
+  country     String // "China", "Estados Unidos", "España", ...
+  depot       String // depósito de salida (ej.: "Depósito Shenzhen")
+  contactUrl  String? // link al proveedor (lo ve el operador)
+  notes       String?
+  active      Boolean @default(true)
+  createdAt   DateTime @default(now())
+
+  products          Product[]
+  procurementOrders ProcurementOrder[]
+}
+
+enum Category {
+  ELECTRONICA
+  HOGAR
+  INDUMENTARIA
+  HERRAMIENTAS
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String
+  category    Category
+  images      String[] // URLs
+  supplierId  String
+  supplier    Supplier @relation(fields: [supplierId], references: [id])
+
+  // Físico (para validar tope courier 50 kg)
+  weightKg  Decimal @db.Decimal(8, 3) // peso estimado por unidad
+  volumeM3  Decimal @db.Decimal(8, 4) // volumen estimado por unidad
+
+  // Desglose de costos (solo lo ven admin/operador) — todo en USD
+  costUsd     Decimal @db.Decimal(10, 2) // costo del producto
+  freightUsd  Decimal @db.Decimal(10, 2) // flete estimado
+  taxesUsd    Decimal @db.Decimal(10, 2) // impuestos estimados
+  marginUsd   Decimal @db.Decimal(10, 2) // margen
+  priceUsd    Decimal @db.Decimal(10, 2) // precio final que ve el cliente
+  // Precio local de referencia (lo que saldría comprarlo en Argentina).
+  // Opcional: de acá sale el badge de ahorro. Solo se muestra si es mayor al final.
+  referencePriceUsd Decimal? @db.Decimal(10, 2)
+
+  deliveryDaysMin Int @default(45)
+  deliveryDaysMax Int @default(60)
+
+  active    Boolean  @default(true)
+  featured  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  variants   ProductVariant[]
+  orderItems OrderItem[]
+  favorites  Favorite[]
+
+  @@index([category, active])
+}
+
+model ProductVariant {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  kind      String // "Talle" | "Color" | ...
+  value     String // "M", "Rojo", ...
+  available Boolean @default(true)
+
+  orderItems OrderItem[]
+
+  @@unique([productId, kind, value])
+}
+
+model Favorite {
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, productId])
+}
+
+// ─── Pedidos ─────────────────────────────────────────────────────────────────
+
+enum PaymentStatus {
+  PENDIENTE
+  PAGADO
+  FALLIDO
+  REEMBOLSADO
+}
+
+enum LogisticState {
+  PAGADO
+  COMPRADO_EN_ORIGEN
+  RECIBIDO_DEPOSITO_EXTERIOR
+  EMBARCADO
+  EN_ADUANA
+  ENTREGADO
+  CANCELADO
+}
+
+model Order {
+  id        String   @id @default(cuid())
+  number    Int      @unique @default(autoincrement()) // número visible (#1042)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  addressId String
+  address   Address  @relation(fields: [addressId], references: [id])
+
+  // Documento usado en ESTA compra (el comprador es el importador)
+  docType   DocType
+  docNumber String
+
+  itemsUsd    Decimal @db.Decimal(10, 2)
+  totalUsd    Decimal @db.Decimal(10, 2)
+  totalWeightKg Decimal @db.Decimal(8, 3)
+
+  paymentStatus     PaymentStatus @default(PENDIENTE)
+  paymentProvider   String? // "mock" | "stripe"
+  paymentExternalId String? // id del checkout/pago en el procesador
+
+  state         LogisticState @default(PAGADO)
+  cancelReason  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items             OrderItem[]
+  statusEvents      StatusEvent[]
+  procurementOrders ProcurementOrder[]
+  shipment          Shipment?
+
+  @@index([state])
+  @@index([userId])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id])
+
+  quantity     Int
+  unitPriceUsd Decimal @db.Decimal(10, 2) // precio congelado al comprar
+  unitWeightKg Decimal @db.Decimal(8, 3)
+}
+
+// ─── Operación (Fase 1: manual; entidades propias para fases futuras) ────────
+
+enum ProcurementStatus {
+  PENDIENTE
+  COMPRADO
+  RECIBIDO_EN_DEPOSITO
+}
+
+model ProcurementOrder {
+  id         String   @id @default(cuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  supplierId String
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+  status     ProcurementStatus @default(PENDIENTE)
+  reference  String? // nº de orden en el sitio del proveedor
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Shipment {
+  id            String    @id @default(cuid())
+  orderId       String    @unique
+  order         Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  // Fechas por estado logístico (se completan al avanzar)
+  boughtAt      DateTime? // COMPRADO_EN_ORIGEN
+  atDepotAt     DateTime? // RECIBIDO_DEPOSITO_EXTERIOR
+  shippedAt     DateTime? // EMBARCADO
+  atCustomsAt   DateTime? // EN_ADUANA
+  deliveredAt   DateTime? // ENTREGADO
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+// Estado del procesador de pagos SIMULADO (solo desarrollo). Vive en DB porque
+// el dev server usa varios workers y la memoria no se comparte entre ellos.
+model MockPayment {
+  externalId String @id
+  orderId    String
+  status     String @default("pending") // pending | approved | rejected
+  createdAt  DateTime @default(now())
+}
+
+model StatusEvent {
+  id        String        @id @default(cuid())
+  orderId   String
+  order     Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  fromState LogisticState?
+  toState   LogisticState
+  note      String?
+  actorId   String? // null = sistema (ej.: pago confirmado)
+  actor     User?   @relation(fields: [actorId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+}
