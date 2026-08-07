@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&amp;family=Archivo:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#0C2136; font-family:Archivo, sans-serif; }
+  a { color:#FF5A1F; text-decoration:none; }
+  a:hover { color:#8FCDEB; }
+  @keyframes traelo-dash { to { stroke-dashoffset:-64; } }
+  @keyframes traelo-pulse { 0%,100% { opacity:.35; transform:scale(1); } 50% { opacity:1; transform:scale(1.35); } }
+</style>
+</helmet>
+
+<div style="background:#0C2136;padding:56px 56px 120px;color:#F4F6F2;">
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px;flex-wrap:wrap;border-bottom:1px solid rgba(244,246,242,.14);padding-bottom:28px;margin-bottom:56px;">
+    <div style="display:flex;align-items:center;gap:20px;">
+      <svg width="64" height="64" viewBox="0 0 64 64" style="display:block;border-radius:10px;background:#132D45;">
+        <circle cx="13" cy="44" r="4.5" fill="#8FCDEB"></circle>
+        <path d="M13 44 C 26 16, 36 14, 46 24" fill="none" stroke="#FF5A1F" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="3 7" style="animation:traelo-dash 2.4s linear infinite;"></path>
+        <circle cx="47" cy="27" r="8" fill="none" stroke="#FF5A1F" stroke-width="3"></circle>
+      </svg>
+      <div>
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:46px;line-height:1;letter-spacing:-.03em;">traelo<span style="color:#FF5A1F;">.</span></div>
+        <div style="font-family:'Space Mono',monospace;font-size:12px;color:#8FCDEB;margin-top:8px;letter-spacing:.14em;text-transform:uppercase;">Sistema de diseño · v1 · marketplace de importación</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;font-family:'Space Mono',monospace;font-size:11px;">
+      <div style="display:flex;align-items:center;gap:8px;background:#132D45;padding:8px 12px;border-radius:8px;"><span style="width:14px;height:14px;border-radius:4px;background:#0C2136;border:1px solid rgba(244,246,242,.25);"></span>#0C2136</div>
+      <div style="display:flex;align-items:center;gap:8px;background:#132D45;padding:8px 12px;border-radius:8px;"><span style="width:14px;height:14px;border-radius:4px;background:#F4F6F2;"></span>#F4F6F2</div>
+      <div style="display:flex;align-items:center;gap:8px;background:#132D45;padding:8px 12px;border-radius:8px;"><span style="width:14px;height:14px;border-radius:4px;background:#FF5A1F;"></span>#FF5A1F</div>
+      <div style="display:flex;align-items:center;gap:8px;background:#132D45;padding:8px 12px;border-radius:8px;"><span style="width:14px;height:14px;border-radius:4px;background:#8FCDEB;"></span>#8FCDEB</div>
+      <div style="display:flex;align-items:center;gap:8px;background:#132D45;padding:8px 12px;border-radius:8px;"><span style="width:14px;height:14px;border-radius:4px;background:#BFE2F2;"></span>#BFE2F2</div>
+    </div>
+  </div>
+
+  <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#8FCDEB;margin-bottom:24px;">01 · Mobile — 390 × 844</div>
+
+  <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start;">
+
+    <!-- ===================== 1. HOME ===================== -->
+    <div data-screen-label="Home">
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:15px;margin-bottom:12px;color:#F4F6F2;">1 · Home</div>
+      <div style="width:390px;height:844px;border-radius:28px;overflow:hidden;background:#0C2136;border:1px solid rgba(244,246,242,.16);box-shadow:0 30px 60px rgba(0,0,0,.45);display:flex;flex-direction:column;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 22px 6px;font-family:'Space Mono',monospace;font-size:12px;color:#F4F6F2;"><span>9:41</span><span style="letter-spacing:.1em;">▮▮▮ ▲ ▮</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 20px 14px;">
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;letter-spacing:-.03em;color:#F4F6F2;">traelo<span style="color:#FF5A1F;">.</span></div>
+          <div style="display:flex;gap:14px;align-items:center;font-size:13px;color:#8FCDEB;font-family:'Space Mono',monospace;">
+            <span>buscar</span>
+            <span style="position:relative;">carrito<span style="position:absolute;top:-6px;right:-12px;background:#FF5A1F;color:#fff;font-size:10px;border-radius:999px;padding:1px 5px;">2</span></span>
+          </div>
+        </div>
+
+        <div style="padding:0 20px;">
+          <div style="border-radius:10px;background:linear-gradient(180deg,#132D45 0%,#0C2136 100%);border:1px solid rgba(143,205,235,.22);padding:24px 20px 20px;">
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:38px;line-height:1.02;letter-spacing:-.035em;color:#F4F6F2;">Lo viste en la fábrica.<br><span style="color:#FF5A1F;">Traelo.</span></div>
+            <div style="font-size:14px;line-height:1.5;color:#BFE2F2;margin-top:12px;max-width:290px;">Comprás directo de fábrica en China. Pagás en pesos, un solo precio, y te llega a la puerta.</div>
+            <svg width="330" height="86" viewBox="0 0 330 86" style="display:block;margin-top:18px;">
+              <circle cx="16" cy="60" r="6" fill="#8FCDEB"></circle>
+              <circle cx="16" cy="60" r="12" fill="#8FCDEB" style="animation:traelo-pulse 2.6s ease-in-out infinite;transform-origin:16px 60px;"></circle>
+              <path d="M16 60 C 90 6, 200 4, 300 42" fill="none" stroke="#FF5A1F" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 9" style="animation:traelo-dash 2.4s linear infinite;"></path>
+              <circle cx="303" cy="44" r="11" fill="none" stroke="#FF5A1F" stroke-width="3.5"></circle>
+              <text x="8" y="82" fill="#8FCDEB" font-family="Space Mono, monospace" font-size="11">SHANGHÁI</text>
+              <text x="258" y="78" fill="#FF5A1F" font-family="Space Mono, monospace" font-size="11">TU PUERTA</text>
+            </svg>
+          </div>
+        </div>
+
+        <div style="margin:16px 0 0;background:#FF5A1F;padding:11px 0;overflow:hidden;">
+          <div style="display:flex;gap:26px;padding:0 20px;font-family:'Space Mono',monospace;font-size:11.5px;color:#0C2136;font-weight:700;white-space:nowrap;letter-spacing:.02em;">
+            <span>50 KG POR BULTO</span><span>·</span><span>HASTA USD 3.000</span><span>·</span><span>PAGÁS EN PESOS</span><span>·</span><span>TRACKING</span>
+          </div>
+        </div>
+
+        <div style="flex:1;background:#F4F6F2;padding:20px;overflow:hidden;">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;">
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;color:#0C2136;letter-spacing:-.02em;">Recién embarcado</div>
+            <div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5A1F;">VER TODO →</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div style="background:#fff;border:1px solid rgba(12,33,54,.1);border-radius:10px;overflow:hidden;">
+              <div style="height:104px;background:#BFE2F2;display:flex;align-items:flex-end;justify-content:space-between;padding:8px;">
+                <span style="font-family:'Space Mono',monospace;font-size:9.5px;color:#0C2136;opacity:.55;">FOTO</span>
+                <span style="background:#FF5A1F;color:#fff;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 6px;border-radius:6px;">-42%</span>
+              </div>
+              <div style="padding:10px;">
+                <div style="font-family:'Space Mono',monospace;font-size:9.5px;color:#0C2136;opacity:.5;">SKU TRL-4471</div>
+                <div style="font-size:13px;font-weight:600;color:#0C2136;line-height:1.25;margin:4px 0 6px;text-wrap:pretty;">Auriculares TWS con estuche</div>
+                <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:21px;color:#0C2136;letter-spacing:-.02em;">$38.900</div>
+                <div style="font-family:'Space Mono',monospace;font-size:9.5px;color:#0C2136;opacity:.55;margin-top:3px;">⚓ ~60 DÍAS</div>
+              </div>
+            </div>
+            <div style="background:#fff;border:1px solid rgba(12,33,54,.1);border-radius:10px;overflow:hidden;">
+              <div style="height:104px;background:#8FCDEB;display:flex;align-items:flex-end;justify-content:space-between;padding:8px;">
+                <span style="font-family:'Space Mono',monospace;font-size:9.5px;color:#0C2136;opacity:.55;">FOTO</span>
+                <span style="background:#FF5A1F;color:#fff;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 6px;border-radius:6px;">-55%</span>
+              </div>
+              <div style="padding:10px;">
+                <div style="font-family:'Space Mono',monospace;font-size:9.5px;color:#0C2136;opacity:.5;">SKU TRL-2210</div>
+                <div style="font-size:13px;font-weight:600;color:#0C2136;line-height:1.25;margin:4px 0 6px;text-wrap:pretty;">Taladro percutor 750W</div>
+                <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:21px;color:#0C2136;letter-spacing:-.02em;">$74.500</div>
+                <div style="font-family:'Space Mono',monospace;font-size:9.5px;color:#0C2136;opacity:.55;margin-top:3px;">⚓ ~60 DÍAS</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-around;align-items:center;background:#0C2136;padding:14px 0 20px;font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.06em;">
+          <span style="color:#FF5A1F;">INICIO</span><span style="color:rgba(244,246,242,.5);">CATÁLOGO</span><span style="color:rgba(244,246,242,.5);">CARGA</span><span style="color:rgba(244,246,242,.5);">CUENTA</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== 2. CATÁLOGO ===================== -->
+    <div data-screen-label="Catálogo">
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:15px;margin-bottom:12px;color:#F4F6F2;">2 · Catálogo</div>
+      <div style="width:390px;height:844px;border-radius:28px;overflow:hidden;background:#F4F6F2;border:1px solid rgba(244,246,242,.16);box-shadow:0 30px 60px rgba(0,0,0,.45);display:flex;flex-direction:column;">
+        <div style="background:#0C2136;padding:14px 22px 6px;display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:12px;color:#F4F6F2;"><span>9:41</span><span style="letter-spacing:.1em;">▮▮▮ ▲ ▮</span></div>
+        <div style="background:#0C2136;padding:8px 20px 16px;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+            <span style="color:#F4F6F2;font-size:18px;">←</span>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;color:#F4F6F2;letter-spacing:-.025em;">Ferretería</div>
+          </div>
+          <div style="background:#132D45;border:1px solid rgba(143,205,235,.25);border-radius:8px;padding:11px 14px;font-family:'Space Mono',monospace;font-size:12px;color:rgba(244,246,242,.45);">Buscá lo que traés…</div>
+        </div>
+        <div style="background:#fff;border-bottom:1px solid rgba(12,33,54,.1);padding:12px 20px;display:flex;gap:8px;overflow:hidden;">
+          <span style="background:#0C2136;color:#F4F6F2;font-family:'Space Mono',monospace;font-size:11px;padding:7px 12px;border-radius:999px;white-space:nowrap;">TODO</span>
+          <span style="background:#fff;border:1px solid rgba(12,33,54,.18);color:#0C2136;font-family:'Space Mono',monospace;font-size:11px;padding:7px 12px;border-radius:999px;white-space:nowrap;">HERRAMIENTAS</span>
+          <span style="background:#fff;border:1px solid rgba(12,33,54,.18);color:#0C2136;font-family:'Space Mono',monospace;font-size:11px;padding:7px 12px;border-radius:999px;white-space:nowrap;">MEDICIÓN</span>
+        </div>
+        <div style="background:#fff;padding:12px 20px 14px;border-bottom:1px solid rgba(12,33,54,.1);">
+          <div style="display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:10.5px;color:#0C2136;opacity:.6;margin-bottom:8px;"><span>PRECIO FINAL</span><span>$0 — $150.000</span></div>
+          <div style="height:4px;background:rgba(12,33,54,.12);border-radius:999px;position:relative;">
+            <div style="position:absolute;left:8%;right:32%;top:0;bottom:0;background:#FF5A1F;border-radius:999px;"></div>
+            <div style="position:absolute;left:8%;top:-5px;width:14px;height:14px;border-radius:999px;background:#0C2136;border:3px solid #FF5A1F;margin-left:-7px;"></div>
+            <div style="position:absolute;left:68%;top:-5px;width:14px;height:14px;border-radius:999px;background:#0C2136;border:3px solid #FF5A1F;margin-left:-7px;"></div>
+          </div>
+        </div>
+
+        <div style="flex:1;padding:16px 20px;overflow:hidden;">
+          <div style="font-family:'Space Mono',monospace;font-size:10.5px;color:#0C2136;opacity:.55;margin-bottom:12px;">128 PRODUCTOS · ORDENADO POR AHORRO</div>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+
+            <div style="background:#fff;border:1px solid rgba(12,33,54,.1);border-radius:10px;padding:12px;display:flex;gap:12px;">
+              <div style="width:96px;height:96px;border-radius:8px;background:#BFE2F2;flex:none;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:10px;color:rgba(12,33,54,.5);">FOTO</div>
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span style="font-family:'Space Mono',monospace;font-size:10px;color:#0C2136;opacity:.5;">SKU TRL-2210</span>
+                  <span style="background:#FF5A1F;color:#fff;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 7px;border-radius:6px;">-55% vs. local</span>
+                </div>
+                <div style="font-size:14px;font-weight:600;color:#0C2136;margin:5px 0 6px;line-height:1.25;">Taladro percutor 750W con maletín</div>
+                <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;color:#0C2136;letter-spacing:-.025em;line-height:1;">$74.500</div>
+                <div style="font-size:11px;color:rgba(12,33,54,.6);margin-top:4px;">Precio final, con impuestos y flete</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+                  <span style="font-family:'Space Mono',monospace;font-size:10.5px;color:#0C2136;opacity:.65;">⚓ LLEGA EN ~60 DÍAS</span>
+                  <span style="background:#FF5A1F;color:#fff;font-family:Archivo,sans-serif;font-weight:700;font-size:13px;padding:9px 14px;border-radius:8px;">Traelo →</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid rgba(12,33,54,.1);border-radius:10px;padding:12px;display:flex;gap:12px;">
+              <div style="width:96px;height:96px;border-radius:8px;background:#8FCDEB;flex:none;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:10px;color:rgba(12,33,54,.5);">FOTO</div>
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span style="font-family:'Space Mono',monospace;font-size:10px;color:#0C2136;opacity:.5;">SKU TRL-8834</span>
+                  <span style="background:#FF5A1F;color:#fff;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 7px;border-radius:6px;">-38% vs. local</span>
+                </div>
+                <div style="font-size:14px;font-weight:600;color:#0C2136;margin:5px 0 6px;line-height:1.25;">Amoladora angular 4½" 900W</div>
+                <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;color:#0C2136;letter-spacing:-.025em;line-height:1;">$52.300</div>
+                <div style="font-size:11px;color:rgba(12,33,54,.6);margin-top:4px;">Precio final, con impuestos y flete</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+                  <span style="font-family:'Space Mono',monospace;font-size:10.5px;color:#0C2136;opacity:.65;">⚓ LLEGA EN ~60 DÍAS</span>
+                  <span style="background:#FF5A1F;color:#fff;font-family:Archivo,sans-serif;font-weight:700;font-size:13px;padding:9px 14px;border-radius:8px;">Traelo →</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid rgba(12,33,54,.1);border-radius:10px;padding:12px;display:flex;gap:12px;">
+              <div style="width:96px;height:96px;border-radius:8px;background:#BFE2F2;flex:none;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:10px;color:rgba(12,33,54,.5);">FOTO</div>
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span style="font-family:'Space Mono',monospace;font-size:10px;color:#0C2136;opacity:.5;">SKU TRL-1092</span>
+                  <span style="background:#FF5A1F;color:#fff;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 7px;border-radius:6px;">-61% vs. local</span>
+                </div>
+                <div style="font-size:14px;font-weight:600;color:#0C2136;margin:5px 0 6px;line-height:1.25;">Set 40 puntas + llave de torque</div>
+                <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;color:#0C2136;letter-spacing:-.025em;line-height:1;">$21.700</div>
+                <div style="font-size:11px;color:rgba(12,33,54,.6);margin-top:4px;">Precio final, con impuestos y flete</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== 3. DETALLE ===================== -->
+    <div data-screen-label="Detalle de producto">
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:15px;margin-bottom:12px;color:#F4F6F2;">3 · Detalle de producto</div>
+      <div style="width:390px;height:844px;border-radius:28px;overflow:hidden;background:#F4F6F2;border:1px solid rgba(244,246,242,.16);box-shadow:0 30px 60px rgba(0,0,0,.45);display:flex;flex-direction:column;">
+        <div style="background:#BFE2F2;height:280px;position:relative;display:flex;align-items:center;justify-content:center;">
+          <span style="font-family:'Space Mono',monospace;font-size:12px;color:rgba(12,33,54,.45);">GALERÍA · FOTO 1/6</span>
+          <div style="position:absolute;top:16px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="width:34px;height:34px;border-radius:8px;background:rgba(12,33,54,.85);color:#F4F6F2;display:flex;align-items:center;justify-content:center;font-size:15px;">←</span>
+            <span style="background:#FF5A1F;color:#fff;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:6px 10px;border-radius:8px;">-55% vs. local</span>
+          </div>
+          <div style="position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:center;gap:6px;">
+            <span style="width:22px;height:4px;border-radius:999px;background:#0C2136;"></span>
+            <span style="width:8px;height:4px;border-radius:999px;background:rgba(12,33,54,.3);"></span>
+            <span style="width:8px;height:4px;border-radius:999px;background:rgba(12,33,54,.3);"></span>
+            <span style="width:8px;height:4px;border-radius:999px;background:rgba(12,33,54,.3);"></span>
+          </div>
+        </div>
+
+        <div style="flex:1;padding:18px 20px 0;overflow:hidden;">
+          <div style="font-family:'Space Mono',monospace;font-size:10.5px;color:rgba(12,33,54,.5);">SKU TRL-2210 · GUANGDONG</div>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#0C2136;letter-spacing:-.03em;line-height:1.1;margin:6px 0 10px;text-wrap:pretty;">Taladro percutor 750W con maletín</div>
+
+          <div style="display:flex;gap:8px;margin-bottom:14px;">
+            <span style="border:2px solid #0C2136;color:#0C2136;font-family:'Space Mono',monospace;font-size:11px;padding:7px 12px;border-radius:8px;font-weight:700;">220V</span>
+            <span style="border:1px solid rgba(12,33,54,.2);color:rgba(12,33,54,.7);font-family:'Space Mono',monospace;font-size:11px;padding:7px 12px;border-radius:8px;">110V</span>
+            <span style="border:1px solid rgba(12,33,54,.2);color:rgba(12,33,54,.7);font-family:'Space Mono',monospace;font-size:11px;padding:7px 12px;border-radius:8px;">+ 20 pzas</span>
+          </div>
+
+          <div style="background:#0C2136;border-radius:10px;padding:16px;color:#F4F6F2;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+              <div>
+                <div style="font-family:'Space Mono',monospace;font-size:10.5px;color:#8FCDEB;letter-spacing:.1em;">PRECIO FINAL EN PESOS</div>
+                <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:40px;letter-spacing:-.03em;line-height:1.05;margin-top:4px;">$74.500</div>
+              </div>
+              <div style="font-family:'Space Mono',monospace;font-size:10.5px;color:#FF5A1F;text-align:right;line-height:1.5;">OCULTAR<br>DESGLOSE ▲</div>
+            </div>
+            <div style="margin-top:14px;border-top:1px dashed rgba(143,205,235,.35);padding-top:12px;display:flex;flex-direction:column;gap:8px;font-family:'Space Mono',monospace;font-size:12px;">
+              <div style="display:flex;justify-content:space-between;"><span style="color:#BFE2F2;">Producto (fábrica)</span><span>$31.200</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:#BFE2F2;">Flete marítimo</span><span>$12.900</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:#BFE2F2;">Impuestos y aduana</span><span>$22.600</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:#BFE2F2;">Servicio traelo.</span><span>$7.800</span></div>
+              <div style="display:flex;justify-content:space-between;border-top:1px solid rgba(143,205,235,.35);padding-top:9px;margin-top:2px;font-weight:700;"><span>Total</span><span style="color:#FF5A1F;">$74.500</span></div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:14px;">
+            <div style="flex:1;background:#fff;border:1px solid rgba(12,33,54,.12);border-radius:10px;padding:12px;">
+              <div style="font-family:'Space Mono',monospace;font-size:10px;color:rgba(12,33,54,.55);letter-spacing:.08em;">LLEGA ENTRE</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:17px;color:#0C2136;margin-top:4px;">2 y 16 de oct.</div>
+            </div>
+            <div style="flex:1;background:#fff;border:1px solid rgba(12,33,54,.12);border-radius:10px;padding:12px;">
+              <div style="font-family:'Space Mono',monospace;font-size:10px;color:rgba(12,33,54,.55);letter-spacing:.08em;">PESO DEL BULTO</div>
+              <div style="font-family:'Space Mono',monospace;font-weight:700;font-size:17px;color:#0C2136;margin-top:4px;">4,2 KG</div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;background:#BFE2F2;border-radius:10px;padding:12px 14px;font-size:12.5px;color:#0C2136;line-height:1.45;">
+            <strong>Viene por barco.</strong> Son ~60 días de espera y te avisamos cada movimiento por WhatsApp. Si tenés apuro, esto no es para vos.
+          </div>
+        </div>
+
+        <div style="background:#fff;border-top:1px solid rgba(12,33,54,.1);padding:14px 20px 24px;display:flex;gap:12px;align-items:center;">
+          <div style="display:flex;align-items:center;gap:12px;border:1px solid rgba(12,33,54,.2);border-radius:8px;padding:10px 12px;font-family:'Space Mono',monospace;font-size:14px;color:#0C2136;">−<span style="font-weight:700;">1</span>+</div>
+          <div style="flex:1;background:#FF5A1F;color:#fff;font-weight:700;font-size:17px;text-align:center;padding:16px;border-radius:10px;font-family:Archivo,sans-serif;">Traelo →</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== 4. CHECKOUT ===================== -->
+    <div data-screen-label="Checkout">
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:15px;margin-bottom:12px;color:#F4F6F2;">4 · Carrito y checkout</div>
+      <div style="width:390px;height:844px;border-radius:28px;overflow:hidden;background:#F4F6F2;border:1px solid rgba(244,246,242,.16);box-shadow:0 30px 60px rgba(0,0,0,.45);display:flex;flex-direction:column;">
+        <div style="background:#0C2136;padding:14px 22px 6px;display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:12px;color:#F4F6F2;"><span>9:41</span><span style="letter-spacing:.1em;">▮▮▮ ▲ ▮</span></div>
+        <div style="background:#0C2136;padding:10px 20px 18px;display:flex;align-items:center;gap:12px;">
+          <span style="color:#F4F6F2;font-size:18px;">←</span>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;color:#F4F6F2;letter-spacing:-.025em;">Tu carga</div>
+        </div>
+
+        <div style="flex:1;padding:16px 20px;overflow:hidden;">
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="background:#fff;border:1px solid rgba(12,33,54,.1);border-radius:10px;padding:12px;display:flex;gap:12px;align-items:center;">
+              <div style="width:64px;height:64px;border-radius:8px;background:#BFE2F2;flex:none;"></div>
+              <div style="flex:1;">
+                <div style="font-family:'Space Mono',monospace;font-size:9.5px;color:rgba(12,33,54,.5);">TRL-2210 · 220V · 4,2 KG</div>
+                <div style="font-size:13px;font-weight:600;color:#0C2136;margin:3px 0 4px;">Taladro percutor 750W</div>
+                <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;color:#0C2136;">$74.500</div>
+              </div>
+              <div style="font-family:'Space Mono',monospace;font-size:13px;color:#0C2136;">×1</div>
+            </div>
+            <div style="background:#fff;border:1px solid rgba(12,33,54,.1);border-radius:10px;padding:12px;display:flex;gap:12px;align-items:center;">
+              <div style="width:64px;height:64px;border-radius:8px;background:#8FCDEB;flex:none;"></div>
+              <div style="flex:1;">
+                <div style="font-family:'Space Mono',monospace;font-size:9.5px;color:rgba(12,33,54,.5);">TRL-4471 · NEGRO · 0,3 KG</div>
+                <div style="font-size:13px;font-weight:600;color:#0C2136;margin:3px 0 4px;">Auriculares TWS ×10</div>
+                <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;color:#0C2136;">$389.000</div>
+              </div>
+              <div style="font-family:'Space Mono',monospace;font-size:13px;color:#0C2136;">×10</div>
+            </div>
+          </div>
+
+          <div style="margin-top:18px;font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.12em;color:rgba(12,33,54,.55);">ENTREGA</div>
+          <div style="background:#fff;border:1px solid rgba(12,33,54,.12);border-radius:10px;padding:12px 14px;margin-top:8px;">
+            <div style="font-size:13px;font-weight:600;color:#0C2136;">Av. Corrientes 3421, 5º B</div>
+            <div style="font-size:12px;color:rgba(12,33,54,.6);margin-top:2px;">CABA · C1193 · Martín Duarte</div>
+          </div>
+
+          <div style="margin-top:18px;font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.12em;color:rgba(12,33,54,.55);">PAGO</div>
+          <div style="background:#fff;border:2px solid #FF5A1F;border-radius:10px;padding:14px;margin-top:8px;display:flex;align-items:center;gap:12px;">
+            <div style="width:38px;height:38px;border-radius:8px;background:#8FCDEB;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-weight:700;font-size:11px;color:#0C2136;">MP</div>
+            <div style="flex:1;">
+              <div style="font-size:13.5px;font-weight:700;color:#0C2136;">MercadoPago</div>
+              <div style="font-size:11.5px;color:rgba(12,33,54,.6);">Débito, crédito o dinero en cuenta</div>
+            </div>
+            <div style="width:20px;height:20px;border-radius:999px;background:#FF5A1F;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;">✓</div>
+          </div>
+
+          <div style="margin-top:16px;background:#0C2136;border-radius:10px;padding:16px;color:#F4F6F2;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+              <div>
+                <div style="font-family:'Space Mono',monospace;font-size:10.5px;color:#8FCDEB;letter-spacing:.1em;">TOTAL A PAGAR HOY</div>
+                <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:36px;letter-spacing:-.03em;margin-top:4px;">$463.500</div>
+              </div>
+              <div style="font-family:'Space Mono',monospace;font-size:10px;color:#BFE2F2;text-align:right;line-height:1.5;">2 BULTOS<br>7,2 KG</div>
+            </div>
+            <div style="font-size:11.5px;color:#BFE2F2;margin-top:8px;">Un solo precio. Nada extra al recibir.</div>
+          </div>
+        </div>
+
+        <div style="background:#fff;border-top:1px solid rgba(12,33,54,.1);padding:14px 20px 24px;">
+          <div style="display:flex;gap:10px;align-items:flex-start;background:#BFE2F2;border-radius:10px;padding:11px 12px;margin-bottom:12px;">
+            <span style="font-size:14px;">⚓</span>
+            <div style="font-size:12px;color:#0C2136;line-height:1.4;">Confirmando aceptás que la carga viaja por barco: <strong>llega entre el 2 y el 16 de octubre</strong>. No hay envío exprés.</div>
+          </div>
+          <div style="background:#FF5A1F;color:#fff;font-weight:700;font-size:17px;text-align:center;padding:16px;border-radius:10px;">Pagar y zarpar →</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== 5. TRACKING ===================== -->
+    <div data-screen-label="Tracking">
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:15px;margin-bottom:12px;color:#F4F6F2;">5 · Seguí tu carga</div>
+      <div style="width:390px;height:844px;border-radius:28px;overflow:hidden;background:#0C2136;border:1px solid rgba(244,246,242,.16);box-shadow:0 30px 60px rgba(0,0,0,.45);display:flex;flex-direction:column;">
+        <div style="padding:14px 22px 6px;display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:12px;color:#F4F6F2;"><span>9:41</span><span style="letter-spacing:.1em;">▮▮▮ ▲ ▮</span></div>
+        <div style="padding:10px 20px 0;display:flex;align-items:center;gap:12px;">
+          <span style="color:#F4F6F2;font-size:18px;">←</span>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;color:#F4F6F2;letter-spacing:-.025em;">Seguí tu carga</div>
+        </div>
+
+        <div style="padding:18px 20px 0;">
+          <div style="border:1px solid rgba(143,205,235,.3);border-radius:10px;padding:16px;background:#132D45;">
+            <div style="font-family:'Space Mono',monospace;font-size:10.5px;color:#8FCDEB;letter-spacing:.14em;">CÓDIGO DE CARGA</div>
+            <div style="font-family:'Space Mono',monospace;font-weight:700;font-size:24px;color:#F4F6F2;letter-spacing:.02em;margin-top:6px;">TRL-2026-00147</div>
+            <div style="display:flex;gap:20px;margin-top:14px;font-family:'Space Mono',monospace;font-size:11px;color:#BFE2F2;">
+              <span>2 BULTOS</span><span>7,2 KG</span><span>MSC ANNA / V.214</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding:22px 20px 0;">
+          <div style="font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:#8FCDEB;margin-bottom:18px;">ESTADO 4 DE 6 · EMBARCADA</div>
+          <div style="position:relative;">
+            <div style="position:absolute;top:9px;left:10px;right:10px;height:2px;background:rgba(143,205,235,.25);"></div>
+            <div style="position:absolute;top:9px;left:10px;width:52%;height:2px;background:#FF5A1F;"></div>
+            <div style="position:relative;display:flex;justify-content:space-between;">
+              <div style="width:44px;text-align:center;"><div style="width:20px;height:20px;border-radius:999px;background:#FF5A1F;margin:0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;">✓</div><div style="font-family:'Space Mono',monospace;font-size:9px;color:#F4F6F2;margin-top:8px;line-height:1.3;">PAGADA</div></div>
+              <div style="width:44px;text-align:center;"><div style="width:20px;height:20px;border-radius:999px;background:#FF5A1F;margin:0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;">✓</div><div style="font-family:'Space Mono',monospace;font-size:9px;color:#F4F6F2;margin-top:8px;line-height:1.3;">COMPRADA</div></div>
+              <div style="width:44px;text-align:center;"><div style="width:20px;height:20px;border-radius:999px;background:#FF5A1F;margin:0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;">✓</div><div style="font-family:'Space Mono',monospace;font-size:9px;color:#F4F6F2;margin-top:8px;line-height:1.3;">EN<br>DEPÓSITO</div></div>
+              <div style="width:44px;text-align:center;"><div style="width:20px;height:20px;border-radius:999px;background:#0C2136;border:3px solid #FF5A1F;margin:0 auto;"></div><div style="font-family:'Space Mono',monospace;font-size:9px;color:#FF5A1F;font-weight:700;margin-top:8px;line-height:1.3;">EMBAR-<br>CADA</div></div>
+              <div style="width:44px;text-align:center;"><div style="width:20px;height:20px;border-radius:999px;background:#0C2136;border:2px solid rgba(143,205,235,.4);margin:0 auto;"></div><div style="font-family:'Space Mono',monospace;font-size:9px;color:rgba(244,246,242,.45);margin-top:8px;line-height:1.3;">EN<br>ADUANA</div></div>
+              <div style="width:44px;text-align:center;"><div style="width:20px;height:20px;border-radius:999px;background:#0C2136;border:2px solid rgba(143,205,235,.4);margin:0 auto;"></div><div style="font-family:'Space Mono',monospace;font-size:9px;color:rgba(244,246,242,.45);margin-top:8px;line-height:1.3;">EN TU<br>PUERTA</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding:24px 20px 0;">
+          <svg width="330" height="70" viewBox="0 0 330 70" style="display:block;">
+            <circle cx="12" cy="46" r="5" fill="#8FCDEB"></circle>
+            <path d="M12 46 C 80 6, 170 8, 300 34" fill="none" stroke="#FF5A1F" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 9" style="animation:traelo-dash 2.4s linear infinite;"></path>
+            <circle cx="303" cy="35" r="9" fill="none" stroke="rgba(255,90,31,.45)" stroke-width="3"></circle>
+            <circle cx="152" cy="16" r="6" fill="#FF5A1F"></circle>
+            <text x="118" y="8" fill="#F4F6F2" font-family="Space Mono, monospace" font-size="10">EN TRÁNSITO</text>
+            <text x="4" y="66" fill="#8FCDEB" font-family="Space Mono, monospace" font-size="10">YANTIAN</text>
+            <text x="252" y="60" fill="rgba(244,246,242,.5)" font-family="Space Mono, monospace" font-size="10">BS. AS.</text>
+          </svg>
+        </div>
+
+        <div style="flex:1;padding:8px 20px 0;overflow:hidden;">
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;gap:12px;">
+              <div style="font-family:'Space Mono',monospace;font-size:10.5px;color:#8FCDEB;width:64px;flex:none;padding-top:2px;">14 AGO</div>
+              <div><div style="font-size:13.5px;font-weight:600;color:#F4F6F2;">Zarpó de Yantian</div><div style="font-size:12px;color:rgba(191,226,242,.75);margin-top:2px;">Buque MSC Anna · ETA Buenos Aires 2 de oct.</div></div>
+            </div>
+            <div style="display:flex;gap:12px;">
+              <div style="font-family:'Space Mono',monospace;font-size:10.5px;color:rgba(143,205,235,.6);width:64px;flex:none;padding-top:2px;">06 AGO</div>
+              <div><div style="font-size:13.5px;font-weight:600;color:rgba(244,246,242,.8);">Consolidada en depósito</div><div style="font-size:12px;color:rgba(191,226,242,.55);margin-top:2px;">Shenzhen · 2 bultos · 7,2 kg</div></div>
+            </div>
+          </div>
+          <div style="margin-top:16px;background:#132D45;border:1px dashed rgba(143,205,235,.35);border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;">
+            <span style="font-size:14px;">💬</span>
+            <div style="font-size:12px;color:#BFE2F2;line-height:1.45;">Cada cambio de estado te llega por <strong style="color:#F4F6F2;">WhatsApp</strong> al 11 5·· ··47. Tu carga, a la vista siempre.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-around;align-items:center;padding:14px 0 20px;font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.06em;border-top:1px solid rgba(244,246,242,.1);">
+          <span style="color:rgba(244,246,242,.5);">INICIO</span><span style="color:rgba(244,246,242,.5);">CATÁLOGO</span><span style="color:#FF5A1F;">CARGA</span><span style="color:rgba(244,246,242,.5);">CUENTA</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== 6. CUENTA ===================== -->
+    <div data-screen-label="Mi cuenta">
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:15px;margin-bottom:12px;color:#F4F6F2;">6 · Mi cuenta</div>
+      <div style="width:390px;height:844px;border-radius:28px;overflow:hidden;background:#F4F6F2;border:1px solid rgba(244,246,242,.16);box-shadow:0 30px 60px rgba(0,0,0,.45);display:flex;flex-direction:column;">
+        <div style="background:#0C2136;padding:14px 22px 6px;display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:12px;color:#F4F6F2;"><span>9:41</span><span style="letter-spacing:.1em;">▮▮▮ ▲ ▮</span></div>
+        <div style="background:#0C2136;padding:10px 20px 20px;">
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:#F4F6F2;letter-spacing:-.03em;">Hola, Valentín</div>
+          <div style="font-family:'Space Mono',monospace;font-size:11px;color:#8FCDEB;margin-top:4px;">CLIENTE DESDE 2025 · 14 CARGAS TRAÍDAS</div>
+          <div style="margin-top:16px;background:#FF5A1F;border-radius:10px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-family:'Space Mono',monospace;font-size:10px;color:rgba(12,33,54,.75);letter-spacing:.12em;">WALLET · SALDO EN PESOS</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;color:#fff;letter-spacing:-.02em;margin-top:2px;">$18.240</div>
+            </div>
+            <div style="font-family:'Space Mono',monospace;font-size:10px;color:#fff;text-align:right;line-height:1.5;">REEMBOLSOS Y<br>DIFERENCIAS →</div>
+          </div>
+        </div>
+
+        <div style="flex:1;padding:18px 20px;overflow:hidden;">
+          <div style="font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:rgba(12,33,54,.55);margin-bottom:10px;">EN VIAJE · 2</div>
+
+          <div style="background:#fff;border:1px solid rgba(12,33,54,.1);border-radius:10px;padding:14px;margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;color:#0C2136;">TRL-2026-00147</span>
+              <span style="font-family:'Space Mono',monospace;font-size:10px;color:#FF5A1F;">EMBARCADA</span>
+            </div>
+            <div style="font-size:12.5px;color:rgba(12,33,54,.7);margin:6px 0 12px;">2 productos · 7,2 kg · llega ~2 de oct.</div>
+            <div style="position:relative;height:14px;">
+              <div style="position:absolute;top:5px;left:0;right:0;height:2px;background:rgba(12,33,54,.15);"></div>
+              <div style="position:absolute;top:5px;left:0;width:58%;height:2px;background:#FF5A1F;"></div>
+              <div style="position:relative;display:flex;justify-content:space-between;">
+                <span style="width:12px;height:12px;border-radius:999px;background:#FF5A1F;"></span>
+                <span style="width:12px;height:12px;border-radius:999px;background:#FF5A1F;"></span>
+                <span style="width:12px;height:12px;border-radius:999px;background:#FF5A1F;"></span>
+                <span style="width:12px;height:12px;border-radius:999px;background:#F4F6F2;border:3px solid #FF5A1F;"></span>
+                <span style="width:12px;height:12px;border-radius:999px;background:rgba(12,33,54,.18);"></span>
+                <span style="width:12px;height:12px;border-radius:999px;background:rgba(12,33,54,.18);"></span>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid rgba(12,33,54,.1);border-radius:10px;padding:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-family:'Space Mono',monospace;font-size:11.5px;font-weight:700;color:#0C2136;">TRL-2026-00133</span>
+              <span style="font-family:'Space Mono',monospace;font-size:10px;color:#FF5A1F;">EN ADUANA</span>
+            </div>
+            <div style="font-size:12.5px;color:rgba(12,33,54,.7);margin:6px 0 12px;">1 producto · 22 kg · llega ~19 de ago.</div>
+            <div style="position:relative;height:14px;">
+              <div style="position:absolute;top:5px;left:0;right:0;height:2px;background:rgba(12,33,54,.15);"></div>
+              <div style="position:absolute;top:5px;left:0;width:80%;height:2px;background:#FF5A1F;"></div>
+              <div style="position:relative;display:flex;justify-content:space-between;">
+                <span style="width:12px;height:12px;border-radius:999px;background:#FF5A1F;"></span>
+                <span style="width:12px;height:12px;border-radius:999px;background:#FF5A1F;"></span>
+                <span style="width:12px;height:12px;border-radius:999px;background:#FF5A1F;"></span>
+                <span style="width:12px;height:12px;border-radius:999px;background:#FF5A1F;"></span>
+                <span style="width:12px;height:12px;border-radius:999px;background:#F4F6F2;border:3px solid #FF5A1F;"></span>
+                <span style="width:12px;height:12px;border-radius:999px;background:rgba(12,33,54,.18);"></span>
+              </div>
+            </div>
+          </div>
+
+          <div style="font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:rgba(12,33,54,.55);margin:20px 0 10px;">HISTORIAL</div>
+          <div style="background:#fff;border:1px solid rgba(12,33,54,.1);border-radius:10px;">
+            <div style="padding:13px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(12,33,54,.08);">
+              <div><div style="font-family:'Space Mono',monospace;font-size:11.5px;color:#0C2136;">TRL-2025-00981</div><div style="font-size:11.5px;color:rgba(12,33,54,.55);margin-top:2px;">Entregada · 12 jun.</div></div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:15px;color:#0C2136;">$212.400</div>
+            </div>
+            <div style="padding:13px 14px;display:flex;justify-content:space-between;align-items:center;">
+              <div><div style="font-family:'Space Mono',monospace;font-size:11.5px;color:#0C2136;">TRL-2025-00874</div><div style="font-size:11.5px;color:rgba(12,33,54,.55);margin-top:2px;">Entregada · 3 abr.</div></div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:15px;color:#0C2136;">$98.700</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-around;align-items:center;background:#0C2136;padding:14px 0 20px;font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.06em;">
+          <span style="color:rgba(244,246,242,.5);">INICIO</span><span style="color:rgba(244,246,242,.5);">CATÁLOGO</span><span style="color:rgba(244,246,242,.5);">CARGA</span><span style="color:#FF5A1F;">CUENTA</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== DESKTOP ===================== -->
+  <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#8FCDEB;margin:88px 0 24px;">02 · Desktop — 1440</div>
+
+  <div style="display:flex;flex-direction:column;gap:40px;">
+
+    <div data-screen-label="Desktop home" style="width:1440px;border-radius:12px;overflow:hidden;border:1px solid rgba(244,246,242,.16);box-shadow:0 30px 60px rgba(0,0,0,.45);">
+      <div style="background:#0C2136;padding:22px 56px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:44px;">
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;color:#F4F6F2;letter-spacing:-.03em;">traelo<span style="color:#FF5A1F;">.</span></div>
+          <div style="display:flex;gap:28px;font-size:14px;color:rgba(244,246,242,.8);">
+            <span>Catálogo</span><span>Cómo funciona</span><span>Para tu negocio</span><span>Seguí tu carga</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:20px;">
+          <div style="background:#132D45;border:1px solid rgba(143,205,235,.25);border-radius:8px;padding:9px 90px 9px 14px;font-family:'Space Mono',monospace;font-size:12px;color:rgba(244,246,242,.45);">Buscá lo que traés…</div>
+          <span style="font-family:'Space Mono',monospace;font-size:12px;color:#8FCDEB;">CARRITO (2)</span>
+          <span style="background:#FF5A1F;color:#fff;font-weight:700;font-size:13px;padding:9px 16px;border-radius:8px;">Ingresar</span>
+        </div>
+      </div>
+
+      <div style="background:#0C2136;padding:64px 56px 0;display:flex;gap:56px;align-items:center;">
+        <div style="flex:1;">
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:80px;line-height:.98;letter-spacing:-.04em;color:#F4F6F2;">Lo viste en la fábrica.<br><span style="color:#FF5A1F;">Traelo.</span></div>
+          <div style="font-size:19px;line-height:1.5;color:#BFE2F2;margin-top:22px;max-width:520px;text-wrap:pretty;">Comprás directo de fábricas chinas desde el catálogo. Un solo precio final en pesos —producto, flete marítimo e impuestos incluidos— y te lo dejamos en la puerta.</div>
+          <div style="display:flex;gap:14px;margin-top:32px;">
+            <span style="background:#FF5A1F;color:#fff;font-weight:700;font-size:16px;padding:16px 28px;border-radius:10px;">Ver catálogo →</span>
+            <span style="border:1px solid rgba(143,205,235,.45);color:#F4F6F2;font-weight:600;font-size:16px;padding:16px 28px;border-radius:10px;">Cómo funciona</span>
+          </div>
+        </div>
+        <div style="flex:1;">
+          <svg width="620" height="240" viewBox="0 0 620 240" style="display:block;">
+            <circle cx="40" cy="180" r="9" fill="#8FCDEB"></circle>
+            <circle cx="40" cy="180" r="20" fill="#8FCDEB" style="animation:traelo-pulse 2.6s ease-in-out infinite;transform-origin:40px 180px;"></circle>
+            <path d="M40 180 C 180 40, 380 20, 560 96" fill="none" stroke="#FF5A1F" stroke-width="4" stroke-linecap="round" stroke-dasharray="6 13" style="animation:traelo-dash 2.4s linear infinite;"></path>
+            <circle cx="566" cy="99" r="22" fill="none" stroke="#FF5A1F" stroke-width="5"></circle>
+            <text x="20" y="216" fill="#8FCDEB" font-family="Space Mono, monospace" font-size="14" letter-spacing="2">SHANGHÁI</text>
+            <text x="478" y="150" fill="#FF5A1F" font-family="Space Mono, monospace" font-size="14" letter-spacing="2">TU PUERTA</text>
+          </svg>
+        </div>
+      </div>
+
+      <div style="background:#FF5A1F;margin-top:48px;padding:16px 56px;display:flex;gap:48px;font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:#0C2136;">
+        <span>50 KG POR BULTO</span><span>·</span><span>HASTA USD 3.000</span><span>·</span><span>PAGÁS EN PESOS</span><span>·</span><span>TRACKING PUERTO A PUERTA</span>
+      </div>
+
+      <div style="background:#F4F6F2;padding:56px;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:28px;">
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:40px;color:#0C2136;letter-spacing:-.03em;">Recién embarcado</div>
+          <div style="font-family:'Space Mono',monospace;font-size:13px;color:#FF5A1F;">VER LOS 128 PRODUCTOS →</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;">
+
+          <div style="background:#fff;border:1px solid rgba(12,33,54,.1);border-radius:10px;overflow:hidden;">
+            <div style="height:180px;background:#BFE2F2;position:relative;"><span style="position:absolute;top:12px;right:12px;background:#FF5A1F;color:#fff;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;">-42% vs. local</span></div>
+            <div style="padding:16px;">
+              <div style="font-family:'Space Mono',monospace;font-size:11px;color:rgba(12,33,54,.5);">SKU TRL-4471</div>
+              <div style="font-size:15px;font-weight:600;color:#0C2136;margin:6px 0 10px;line-height:1.3;">Auriculares TWS con estuche de carga</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px;color:#0C2136;letter-spacing:-.03em;line-height:1;">$38.900</div>
+              <div style="font-size:12px;color:rgba(12,33,54,.6);margin-top:5px;">Precio final, con impuestos y flete</div>
+              <div style="font-family:'Space Mono',monospace;font-size:11px;color:rgba(12,33,54,.65);margin-top:12px;">⚓ LLEGA EN ~60 DÍAS</div>
+              <div style="background:#FF5A1F;color:#fff;font-weight:700;font-size:15px;text-align:center;padding:13px;border-radius:8px;margin-top:14px;">Traelo →</div>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid rgba(12,33,54,.1);border-radius:10px;overflow:hidden;">
+            <div style="height:180px;background:#8FCDEB;position:relative;"><span style="position:absolute;top:12px;right:12px;background:#FF5A1F;color:#fff;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;">-55% vs. local</span></div>
+            <div style="padding:16px;">
+              <div style="font-family:'Space Mono',monospace;font-size:11px;color:rgba(12,33,54,.5);">SKU TRL-2210</div>
+              <div style="font-size:15px;font-weight:600;color:#0C2136;margin:6px 0 10px;line-height:1.3;">Taladro percutor 750W con maletín</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px;color:#0C2136;letter-spacing:-.03em;line-height:1;">$74.500</div>
+              <div style="font-size:12px;color:rgba(12,33,54,.6);margin-top:5px;">Precio final, con impuestos y flete</div>
+              <div style="font-family:'Space Mono',monospace;font-size:11px;color:rgba(12,33,54,.65);margin-top:12px;">⚓ LLEGA EN ~60 DÍAS</div>
+              <div style="background:#FF5A1F;color:#fff;font-weight:700;font-size:15px;text-align:center;padding:13px;border-radius:8px;margin-top:14px;">Traelo →</div>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid rgba(12,33,54,.1);border-radius:10px;overflow:hidden;">
+            <div style="height:180px;background:#BFE2F2;position:relative;"><span style="position:absolute;top:12px;right:12px;background:#FF5A1F;color:#fff;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;">-61% vs. local</span></div>
+            <div style="padding:16px;">
+              <div style="font-family:'Space Mono',monospace;font-size:11px;color:rgba(12,33,54,.5);">SKU TRL-1092</div>
+              <div style="font-size:15px;font-weight:600;color:#0C2136;margin:6px 0 10px;line-height:1.3;">Set 40 puntas + llave de torque</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px;color:#0C2136;letter-spacing:-.03em;line-height:1;">$21.700</div>
+              <div style="font-size:12px;color:rgba(12,33,54,.6);margin-top:5px;">Precio final, con impuestos y flete</div>
+              <div style="font-family:'Space Mono',monospace;font-size:11px;color:rgba(12,33,54,.65);margin-top:12px;">⚓ LLEGA EN ~60 DÍAS</div>
+              <div style="background:#FF5A1F;color:#fff;font-weight:700;font-size:15px;text-align:center;padding:13px;border-radius:8px;margin-top:14px;">Traelo →</div>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid rgba(12,33,54,.1);border-radius:10px;overflow:hidden;">
+            <div style="height:180px;background:#8FCDEB;position:relative;"><span style="position:absolute;top:12px;right:12px;background:#FF5A1F;color:#fff;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;">-47% vs. local</span></div>
+            <div style="padding:16px;">
+              <div style="font-family:'Space Mono',monospace;font-size:11px;color:rgba(12,33,54,.5);">SKU TRL-6620</div>
+              <div style="font-size:15px;font-weight:600;color:#0C2136;margin:6px 0 10px;line-height:1.3;">Balanza digital para comercio 40 kg</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px;color:#0C2136;letter-spacing:-.03em;line-height:1;">$44.200</div>
+              <div style="font-size:12px;color:rgba(12,33,54,.6);margin-top:5px;">Precio final, con impuestos y flete</div>
+              <div style="font-family:'Space Mono',monospace;font-size:11px;color:rgba(12,33,54,.65);margin-top:12px;">⚓ LLEGA EN ~60 DÍAS</div>
+              <div style="background:#FF5A1F;color:#fff;font-weight:700;font-size:15px;text-align:center;padding:13px;border-radius:8px;margin-top:14px;">Traelo →</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div data-screen-label="Desktop tracking" style="width:1440px;border-radius:12px;overflow:hidden;border:1px solid rgba(244,246,242,.16);box-shadow:0 30px 60px rgba(0,0,0,.45);background:#0C2136;padding:0 0 56px;">
+      <div style="padding:22px 56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(244,246,242,.1);">
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;color:#F4F6F2;letter-spacing:-.03em;">traelo<span style="color:#FF5A1F;">.</span></div>
+        <div style="font-family:'Space Mono',monospace;font-size:12px;color:#8FCDEB;">MARTÍN D. · WALLET $18.240</div>
+      </div>
+      <div style="padding:48px 56px 0;display:flex;gap:56px;align-items:flex-end;justify-content:space-between;">
+        <div>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:52px;color:#F4F6F2;letter-spacing:-.035em;line-height:1;">Seguí tu carga</div>
+          <div style="font-size:17px;color:#BFE2F2;margin-top:12px;">Tu carga, a la vista siempre.</div>
+        </div>
+        <div style="background:#132D45;border:1px solid rgba(143,205,235,.3);border-radius:10px;padding:18px 24px;">
+          <div style="font-family:'Space Mono',monospace;font-size:11px;color:#8FCDEB;letter-spacing:.14em;">CÓDIGO DE CARGA</div>
+          <div style="font-family:'Space Mono',monospace;font-weight:700;font-size:26px;color:#F4F6F2;margin-top:6px;">TRL-2026-00147</div>
+          <div style="display:flex;gap:24px;margin-top:12px;font-family:'Space Mono',monospace;font-size:12px;color:#BFE2F2;"><span>2 BULTOS</span><span>7,2 KG</span><span>MSC ANNA / V.214</span></div>
+        </div>
+      </div>
+
+      <div style="padding:56px 56px 0;">
+        <div style="position:relative;">
+          <div style="position:absolute;top:15px;left:60px;right:60px;height:3px;background:rgba(143,205,235,.25);"></div>
+          <div style="position:absolute;top:15px;left:60px;width:52%;height:3px;background:#FF5A1F;"></div>
+          <div style="position:relative;display:flex;justify-content:space-between;">
+            <div style="width:120px;text-align:center;"><div style="width:32px;height:32px;border-radius:999px;background:#FF5A1F;margin:0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;">✓</div><div style="font-family:'Space Mono',monospace;font-size:12px;color:#F4F6F2;margin-top:12px;">PAGADA</div><div style="font-family:'Space Mono',monospace;font-size:11px;color:rgba(143,205,235,.7);margin-top:4px;">28 JUL</div></div>
+            <div style="width:120px;text-align:center;"><div style="width:32px;height:32px;border-radius:999px;background:#FF5A1F;margin:0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;">✓</div><div style="font-family:'Space Mono',monospace;font-size:12px;color:#F4F6F2;margin-top:12px;">COMPRADA</div><div style="font-family:'Space Mono',monospace;font-size:11px;color:rgba(143,205,235,.7);margin-top:4px;">31 JUL</div></div>
+            <div style="width:120px;text-align:center;"><div style="width:32px;height:32px;border-radius:999px;background:#FF5A1F;margin:0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;">✓</div><div style="font-family:'Space Mono',monospace;font-size:12px;color:#F4F6F2;margin-top:12px;">EN DEPÓSITO</div><div style="font-family:'Space Mono',monospace;font-size:11px;color:rgba(143,205,235,.7);margin-top:4px;">06 AGO</div></div>
+            <div style="width:120px;text-align:center;"><div style="width:32px;height:32px;border-radius:999px;background:#0C2136;border:5px solid #FF5A1F;margin:0 auto;"></div><div style="font-family:'Space Mono',monospace;font-size:12px;color:#FF5A1F;font-weight:700;margin-top:12px;">EMBARCADA</div><div style="font-family:'Space Mono',monospace;font-size:11px;color:#FF5A1F;margin-top:4px;">14 AGO</div></div>
+            <div style="width:120px;text-align:center;"><div style="width:32px;height:32px;border-radius:999px;background:#0C2136;border:2px solid rgba(143,205,235,.4);margin:0 auto;"></div><div style="font-family:'Space Mono',monospace;font-size:12px;color:rgba(244,246,242,.45);margin-top:12px;">EN ADUANA</div><div style="font-family:'Space Mono',monospace;font-size:11px;color:rgba(143,205,235,.45);margin-top:4px;">~02 OCT</div></div>
+            <div style="width:120px;text-align:center;"><div style="width:32px;height:32px;border-radius:999px;background:#0C2136;border:2px solid rgba(143,205,235,.4);margin:0 auto;"></div><div style="font-family:'Space Mono',monospace;font-size:12px;color:rgba(244,246,242,.45);margin-top:12px;">EN TU PUERTA</div><div style="font-family:'Space Mono',monospace;font-size:11px;color:rgba(143,205,235,.45);margin-top:4px;">~09 OCT</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:56px 56px 0;display:grid;grid-template-columns:1.4fr 1fr;gap:32px;align-items:start;">
+        <div style="background:#132D45;border-radius:10px;padding:28px 32px;">
+          <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;color:#8FCDEB;margin-bottom:20px;">BITÁCORA</div>
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;gap:20px;"><div style="font-family:'Space Mono',monospace;font-size:12px;color:#8FCDEB;width:80px;flex:none;">14 AGO</div><div><div style="font-size:16px;font-weight:600;color:#F4F6F2;">Zarpó de Yantian</div><div style="font-size:14px;color:rgba(191,226,242,.75);margin-top:3px;">Buque MSC Anna · ETA Buenos Aires 2 de oct.</div></div></div>
+            <div style="display:flex;gap:20px;"><div style="font-family:'Space Mono',monospace;font-size:12px;color:rgba(143,205,235,.6);width:80px;flex:none;">06 AGO</div><div><div style="font-size:16px;font-weight:600;color:rgba(244,246,242,.85);">Consolidada en depósito</div><div style="font-size:14px;color:rgba(191,226,242,.55);margin-top:3px;">Shenzhen · 2 bultos · 7,2 kg</div></div></div>
+            <div style="display:flex;gap:20px;"><div style="font-family:'Space Mono',monospace;font-size:12px;color:rgba(143,205,235,.6);width:80px;flex:none;">31 JUL</div><div><div style="font-size:16px;font-weight:600;color:rgba(244,246,242,.85);">Compra confirmada en fábrica</div><div style="font-size:14px;color:rgba(191,226,242,.55);margin-top:3px;">Guangdong · orden PO-88421</div></div></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <svg width="480" height="150" viewBox="0 0 480 150" style="display:block;">
+            <circle cx="24" cy="110" r="7" fill="#8FCDEB"></circle>
+            <path d="M24 110 C 140 24, 300 20, 440 70" fill="none" stroke="#FF5A1F" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="5 11" style="animation:traelo-dash 2.4s linear infinite;"></path>
+            <circle cx="444" cy="71" r="14" fill="none" stroke="rgba(255,90,31,.45)" stroke-width="4"></circle>
+            <circle cx="222" cy="36" r="8" fill="#FF5A1F"></circle>
+            <text x="178" y="24" fill="#F4F6F2" font-family="Space Mono, monospace" font-size="12">EN TRÁNSITO</text>
+            <text x="6" y="136" fill="#8FCDEB" font-family="Space Mono, monospace" font-size="12">YANTIAN</text>
+            <text x="392" y="106" fill="rgba(244,246,242,.5)" font-family="Space Mono, monospace" font-size="12">BS. AS.</text>
+          </svg>
+          <div style="background:#132D45;border:1px dashed rgba(143,205,235,.35);border-radius:10px;padding:18px 20px;display:flex;gap:12px;">
+            <span style="font-size:16px;">💬</span>
+            <div style="font-size:14px;color:#BFE2F2;line-height:1.5;">Cada cambio de estado te llega por <strong style="color:#F4F6F2;">WhatsApp</strong>. No hace falta que entres a mirar.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== SISTEMA ===================== -->
+  <sc-if value="{{ showSystem }}" hint-placeholder-val="{{ true }}">
+  <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#8FCDEB;margin:88px 0 24px;">03 · Componentes y estados</div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1440px;">
+
+    <div style="background:#F4F6F2;border-radius:12px;padding:28px;">
+      <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;color:rgba(12,33,54,.5);margin-bottom:18px;">BOTONES</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="background:#FF5A1F;color:#fff;font-weight:700;font-size:16px;text-align:center;padding:15px;border-radius:10px;">Traelo →</div>
+        <div style="background:#0C2136;color:#F4F6F2;font-weight:700;font-size:16px;text-align:center;padding:15px;border-radius:10px;">Ver catálogo</div>
+        <div style="border:1px solid rgba(12,33,54,.25);color:#0C2136;font-weight:600;font-size:16px;text-align:center;padding:15px;border-radius:10px;">Secundario</div>
+        <div style="background:rgba(12,33,54,.12);color:rgba(12,33,54,.4);font-weight:700;font-size:16px;text-align:center;padding:15px;border-radius:10px;">Sin stock</div>
+      </div>
+      <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;color:rgba(12,33,54,.5);margin:26px 0 14px;">CHIPS</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <span style="background:#FF5A1F;color:#fff;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:5px 10px;border-radius:6px;">-55% vs. local</span>
+        <span style="background:#BFE2F2;color:#0C2136;font-family:'Space Mono',monospace;font-size:11px;padding:5px 10px;border-radius:6px;">⚓ ~60 DÍAS</span>
+        <span style="background:#0C2136;color:#F4F6F2;font-family:'Space Mono',monospace;font-size:11px;padding:5px 10px;border-radius:999px;">CATEGORÍA</span>
+        <span style="border:1px solid rgba(12,33,54,.25);color:#0C2136;font-family:'Space Mono',monospace;font-size:11px;padding:5px 10px;border-radius:999px;">FILTRO</span>
+      </div>
+      <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;color:rgba(12,33,54,.5);margin:26px 0 14px;">INPUTS</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="background:#fff;border:1px solid rgba(12,33,54,.2);border-radius:8px;padding:13px 14px;font-size:14px;color:rgba(12,33,54,.4);">Buscá lo que traés…</div>
+        <div style="background:#fff;border:2px solid #FF5A1F;border-radius:8px;padding:13px 14px;font-size:14px;color:#0C2136;">Av. Corrientes 3421<span style="color:#FF5A1F;">|</span></div>
+        <div style="background:#fff;border:1px solid #FF5A1F;border-radius:8px;padding:13px 14px;font-size:14px;color:#0C2136;">CP inválido</div>
+      </div>
+    </div>
+
+    <div style="background:#132D45;border-radius:12px;padding:28px;">
+      <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;color:#8FCDEB;margin-bottom:18px;">TIPOGRAFÍA</div>
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:44px;color:#F4F6F2;letter-spacing:-.035em;line-height:1;">Bricolage 800</div>
+      <div style="font-family:'Space Mono',monospace;font-size:11px;color:#8FCDEB;margin-top:6px;">DISPLAY · TÍTULOS · PRECIOS</div>
+      <div style="font-size:17px;color:#F4F6F2;margin-top:22px;line-height:1.5;">Archivo 400/600 — texto de interfaz, descripciones y microcopy. Rioplatense, directo, sin vueltas.</div>
+      <div style="font-family:'Space Mono',monospace;font-size:15px;color:#BFE2F2;margin-top:22px;line-height:1.6;">TRL-2026-00147<br>7,2 KG · USD 3.000<br>SKU TRL-2210</div>
+      <div style="font-family:'Space Mono',monospace;font-size:11px;color:#8FCDEB;margin-top:6px;">SPACE MONO · DATOS DUROS</div>
+
+      <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;color:#8FCDEB;margin:30px 0 14px;">ISOLOGO · MOTION</div>
+      <svg width="300" height="90" viewBox="0 0 300 90" style="display:block;">
+        <circle cx="14" cy="64" r="6" fill="#8FCDEB"></circle>
+        <path d="M14 64 C 80 12, 170 10, 262 44" fill="none" stroke="#FF5A1F" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 9" style="animation:traelo-dash 2.4s linear infinite;"></path>
+        <circle cx="266" cy="46" r="13" fill="none" stroke="#FF5A1F" stroke-width="4"></circle>
+        <text x="4" y="86" fill="#8FCDEB" font-family="Space Mono, monospace" font-size="10">SHANGHÁI</text>
+        <text x="222" y="82" fill="#FF5A1F" font-family="Space Mono, monospace" font-size="10">TU PUERTA</text>
+      </svg>
+      <div style="font-size:13px;color:rgba(191,226,242,.75);margin-top:10px;line-height:1.5;">La línea punteada es el único motion del sistema. Nada más se mueve.</div>
+    </div>
+
+    <div style="background:#F4F6F2;border-radius:12px;padding:28px;">
+      <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;color:rgba(12,33,54,.5);margin-bottom:18px;">ESTADOS VACÍOS</div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="background:#fff;border:1px dashed rgba(12,33,54,.25);border-radius:10px;padding:26px 22px;text-align:center;">
+          <div style="font-size:26px;">⚓</div>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:21px;color:#0C2136;margin-top:10px;letter-spacing:-.02em;">Todavía no zarpó nada.</div>
+          <div style="font-size:14px;color:rgba(12,33,54,.65);margin-top:6px;">Buscá algo que valga el viaje.</div>
+          <div style="background:#FF5A1F;color:#fff;font-weight:700;font-size:15px;padding:12px 20px;border-radius:8px;display:inline-block;margin-top:16px;">Ver catálogo →</div>
+        </div>
+        <div style="background:#fff;border:1px dashed rgba(12,33,54,.25);border-radius:10px;padding:22px;text-align:center;">
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px;color:#0C2136;letter-spacing:-.02em;">Ninguna carga en el agua.</div>
+          <div style="font-size:13.5px;color:rgba(12,33,54,.65);margin-top:5px;">Cuando pidas algo, lo vas a ver acá desde que sale de la fábrica.</div>
+        </div>
+        <div style="background:#fff;border:1px dashed rgba(12,33,54,.25);border-radius:10px;padding:22px;text-align:center;">
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px;color:#0C2136;letter-spacing:-.02em;">Nada con ese nombre.</div>
+          <div style="font-size:13.5px;color:rgba(12,33,54,.65);margin-top:5px;">Probá con otra palabra, o escribinos y lo buscamos en fábrica.</div>
+        </div>
+        <div style="background:#0C2136;border-radius:10px;padding:22px;text-align:center;">
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px;color:#F4F6F2;letter-spacing:-.02em;">Wallet en cero.</div>
+          <div style="font-size:13.5px;color:#BFE2F2;margin-top:5px;">Acá te devolvemos plata si un producto sale menos de lo cotizado.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showSystem&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Board&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return { showSystem: this.props.showSystem ?? true };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,14 +1,14 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Isologo de Traelo (sistema de diseño v1).
+ * Isologo de Traelo (sistema de diseño v1, de Andy).
  *
- * Un tile de tinta oceánica con una ruta punteada naranja que va del origen
- * (punto celeste = la fábrica) al destino (nodo naranja = tu casa). Los puntos
- * de la ruta fluyen hacia el destino — es el único elemento en movimiento de
- * toda la identidad. Respeta `prefers-reduced-motion` (se detiene el flujo).
+ * Tile de tinta oceánica clara (#132D45) con una ruta punteada naranja que sale
+ * de un origen celeste (la fábrica) y termina en un anillo naranja (tu puerta).
+ * Los puntos de la ruta fluyen hacia el destino — es el único motion del sistema.
+ * Respeta `prefers-reduced-motion` (el flujo se detiene vía globals.css).
  *
- * `tile=false` dibuja solo la marca, sin el fondo, para usarla inline.
+ * `tile=false` dibuja solo la marca, sin el fondo.
  */
 export function Isologo({
   className,
@@ -20,30 +20,26 @@ export function Isologo({
   animated?: boolean;
 }) {
   return (
-    <span
-      className={cn(
-        "relative inline-flex items-center justify-center overflow-hidden",
-        tile && "rounded-2xl bg-primary",
-        className,
-      )}
+    <svg
+      viewBox="0 0 64 64"
+      className={cn("block", className)}
+      style={tile ? { borderRadius: "22%", background: "var(--primary-2)" } : undefined}
       aria-hidden="true"
     >
-      <svg viewBox="0 0 48 48" fill="none" className="size-[62%]">
-        {/* Ruta punteada fábrica → casa */}
-        <path
-          d="M12 34 C 18 20, 30 28, 36 14"
-          stroke="var(--accent)"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          strokeDasharray="0.1 7"
-          className={animated ? "isologo-route" : undefined}
-        />
-        {/* Origen — la fábrica (celeste) */}
-        <circle cx="12" cy="34" r="3.2" fill="var(--celeste)" />
-        {/* Destino — tu casa (nodo naranja) */}
-        <circle cx="36" cy="14" r="5" fill="var(--accent)" />
-        <circle cx="36" cy="14" r="2" fill="var(--primary)" />
-      </svg>
-    </span>
+      {/* Origen — la fábrica (celeste) */}
+      <circle cx="13" cy="44" r="4.5" fill="var(--celeste)" />
+      {/* Ruta punteada fábrica → tu puerta */}
+      <path
+        d="M13 44 C 26 16, 36 14, 46 24"
+        fill="none"
+        stroke="var(--accent)"
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        strokeDasharray="3 7"
+        className={animated ? "traelo-dash" : undefined}
+      />
+      {/* Destino — tu puerta (anillo naranja) */}
+      <circle cx="47" cy="27" r="8" fill="none" stroke="var(--accent)" strokeWidth="3" />
+    </svg>
   );
 }

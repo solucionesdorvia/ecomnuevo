@@ -55,10 +55,12 @@ si el paquete va a llegar. Eso no se resuelve con un tema de shadcn por default.
 
 Si dudás entre una feature nueva o pulir uno de estos seis puntos, pulí esto primero.
 
-## Identidad visual — marca "Traelo" (definida por Andy, 20/7/2026)
+## Identidad visual — marca "Traelo" (sistema de diseño v1 de Andy, 7/8/2026)
 Nombre de la marca de cara al cliente: **Traelo** (siempre en minúscula, con el
-punto naranja: `traelo.`). Tagline: "Lo viste afuera. Traelo." Ecomex es la
-empresa/cliente; Traelo es el marketplace.
+punto naranja: `traelo.`). Tagline: **"Lo viste en la fábrica. Traelo."** Ecomex es
+la empresa/cliente; Traelo es el marketplace. El diseño de referencia (board de
+Claude Design) está en `scripts/` no — se portó a los componentes; el HTML original
+quedó archivado. Isologo = ruta punteada Shanghái→tu puerta (único motion del sistema).
 
 **Paleta** (tokens en `src/app/globals.css` — no tocar sin hablarlo)
 - Fondo `#F4F6F2` (sal — cálido y fresco, no blanco puro)
@@ -72,9 +74,16 @@ empresa/cliente; Traelo es el marketplace.
 - Celeste `#8FCDEB` / `#BFE2F2` — apoyo suave (info de envío, decorativo).
 - Éxito `#1FA97A` · Borde sutil `#E2E7E5`
 
-**Tipografía:** **Outfit** (geométrica, redondeada, limpia) para todo — vía
-`next/font/google`, self-hosteada. Una sola familia: la velocidad de carga importa
-más que la personalidad, y los precios tienen que verse impecables en tabular figures.
+**Tipografía (sistema v1):** tres familias vía `next/font/google` —
+**Bricolage Grotesque** (700/800) para display, títulos y precios; **Archivo**
+(400–700) para texto de interfaz, descripciones y microcopy; **Space Mono** (400/700)
+para datos duros: SKU, kg, códigos, estados, eyebrows. Tokens `--font-display`,
+`--font-sans`, `--font-mono` en globals. (Antes: Outfit única.)
+
+**Moneda:** el diseño muestra el **precio final al cliente en PESOS** (`formatArs`,
+tasa demo en `lib/format.ts`). OJO: el checkout/costeo interno sigue en USD (Stripe,
+validación USD 3.000, tests). El peso es exhibición hasta integrar MercadoPago/pesos
+de verdad — hablarlo con Andy antes de tocar el backend.
 
 **Estética general:** grilla de producto limpia, mucho aire, jerarquía clara entre
 precio-final / producto / CTA.

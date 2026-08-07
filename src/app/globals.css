@@ -10,6 +10,7 @@
   --accent: #ff5a1f; /* naranja contenedor — SOLO precio final, badges de ahorro, CTA de compra y el punto de la marca */
   --celeste: #8fcdeb; /* celeste — apoyo suave: info de envío, decorativo */
   --celeste-soft: #bfe2f2;
+  --primary-2: #132d45; /* navy claro — cards/superficies sobre tinta oceánica */
   --success: #1fa97a;
   --border: #e2e7e5;
 }
@@ -20,19 +21,35 @@
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-primary: var(--primary);
+  --color-primary-2: var(--primary-2);
   --color-accent: var(--accent);
   --color-celeste: var(--celeste);
   --color-celeste-soft: var(--celeste-soft);
   --color-success: var(--success);
   --color-border: var(--border);
-  --font-sans: var(--font-outfit);
-  --font-mono: var(--font-space-mono);
+  --font-sans: var(--font-archivo); /* Archivo — texto de interfaz */
+  --font-display: var(--font-bricolage); /* Bricolage Grotesque — títulos y precios */
+  --font-mono: var(--font-space-mono); /* Space Mono — datos duros */
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Bricolage Grotesque para display: títulos, precios, hero */
+.font-display {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  letter-spacing: -0.03em;
+}
+
+/* Sección full-bleed: escapa el ancho del <main> y ocupa todo el viewport
+   (para los bloques navy/marquee del diseño, que van de borde a borde). */
+.fullbleed {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
 }
 
 /* Los precios siempre en tabular figures */
@@ -52,9 +69,8 @@ body {
 .eyebrow {
   font-family: var(--font-mono), ui-monospace, monospace;
   text-transform: uppercase;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   font-size: 0.6875rem;
-  font-weight: 700;
   line-height: 1;
 }
 
@@ -62,29 +78,52 @@ body {
   font-family: var(--font-mono), ui-monospace, monospace;
 }
 
-/* Chip / pill de filtro: mayúscula, tracking, mono. Activo = tinta relleno. */
+/* Chip / pill de filtro: mayúscula, mono. Activo = tinta relleno, inactivo = outline. */
 .chip {
   font-family: var(--font-mono), ui-monospace, monospace;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.72rem;
-  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-size: 0.6875rem;
   white-space: nowrap;
   border-radius: 9999px;
-  padding: 0.4rem 0.9rem;
+  padding: 0.44rem 0.75rem;
   transition: colors 0.15s ease;
 }
 
-/* Isologo: la ruta punteada naranja (fábrica → tu casa) es el único elemento
-   en movimiento de todo el sistema (nota del board). Los puntos fluyen hacia
-   el destino animando el dash-offset. */
-@keyframes traelo-route {
+/* Motion del sistema: la ruta punteada naranja (Shanghái → tu puerta) es el
+   ÚNICO elemento en movimiento (nota del board). Los puntos fluyen hacia el
+   destino animando el dash-offset; el origen pulsa suave. */
+@keyframes traelo-dash {
   to {
-    stroke-dashoffset: -100;
+    stroke-dashoffset: -64;
   }
 }
-.isologo-route {
-  animation: traelo-route 3.5s linear infinite;
+@keyframes traelo-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.35);
+  }
+}
+.traelo-dash {
+  animation: traelo-dash 2.4s linear infinite;
+}
+.traelo-pulse {
+  animation: traelo-pulse 2.6s ease-in-out infinite;
+}
+
+/* Franja naranja marquee (datos del régimen courier), scroll infinito */
+@keyframes traelo-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.traelo-marquee {
+  animation: traelo-marquee 22s linear infinite;
 }
 
 /* Foco visible para navegación por teclado (accesibilidad). Especificidad 0

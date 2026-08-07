@@ -1,9 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Price } from "@/components/price";
 import { FavButton } from "@/components/fav-button";
-import { formatUsd } from "@/lib/format";
-import { esNuevo } from "@/lib/nuevo";
+import { formatArs } from "@/lib/format";
 
 export type ProductCardData = {
   id: string;
@@ -34,6 +32,15 @@ export function savingsPct(
   return Math.round((1 - price / ref) * 100);
 }
 
+/** SKU de exhibición estable ("TRL-4471") derivado del id — el diseño los muestra. */
+export function skuFor(id: string): string {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) & 0xffff;
+  return `TRL-${(1000 + (h % 9000)).toString()}`;
+}
+
+const IMG_TINTS = ["bg-celeste-soft", "bg-celeste"];
+
 export function ProductCard({
   product,
   isFav = false,
@@ -45,14 +52,14 @@ export function ProductCard({
   priority?: boolean;
 }) {
   const pct = savingsPct(product.priceUsd, product.referencePriceUsd);
-  const isNew = esNuevo(product.createdAt);
+  const tint = IMG_TINTS[(product.id.charCodeAt(0) || 0) % IMG_TINTS.length];
 
   return (
     <Link
       href={`/p/${product.slug}`}
-      className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-surface transition-shadow hover:shadow-md"
+      className="group flex flex-col overflow-hidden rounded-[10px] border border-primary/10 bg-surface transition-shadow hover:shadow-[0_18px_40px_rgba(12,33,54,.14)]"
     >
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-white">
+      <div className={`relative aspect-[4/3] w-full overflow-hidden ${tint}`}>
         <Image
           src={product.images[0]}
           alt={product.title}
@@ -61,34 +68,29 @@ export function ProductCard({
           priority={priority}
           className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
         />
-        {isNew && (
-          <span className="absolute left-2 top-2 rounded-full bg-primary px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">
-            Nuevo
+        {pct !== null && (
+          <span className="absolute right-3 top-3 rounded-md bg-accent px-2 py-1 font-mono-ui text-[11px] font-bold text-white">
+            -{pct}% vs. local
           </span>
         )}
-        <FavButton productId={product.id} initialFav={isFav} className="absolute right-2 top-2" />
+        <FavButton productId={product.id} initialFav={isFav} className="absolute left-3 top-3" />
       </div>
-      <div className="flex flex-1 flex-col gap-1 p-3">
-        <h3 className="line-clamp-2 text-sm text-foreground">{product.title}</h3>
-        <div className="flex flex-wrap items-baseline gap-x-2">
-          <Price value={product.priceUsd} className="text-lg" />
-          {pct !== null && (
-            <>
-              <span className="text-xs text-muted line-through">
-                {formatUsd(product.referencePriceUsd!)}
-              </span>
-              <span className="rounded bg-accent px-1.5 py-0.5 text-[11px] font-bold text-white">
-                -{pct}%
-              </span>
-            </>
-          )}
+
+      <div className="flex flex-1 flex-col p-4">
+        <div className="font-mono-ui text-[11px] text-primary/50">SKU {skuFor(product.id)}</div>
+        <h3 className="mb-2.5 mt-1.5 line-clamp-2 text-[15px] font-semibold leading-tight text-primary">
+          {product.title}
+        </h3>
+        <div className="mt-auto">
+          <div data-price className="font-display text-[28px] font-extrabold leading-none tracking-[-0.03em] text-primary">
+            {formatArs(product.priceUsd)}
+          </div>
+          <div className="mt-1.5 text-xs text-primary/60">Precio final, con impuestos y flete</div>
+          <div className="mt-3 font-mono-ui text-[11px] text-primary/65">⚓ LLEGA EN ~{product.deliveryDaysMax} DÍAS</div>
+          <div className="mt-3.5 rounded-lg bg-accent py-3 text-center text-[15px] font-bold text-white transition-transform group-hover:-translate-y-0.5">
+            Traelo →
+          </div>
         </div>
-        <p className="text-xs text-muted">
-          Precio final en tu casa · desde {product.originCountry}
-        </p>
-        <p className="text-xs text-muted">
-          Llega en {product.deliveryDaysMin}–{product.deliveryDaysMax} días
-        </p>
       </div>
     </Link>
   );

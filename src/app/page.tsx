@@ -1,132 +1,89 @@
 import Link from "next/link";
-import { PackageCheck, Ship, ShieldCheck } from "lucide-react";
 import { db } from "@/lib/db";
 import { getFavoriteIds } from "@/lib/favoritos";
-import { getRecentlyViewedSlugs } from "@/lib/vistos";
 import { ProductCard } from "@/components/product-card";
-import { CategoryIcon } from "@/components/category-icon";
-
-const CATEGORIES = [
-  { key: "electronica", label: "Electrónica" },
-  { key: "hogar", label: "Hogar" },
-  { key: "indumentaria", label: "Indumentaria" },
-  { key: "herramientas", label: "Herramientas" },
-];
+import { RouteLine } from "@/components/route-line";
+import { Marquee } from "@/components/marquee";
 
 export default async function Home() {
-  const [featured, favIds, recentSlugs] = await Promise.all([
+  const [featured, total, favIds] = await Promise.all([
     db.product.findMany({
       where: { active: true, featured: true },
       include: { supplier: { select: { country: true } } },
       take: 8,
       orderBy: { createdAt: "desc" },
     }),
+    db.product.count({ where: { active: true } }),
     getFavoriteIds(),
-    getRecentlyViewedSlugs(),
   ]);
 
-  // "Seguí mirando": vistos recientemente, en el orden de la cookie
-  const recentProducts =
-    recentSlugs.length > 0
-      ? await db.product.findMany({
-          where: { active: true, slug: { in: recentSlugs } },
+  // Fallback si todavía no hay destacados marcados: mostrar los más nuevos.
+  const products =
+    featured.length > 0
+      ? featured
+      : await db.product.findMany({
+          where: { active: true },
           include: { supplier: { select: { country: true } } },
-        })
-      : [];
-  recentProducts.sort((a, b) => recentSlugs.indexOf(a.slug) - recentSlugs.indexOf(b.slug));
+          take: 8,
+          orderBy: { createdAt: "desc" },
+        });
 
   return (
-    <div className="flex flex-col gap-12 py-8">
-      {/* Hero — card de tinta oceánica, titular display, ruta punteada de fondo */}
-      <section className="relative overflow-hidden rounded-3xl bg-primary px-6 py-10 text-white sm:px-10 sm:py-14">
-        {/* trazo de ruta decorativo, muy sutil */}
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 400 200"
-          className="pointer-events-none absolute -right-10 top-0 h-full w-2/3 opacity-[0.12]"
-          fill="none"
-        >
-          <path
-            d="M20 170 C 120 60, 220 150, 380 30"
-            stroke="var(--accent)"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeDasharray="0.1 14"
-          />
-        </svg>
-
-        <div className="relative flex flex-col items-start gap-5">
-          <p className="eyebrow text-celeste">Marketplace de importación</p>
-          <h1 className="max-w-2xl text-4xl font-black leading-[0.95] tracking-tight sm:text-6xl">
-            Lo viste en la fábrica.
-            <br />
-            <span className="text-accent">Traelo.</span>
-          </h1>
-          <p className="max-w-xl text-lg text-celeste-soft">
-            Comprás directo de fábrica en China. Precio final, un solo pago, y te llega
-            a la puerta — a tu nombre. Nada más que pagar.
-          </p>
-          <Link
-            href="/catalogo"
-            className="rounded-full bg-accent px-7 py-3 font-semibold text-white transition-transform hover:-translate-y-0.5"
-          >
-            Ver catálogo
-          </Link>
-          <div className="mt-2 flex flex-wrap gap-x-6 gap-y-2">
-            {[
-              { Icon: ShieldCheck, t: "Precio final en tu casa" },
-              { Icon: PackageCheck, t: "Directo de fábrica" },
-              { Icon: Ship, t: "Seguimiento en cada paso" },
-            ].map(({ Icon, t }) => (
-              <p key={t} className="flex items-center gap-2 font-mono-ui text-xs text-celeste">
-                <Icon className="size-4 shrink-0" />
-                {t}
-              </p>
-            ))}
+    <div>
+      {/* ── Hero ─────────────────────────────────────────────── */}
+      <section className="fullbleed bg-primary text-white">
+        <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-4 py-12 lg:grid-cols-2 lg:gap-14 lg:px-14 lg:py-16">
+          <div>
+            <h1 className="font-display text-[38px] font-extrabold leading-[1.0] tracking-[-0.04em] sm:text-5xl lg:text-[80px] lg:leading-[0.98]">
+              Lo viste en la fábrica.
+              <br />
+              <span className="text-accent">Traelo.</span>
+            </h1>
+            <p className="mt-5 max-w-xl text-pretty text-base leading-relaxed text-celeste-soft lg:mt-6 lg:text-[19px]">
+              Comprás directo de fábricas chinas desde el catálogo. Un solo precio final en pesos
+              —producto, flete marítimo e impuestos incluidos— y te lo dejamos en la puerta.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3 lg:mt-8">
+              <Link
+                href="/catalogo"
+                className="rounded-[10px] bg-accent px-7 py-4 text-base font-bold text-white transition-transform hover:-translate-y-0.5"
+              >
+                Ver catálogo →
+              </Link>
+              <Link
+                href="#como-funciona"
+                className="rounded-[10px] border border-celeste/45 px-7 py-4 text-base font-semibold text-white transition-colors hover:bg-white/5"
+              >
+                Cómo funciona
+              </Link>
+            </div>
+          </div>
+          <div className="lg:pl-6">
+            <RouteLine className="w-full" />
           </div>
         </div>
       </section>
 
-      {/* Destacados */}
-      <section>
-        <div className="mb-4 flex items-baseline justify-between">
-          <h2 className="text-xl font-semibold">Destacados</h2>
-          <Link href="/catalogo" className="text-sm text-primary hover:underline">
-            Ver todos →
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
-          {featured.map((p, i) => (
-            <ProductCard
-              key={p.id}
-              isFav={favIds.has(p.id)}
-              priority={i < 4}
-              product={{
-                id: p.id,
-                slug: p.slug,
-                title: p.title,
-                images: p.images,
-                priceUsd: p.priceUsd,
-                referencePriceUsd: p.referencePriceUsd,
-                originCountry: p.supplier.country,
-                deliveryDaysMin: p.deliveryDaysMin,
-                deliveryDaysMax: p.deliveryDaysMax,
-                createdAt: p.createdAt,
-              }}
-            />
-          ))}
-        </div>
-      </section>
+      {/* ── Franja de datos ──────────────────────────────────── */}
+      <Marquee className="fullbleed" />
 
-      {/* Seguí mirando */}
-      {recentProducts.length > 0 && (
-        <section>
-          <h2 className="mb-4 text-xl font-semibold">Seguí mirando</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
-            {recentProducts.slice(0, 4).map((p) => (
+      {/* ── Recién embarcado ─────────────────────────────────── */}
+      <section className="fullbleed bg-background">
+        <div className="mx-auto max-w-[1440px] px-4 py-12 lg:px-14 lg:py-14">
+          <div className="mb-7 flex items-baseline justify-between gap-4">
+            <h2 className="font-display text-[28px] font-extrabold tracking-[-0.03em] text-primary lg:text-4xl">
+              Recién embarcado
+            </h2>
+            <Link href="/catalogo" className="font-mono-ui text-xs text-accent hover:underline lg:text-[13px]">
+              VER LOS {total} PRODUCTOS →
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
+            {products.map((p, i) => (
               <ProductCard
                 key={p.id}
                 isFav={favIds.has(p.id)}
+                priority={i < 4}
                 product={{
                   id: p.id,
                   slug: p.slug,
@@ -142,63 +99,42 @@ export default async function Home() {
               />
             ))}
           </div>
-        </section>
-      )}
-
-      {/* Categorías */}
-      <section>
-        <h2 className="mb-4 text-xl font-semibold">Explorá por categoría</h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {CATEGORIES.map((c) => (
-            <Link
-              key={c.key}
-              href={`/catalogo?categoria=${c.key}`}
-              className="group flex flex-col items-center gap-3 rounded-2xl border border-border bg-surface p-5 text-center transition-all hover:-translate-y-0.5 hover:border-celeste hover:shadow-md"
-            >
-              <span
-                className="flex size-16 items-center justify-center rounded-2xl transition-colors group-hover:brightness-95"
-                style={{ background: "color-mix(in srgb, var(--celeste) 22%, white)" }}
-              >
-                <CategoryIcon k={c.key} className="size-9 text-foreground" />
-              </span>
-              <span className="font-medium">{c.label}</span>
-            </Link>
-          ))}
         </div>
       </section>
 
-      {/* Cómo funciona */}
-      <section className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
-        <h2 className="mb-6 text-xl font-semibold">¿Cómo funciona?</h2>
-        <ol className="grid gap-6 sm:grid-cols-3">
-          {[
-            {
-              n: 1,
-              t: "Elegís y pagás el precio final",
-              d: "En dólares, con tarjeta. El precio ya incluye producto, envío marítimo e impuestos.",
-            },
-            {
-              n: 2,
-              t: "Compramos y embarcamos tu pedido",
-              d: "Nuestro equipo lo compra al proveedor y lo despacha por barco, consolidado.",
-            },
-            {
-              n: 3,
-              t: "Te llega a tu casa",
-              d: "En 45–60 días, a tu nombre. Seguís cada paso desde tu cuenta. Nada más que pagar.",
-            },
-          ].map((s) => (
-            <li key={s.n} className="flex gap-4">
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary font-bold text-white">
-                {s.n}
-              </span>
-              <div>
-                <p className="font-medium">{s.t}</p>
-                <p className="mt-1 text-sm text-muted">{s.d}</p>
+      {/* ── Cómo funciona ────────────────────────────────────── */}
+      <section id="como-funciona" className="fullbleed bg-primary text-white">
+        <div className="mx-auto max-w-[1440px] px-4 py-14 lg:px-14 lg:py-16">
+          <p className="eyebrow text-celeste">Cómo funciona</p>
+          <h2 className="mt-3 font-display text-3xl font-extrabold tracking-[-0.03em] lg:text-[44px]">
+            De la fábrica a tu puerta, sin sorpresas.
+          </h2>
+          <div className="mt-10 grid gap-6 lg:grid-cols-3 lg:gap-8">
+            {[
+              {
+                n: "01",
+                t: "Elegís y pagás el precio final",
+                d: "Un solo precio en pesos: producto, flete marítimo e impuestos incluidos. Nada extra al recibir.",
+              },
+              {
+                n: "02",
+                t: "Compramos y embarcamos tu carga",
+                d: "La compramos en fábrica y la despachamos por barco, consolidada bajo régimen courier.",
+              },
+              {
+                n: "03",
+                t: "La seguís hasta tu puerta",
+                d: "~60 días de viaje, con tracking de 6 estados. Te avisamos cada movimiento por WhatsApp.",
+              },
+            ].map((s) => (
+              <div key={s.n} className="rounded-[10px] border border-celeste/20 bg-primary-2 p-6 lg:p-7">
+                <div className="font-mono-ui text-sm text-accent">{s.n}</div>
+                <h3 className="mt-3 font-display text-xl font-extrabold tracking-[-0.02em] lg:text-2xl">{s.t}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-celeste-soft">{s.d}</p>
               </div>
-            </li>
-          ))}
-        </ol>
+            ))}
+          </div>
+        </div>
       </section>
     </div>
   );

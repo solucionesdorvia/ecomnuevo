@@ -34,7 +34,7 @@ function saveRecent(q: string) {
   }
 }
 
-function SearchBoxInner({ className }: { className?: string }) {
+function SearchBoxInner({ className, dark = false }: { className?: string; dark?: boolean }) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -148,7 +148,9 @@ function SearchBoxInner({ className }: { className?: string }) {
       className={`relative ${className ?? ""}`}
       role="search"
     >
-      <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted" />
+      <Search
+        className={`pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 ${dark ? "text-celeste" : "text-muted"}`}
+      />
       <input
         type="search"
         value={value}
@@ -164,7 +166,11 @@ function SearchBoxInner({ className }: { className?: string }) {
         aria-expanded={open}
         aria-controls="search-suggestions"
         autoComplete="off"
-        className="h-10 w-full rounded-full border border-border bg-surface pl-9 pr-9 text-sm outline-none transition-colors focus:border-primary placeholder:font-mono-ui placeholder:text-xs placeholder:tracking-wide [&::-webkit-search-cancel-button]:hidden"
+        className={`h-10 w-full rounded-lg pl-9 pr-9 text-sm outline-none transition-colors placeholder:font-mono-ui placeholder:text-xs placeholder:tracking-wide [&::-webkit-search-cancel-button]:hidden ${
+          dark
+            ? "border border-celeste/25 bg-primary-2 text-white placeholder:text-white/45 focus:border-celeste/60"
+            : "border border-border bg-surface focus:border-primary"
+        }`}
       />
       {value && (
         <button
@@ -255,10 +261,10 @@ function SearchBoxInner({ className }: { className?: string }) {
   );
 }
 
-export function SearchBox({ className }: { className?: string }) {
+export function SearchBox({ className, dark }: { className?: string; dark?: boolean }) {
   return (
     <Suspense fallback={<div className={className} />}>
-      <SearchBoxInner className={className} />
+      <SearchBoxInner className={className} dark={dark} />
     </Suspense>
   );
 }

@@ -1,18 +1,26 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit, Space_Mono } from "next/font/google";
+import { Bricolage_Grotesque, Archivo, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { getCurrentUser } from "@/lib/auth";
 import { getCart } from "@/lib/cart";
 import { Header } from "@/components/header";
+import { BottomNav } from "@/components/bottom-nav";
 import { Footer } from "@/components/footer";
 
-const outfit = Outfit({
-  variable: "--font-outfit",
+// Sistema tipográfico "traelo. v1" (diseño de Andy):
+//  · Bricolage Grotesque 700/800 — display, títulos y precios (carácter de la marca)
+//  · Archivo 400–700 — texto de interfaz, descripciones, microcopy (rioplatense, directo)
+//  · Space Mono 400/700 — datos duros: SKU, kg, códigos, estados, eyebrows
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage",
   subsets: ["latin"],
+  weight: ["700", "800"],
 });
-
-// Mono técnico/editorial para eyebrows, meta y datos (precio final, estados, contadores).
-// Es la contraparte de Outfit en el sistema de diseño "traelo. v1".
+const archivo = Archivo({
+  variable: "--font-archivo",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
 const spaceMono = Space_Mono({
   variable: "--font-space-mono",
   subsets: ["latin"],
@@ -40,8 +48,8 @@ export default async function RootLayout({
 }>) {
   const [user, cart] = await Promise.all([getCurrentUser(), getCart()]);
   return (
-    <html lang="es-AR" className={`${outfit.variable} ${spaceMono.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">
+    <html lang="es-AR" className={`${bricolage.variable} ${archivo.variable} ${spaceMono.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col pb-16 lg:pb-0">
         <a
           href="#contenido"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-white"
@@ -53,6 +61,7 @@ export default async function RootLayout({
           {children}
         </main>
         <Footer />
+        <BottomNav />
       </body>
     </html>
   );
