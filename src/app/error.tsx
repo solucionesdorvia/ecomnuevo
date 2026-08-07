@@ -6,7 +6,7 @@ export default function GlobalError({ reset }: { error: Error; reset: () => void
   return (
     <div className="flex flex-col items-center gap-4 py-24 text-center">
       <TriangleAlert className="size-12 text-amber-500" />
-      <h1 className="text-2xl font-semibold">Algo salió mal de nuestro lado</h1>
+      <h1 className="font-display text-2xl font-extrabold tracking-[-0.02em]">Algo salió mal de nuestro lado</h1>
       <p className="max-w-md text-muted">
         No es tu culpa: fue un error nuestro y no se te cobró nada. Probá de nuevo; si
         sigue pasando, avisanos.

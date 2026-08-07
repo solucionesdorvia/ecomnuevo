@@ -34,7 +34,7 @@ export function SupplierAvatar({
         className,
       )}
     >
-      <span className={cn("font-black uppercase tracking-tight", textClassName)}>
+      <span className={cn("font-display font-extrabold uppercase", textClassName)}>
         {initials(name).toUpperCase()}
       </span>
       <span className="absolute inset-x-0 bottom-0 h-[18%] bg-celeste" />

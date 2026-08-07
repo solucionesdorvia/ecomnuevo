@@ -17,7 +17,7 @@ export default async function FavoritosPage() {
 
   return (
     <div className="py-6">
-      <h1 className="mb-1 text-2xl font-semibold">Tus favoritos</h1>
+      <h1 className="mb-1 font-display text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">Tus favoritos</h1>
       <p className="mb-6 text-sm text-muted">
         {favorites.length === 0
           ? "Guardá lo que te gusta para decidir después."

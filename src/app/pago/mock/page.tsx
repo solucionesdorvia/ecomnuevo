@@ -43,7 +43,7 @@ export default async function MockPaymentPage({
         <CreditCard className="size-7 text-primary" />
       </div>
       <div>
-        <h1 className="text-xl font-semibold">Procesador de pago simulado</h1>
+        <h1 className="font-display text-xl font-extrabold tracking-[-0.02em]">Procesador de pago simulado</h1>
         <p className="mt-1 text-sm text-muted">
           Pantalla de desarrollo — acá iría Stripe o Mercado Pago. Pedido #{order} por US$ {total}.
         </p>

@@ -18,7 +18,7 @@ export default async function AdminProductosPage() {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Productos ({products.length})</h1>
+        <h1 className="font-display text-2xl font-extrabold tracking-[-0.02em]">Productos ({products.length})</h1>
         <Link
           href="/admin/productos/nuevo"
           className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90"

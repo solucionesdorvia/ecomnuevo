@@ -59,7 +59,7 @@ export default async function OperadorPage({
 
   return (
     <div>
-      <h1 className="mb-4 text-2xl font-semibold">Cola de pedidos</h1>
+      <h1 className="mb-4 font-display text-2xl font-extrabold tracking-[-0.02em]">Cola de pedidos</h1>
 
       <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
         {FILTERS.map((f) => (

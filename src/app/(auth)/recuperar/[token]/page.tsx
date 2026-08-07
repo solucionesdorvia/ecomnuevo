@@ -7,7 +7,7 @@ export default async function ResetPage({ params }: { params: Promise<{ token: s
   const { token } = await params;
   return (
     <div className="mx-auto max-w-sm py-12">
-      <h1 className="mb-6 text-2xl font-semibold">Creá una contraseña nueva</h1>
+      <h1 className="mb-6 font-display text-3xl font-extrabold tracking-[-0.03em]">Creá una contraseña nueva</h1>
       <ResetForm token={token} />
     </div>
   );

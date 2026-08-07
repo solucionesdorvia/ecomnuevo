@@ -37,7 +37,7 @@ export default async function OperadorPedidoPage({ params }: { params: Promise<{
       </Link>
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-semibold">Pedido #{order.number}</h1>
+        <h1 className="font-display text-2xl font-extrabold tracking-[-0.02em]">Pedido #{order.number}</h1>
         <StateBadge state={order.state} />
         <span className="text-sm text-muted">
           {formatDate(order.createdAt)} · pago: {order.paymentStatus.toLowerCase()} ({order.paymentProvider})

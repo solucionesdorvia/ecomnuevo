@@ -15,7 +15,7 @@ export default async function RegistrarmePage({
   const { volver } = await searchParams;
   return (
     <div className="mx-auto max-w-sm py-12">
-      <h1 className="mb-1 text-2xl font-semibold">Creá tu cuenta</h1>
+      <h1 className="mb-1 font-display text-3xl font-extrabold tracking-[-0.03em]">Creá tu cuenta</h1>
       <p className="mb-6 text-sm text-muted">
         La necesitás para comprar: tus pedidos entran al país a tu nombre y los seguís desde acá.
       </p>

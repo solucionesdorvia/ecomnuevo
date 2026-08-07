@@ -43,7 +43,7 @@ export default async function FabricasPage() {
     <div className="py-8">
       <div className="max-w-2xl">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent">Transparencia</p>
-        <h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
+        <h1 className="mt-2 font-display text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">
           De dónde viene lo que comprás.
         </h1>
         <p className="mt-3 text-lg text-muted">

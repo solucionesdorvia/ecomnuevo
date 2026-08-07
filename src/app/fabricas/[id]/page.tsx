@@ -88,7 +88,7 @@ export default async function FabricaPage({
             textClassName="text-3xl"
           />
           <div className="flex-1">
-            <h1 className="text-2xl font-black tracking-tight sm:text-3xl">{supplier.name}</h1>
+            <h1 className="font-display text-2xl font-extrabold tracking-[-0.03em] sm:text-3xl">{supplier.name}</h1>
             <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm text-muted">
               <span className="flex items-center gap-1.5">
                 <MapPin className="size-4 shrink-0" /> {supplier.country}
@@ -102,7 +102,7 @@ export default async function FabricaPage({
             </div>
           </div>
           <div className="text-center sm:pb-1 sm:text-right">
-            <p className="text-3xl font-black tabular-nums text-primary">{total}</p>
+            <p className="font-display text-3xl font-extrabold tabular-nums text-primary">{total}</p>
             <p className="text-sm text-muted">{total === 1 ? "producto" : "productos"}</p>
           </div>
         </div>
@@ -148,7 +148,7 @@ export default async function FabricaPage({
         </div>
       )}
 
-      <h2 className="mb-4 mt-6 text-xl font-semibold">
+      <h2 className="mb-4 mt-6 font-display text-xl font-extrabold tracking-[-0.02em]">
         {selectedCat ? CATEGORY_LABEL[selectedCat] : `Lo que traemos de ${supplier.name}`}
       </h2>
       {products.length === 0 ? (
