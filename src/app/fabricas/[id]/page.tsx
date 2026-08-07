@@ -114,12 +114,12 @@ export default async function FabricaPage({
       {/* Categorías que cubre esta fábrica (con filtro) */}
       {catCounts.length > 0 && (
         <div className="mt-6 flex flex-wrap items-center gap-2">
-          <span className="mr-1 text-sm font-medium text-muted">Categorías:</span>
+          <span className="eyebrow mr-1 text-muted">Categorías:</span>
           <Link
             href={`/fabricas/${id}`}
             aria-current={!selectedCat ? "page" : undefined}
             className={cn(
-              "rounded-full border px-3 py-1 text-sm transition-colors",
+              "chip border transition-colors",
               !selectedCat
                 ? "border-primary bg-primary text-white"
                 : "border-border bg-surface text-muted hover:text-foreground",
@@ -135,7 +135,7 @@ export default async function FabricaPage({
                 href={`/fabricas/${id}?categoria=${CATEGORY_KEY[cat]}`}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "rounded-full border px-3 py-1 text-sm transition-colors",
+                  "chip border transition-colors",
                   active
                     ? "border-primary bg-primary text-white"
                     : "border-border bg-surface text-muted hover:text-foreground",

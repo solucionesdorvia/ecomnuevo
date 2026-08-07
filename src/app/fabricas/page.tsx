@@ -90,7 +90,7 @@ export default async function FabricasPage() {
                     {cats.map((c) => (
                       <span
                         key={c}
-                        className="rounded-full bg-background px-2 py-0.5 text-xs font-medium text-muted"
+                        className="rounded-full bg-background px-2 py-0.5 font-mono-ui text-[10px] uppercase tracking-wide text-muted"
                       >
                         {CATEGORY_LABEL[c]}
                       </span>
