@@ -1,101 +1,118 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingCart } from "lucide-react";
+import { Ship } from "lucide-react";
 import { getCart } from "@/lib/cart";
-import { formatKg } from "@/lib/format";
-import { Price } from "@/components/price";
+import { formatKg, formatUsd } from "@/lib/format";
 import { CourierMeter } from "@/components/courier-meter";
 import { CartLineControls } from "@/components/cart-line-controls";
+import { EmptyState } from "@/components/empty-state";
+import { skuFor } from "@/components/product-card";
 
-export const metadata: Metadata = { title: "Carrito" };
+export const metadata: Metadata = { title: "Tu carga" };
 
 export default async function CarritoPage() {
   const cart = await getCart();
 
   if (cart.items.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-4 py-24 text-center">
-        <ShoppingCart className="size-12 text-muted/50" />
-        <h1 className="text-2xl font-semibold">Tu carrito está vacío</h1>
-        <p className="text-muted">Todo lo que ves en el catálogo tiene precio final: producto, envío e impuestos.</p>
-        <Link
-          href="/catalogo"
-          className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-primary/90"
-        >
-          Ver el catálogo
-        </Link>
+      <div className="py-10">
+        <EmptyState
+          title="Todavía no zarpó nada."
+          subtitle="Buscá algo que valga el viaje. Todo lo que ves tiene precio final: producto, envío e impuestos."
+          cta={{ label: "Ver el catálogo →", href: "/catalogo" }}
+        />
       </div>
     );
   }
 
   return (
-    <div className="py-6">
+    <div className="py-7">
       <div className="mb-6 flex flex-wrap items-baseline justify-between gap-2">
-        <h1 className="text-2xl font-semibold">Tu carrito</h1>
-        <Link href="/catalogo" className="text-sm text-primary hover:underline">
-          ← Seguir comprando
+        <h1 className="font-display text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">Tu carga</h1>
+        <Link href="/catalogo" className="font-mono-ui text-xs text-accent hover:underline">
+          ← SEGUIR ELIGIENDO
         </Link>
       </div>
+
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_360px]">
         <ul className="flex flex-col gap-3">
           {cart.items.map((item) => (
             <li
               key={`${item.product.id}-${item.variant?.id ?? "base"}`}
-              className="flex gap-4 rounded-xl border border-border bg-surface p-3"
+              className="flex gap-4 rounded-[10px] border border-primary/10 bg-surface p-3"
             >
-              <Link href={`/p/${item.product.slug}`} className="relative aspect-[4/5] w-20 shrink-0 overflow-hidden rounded-lg bg-white">
+              <Link
+                href={`/p/${item.product.slug}`}
+                className="relative aspect-square w-20 shrink-0 overflow-hidden rounded-lg bg-white"
+              >
                 <Image src={item.product.images[0]} alt="" fill sizes="80px" className="object-cover" />
               </Link>
-              <div className="flex flex-1 flex-col gap-1">
-                <Link href={`/p/${item.product.slug}`} className="line-clamp-2 text-sm font-medium hover:text-primary">
+              <div className="flex flex-1 flex-col gap-0.5">
+                <p className="font-mono-ui text-[10px] text-primary/50">
+                  {skuFor(item.product.id)}
+                  {item.variant ? ` · ${item.variant.value}` : ""} · {formatKg(item.lineWeightKg).toUpperCase()}
+                </p>
+                <Link
+                  href={`/p/${item.product.slug}`}
+                  className="line-clamp-2 text-sm font-semibold text-primary hover:text-accent"
+                >
                   {item.product.title}
                 </Link>
-                {item.variant && (
-                  <p className="text-xs text-muted">
-                    {item.variant.kind}: {item.variant.value}
-                  </p>
-                )}
-                <p className="text-xs text-muted">{formatKg(item.lineWeightKg)}</p>
-                <div className="mt-auto flex items-center justify-between">
+                <p data-price className="font-display text-lg font-extrabold text-primary">
+                  {formatUsd(item.lineTotalUsd)}
+                </p>
+                <div className="mt-1">
                   <CartLineControls
                     productId={item.product.id}
                     variantId={item.variant?.id ?? null}
                     quantity={item.quantity}
                   />
-                  <Price value={item.lineTotalUsd} />
                 </div>
               </div>
             </li>
           ))}
         </ul>
 
-        <div className="flex flex-col gap-4 lg:sticky lg:top-40">
+        <div className="flex flex-col gap-4 lg:sticky lg:top-28">
           <CourierMeter check={cart.courier} />
-          <div className="rounded-xl border border-border bg-surface p-4">
-            <div className="flex items-baseline justify-between">
-              <p className="font-medium">Total</p>
-              <Price value={cart.totalUsd} className="text-2xl" />
+
+          {/* Total — card navy */}
+          <div className="rounded-[10px] bg-primary p-5 text-white">
+            <div className="flex items-end justify-between">
+              <div>
+                <p className="eyebrow text-celeste">Total a pagar hoy</p>
+                <p data-price className="mt-1.5 font-display text-4xl font-extrabold tracking-[-0.03em]">
+                  {formatUsd(cart.totalUsd)}
+                </p>
+              </div>
+              <p className="font-mono-ui text-[10px] text-celeste-soft">
+                {cart.items.length} {cart.items.length === 1 ? "BULTO" : "BULTOS"}
+              </p>
             </div>
-            <p className="mt-1 text-xs text-muted">
-              Precio final en dólares: producto, envío marítimo e impuestos incluidos.
-            </p>
-            {cart.courier.ok ? (
-              <Link
-                href="/checkout"
-                className="mt-4 flex h-12 items-center justify-center rounded-lg bg-accent font-medium text-white transition-colors hover:bg-accent/90"
-              >
-                Continuar la compra
-              </Link>
-            ) : (
-              <button
-                disabled
-                className="mt-4 h-12 w-full cursor-not-allowed rounded-lg bg-border font-medium text-muted"
-              >
-                Superás los topes del pedido
-              </button>
-            )}
+            <p className="mt-2 text-xs text-celeste-soft">Un solo precio. Nada extra al recibir.</p>
           </div>
+
+          <div className="flex items-start gap-2.5 rounded-[10px] bg-celeste-soft/60 p-3 text-[13px] leading-relaxed text-primary">
+            <Ship className="mt-0.5 size-4 shrink-0" />
+            <span>Confirmando aceptás que la carga viaja por barco: son ~45 a 60 días. No hay envío exprés.</span>
+          </div>
+
+          {cart.courier.ok ? (
+            <Link
+              href="/checkout"
+              className="flex h-14 items-center justify-center rounded-[10px] bg-accent text-base font-bold text-white transition-transform hover:-translate-y-0.5"
+            >
+              Pagar y zarpar →
+            </Link>
+          ) : (
+            <button
+              disabled
+              className="h-14 w-full cursor-not-allowed rounded-[10px] bg-primary/12 font-bold text-primary/40"
+            >
+              Superás los topes del pedido
+            </button>
+          )}
         </div>
       </div>
     </div>

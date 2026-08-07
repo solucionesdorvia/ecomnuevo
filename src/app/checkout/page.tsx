@@ -34,7 +34,7 @@ export default async function CheckoutPage({
 
   return (
     <div className="py-6">
-      <h1 className="mb-2 text-2xl font-semibold">Checkout</h1>
+      <h1 className="mb-2 font-display text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">Pagar y zarpar</h1>
       <p className="mb-6 text-sm text-muted">
         Pagás en dólares con tarjeta. El precio es final: no hay ningún costo después.
       </p>
@@ -66,7 +66,7 @@ export default async function CheckoutPage({
 
         <div className="flex flex-col gap-4 lg:sticky lg:top-40">
           <div className="rounded-xl border border-border bg-surface p-4">
-            <h2 className="mb-3 font-semibold">Tu pedido</h2>
+            <h2 className="eyebrow mb-3 text-muted">Tu pedido</h2>
             <ul className="flex flex-col gap-2 text-sm">
               {cart.items.map((i) => (
                 <li key={`${i.product.id}-${i.variant?.id ?? "base"}`} className="flex justify-between gap-2">

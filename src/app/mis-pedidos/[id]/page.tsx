@@ -11,6 +11,8 @@ import { formatDate, formatKg } from "@/lib/format";
 import { Price } from "@/components/price";
 import { StateBadge } from "@/components/ui/badge";
 import { OrderTimeline } from "@/components/order-timeline";
+import { OrderProgress } from "@/components/order-progress";
+import { RouteLine } from "@/components/route-line";
 
 export const metadata: Metadata = { title: "Detalle del pedido" };
 
@@ -53,10 +55,39 @@ export default async function PedidoPage({
         </div>
       )}
 
-      <div className="mb-6 flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-semibold">Pedido #{order.number}</h1>
-        <StateBadge state={order.state} />
-        <span className="text-sm text-muted">{formatDate(order.createdAt)}</span>
+      {/* Tracking hero — código de carga + stepper + ruta */}
+      <div className="mb-6 overflow-hidden rounded-2xl bg-primary p-5 text-white sm:p-7">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h1 className="font-display text-2xl font-extrabold tracking-[-0.03em] sm:text-4xl">Seguí tu carga</h1>
+            <p className="mt-1.5 text-sm text-celeste-soft">Tu carga, a la vista siempre.</p>
+          </div>
+          <div className="rounded-[10px] border border-celeste/30 bg-primary-2 px-4 py-3">
+            <p className="eyebrow text-celeste">Código de carga</p>
+            <p className="mt-1.5 font-mono-ui text-lg font-bold sm:text-2xl">
+              TRL-{formatDate(order.createdAt).replace(/\D+/g, "").slice(-4)}-{String(order.number).padStart(5, "0")}
+            </p>
+            <div className="mt-2 flex gap-4 font-mono-ui text-[11px] text-celeste-soft">
+              <span>{formatKg(order.totalWeightKg).toUpperCase()}</span>
+              <StateBadge state={order.state} />
+            </div>
+          </div>
+        </div>
+
+        {order.state !== "CANCELADO" && (
+          <>
+            <div className="mt-8">
+              <OrderProgress currentState={order.state} events={order.statusEvents} />
+            </div>
+            <div className="mx-auto mt-6 max-w-md">
+              <RouteLine
+                origin="ORIGEN"
+                destination={order.state === "ENTREGADO" ? "ENTREGADA" : "EN TRÁNSITO"}
+                destinationMuted={order.state !== "ENTREGADO"}
+              />
+            </div>
+          </>
+        )}
       </div>
 
       {order.state === "CANCELADO" && order.cancelReason && (
@@ -69,7 +100,7 @@ export default async function PedidoPage({
 
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_380px]">
         <div className="rounded-xl border border-border bg-surface p-4 sm:p-6">
-          <h2 className="mb-4 font-semibold">Seguimiento</h2>
+          <h2 className="eyebrow mb-5 text-muted">Bitácora</h2>
           <OrderTimeline currentState={order.state} events={order.statusEvents} />
           {order.state !== "ENTREGADO" && order.state !== "CANCELADO" && (() => {
             const est = estimateDelivery(
@@ -94,7 +125,7 @@ export default async function PedidoPage({
 
         <div className="flex flex-col gap-4">
           <div className="rounded-xl border border-border bg-surface p-4">
-            <h2 className="mb-3 font-semibold">Productos</h2>
+            <h2 className="eyebrow mb-3 text-muted">Productos</h2>
             <ul className="flex flex-col gap-3">
               {order.items.map((item) => (
                 <li key={item.id} className="flex gap-3">
@@ -120,7 +151,7 @@ export default async function PedidoPage({
           </div>
 
           <div className="rounded-xl border border-border bg-surface p-4 text-sm">
-            <h2 className="mb-2 font-semibold">Entrega</h2>
+            <h2 className="eyebrow mb-2 text-muted">Entrega</h2>
             <p>
               {order.address.street}
               {order.address.apartment ? `, ${order.address.apartment}` : ""}
