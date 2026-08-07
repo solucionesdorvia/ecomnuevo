@@ -37,34 +37,53 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col gap-12 py-8">
-      {/* Hero */}
-      <section className="flex flex-col items-start gap-4 py-6 sm:py-10">
-        <h1 className="max-w-2xl text-3xl font-black leading-[1.05] tracking-tight sm:text-5xl">
-          Lo viste afuera. <span className="whitespace-nowrap">Traelo<span className="text-accent">.</span></span>
-        </h1>
-        <p className="max-w-xl text-lg text-muted">
-          Comprá directo a proveedores del exterior. El precio que ves es final: producto,
-          envío e impuestos incluidos. Te llega a tu casa. Nada más que pagar.
-        </p>
-        <Link
-          href="/catalogo"
-          className="rounded-lg bg-primary px-6 py-3 font-medium text-white transition-colors hover:bg-primary/90"
+      {/* Hero — card de tinta oceánica, titular display, ruta punteada de fondo */}
+      <section className="relative overflow-hidden rounded-3xl bg-primary px-6 py-10 text-white sm:px-10 sm:py-14">
+        {/* trazo de ruta decorativo, muy sutil */}
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 400 200"
+          className="pointer-events-none absolute -right-10 top-0 h-full w-2/3 opacity-[0.12]"
+          fill="none"
         >
-          Ver catálogo
-        </Link>
-        <div className="mt-4 grid gap-3 text-sm text-muted sm:grid-cols-3">
-          <p className="flex items-center gap-2">
-            <ShieldCheck className="size-5 shrink-0 text-success" />
-            Precio final puesto en tu casa
+          <path
+            d="M20 170 C 120 60, 220 150, 380 30"
+            stroke="var(--accent)"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeDasharray="0.1 14"
+          />
+        </svg>
+
+        <div className="relative flex flex-col items-start gap-5">
+          <p className="eyebrow text-celeste">Marketplace de importación</p>
+          <h1 className="max-w-2xl text-4xl font-black leading-[0.95] tracking-tight sm:text-6xl">
+            Lo viste en la fábrica.
+            <br />
+            <span className="text-accent">Traelo.</span>
+          </h1>
+          <p className="max-w-xl text-lg text-celeste-soft">
+            Comprás directo de fábrica en China. Precio final, un solo pago, y te llega
+            a la puerta — a tu nombre. Nada más que pagar.
           </p>
-          <p className="flex items-center gap-2">
-            <PackageCheck className="size-5 shrink-0 text-success" />
-            Comprás directo al proveedor
-          </p>
-          <p className="flex items-center gap-2">
-            <Ship className="size-5 shrink-0 text-success" />
-            Seguimiento en cada paso
-          </p>
+          <Link
+            href="/catalogo"
+            className="rounded-full bg-accent px-7 py-3 font-semibold text-white transition-transform hover:-translate-y-0.5"
+          >
+            Ver catálogo
+          </Link>
+          <div className="mt-2 flex flex-wrap gap-x-6 gap-y-2">
+            {[
+              { Icon: ShieldCheck, t: "Precio final en tu casa" },
+              { Icon: PackageCheck, t: "Directo de fábrica" },
+              { Icon: Ship, t: "Seguimiento en cada paso" },
+            ].map(({ Icon, t }) => (
+              <p key={t} className="flex items-center gap-2 font-mono-ui text-xs text-celeste">
+                <Icon className="size-4 shrink-0" />
+                {t}
+              </p>
+            ))}
+          </div>
         </div>
       </section>
 

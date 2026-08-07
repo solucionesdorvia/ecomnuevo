@@ -83,8 +83,8 @@ export function FilterBar({ countries }: { countries: string[] }) {
     <div className={`mb-6 transition-opacity ${pending ? "opacity-60" : ""}`} aria-busy={pending}>
       <div className="grid grid-cols-2 items-end gap-3 rounded-xl border border-border bg-surface p-4 sm:grid-cols-4">
         <div>
-          <label htmlFor="f-min" className="mb-1 block text-xs font-medium text-muted">
-            Precio desde (US$)
+          <label htmlFor="f-min" className="eyebrow mb-1.5 block text-muted">
+            Desde (US$)
           </label>
           <input
             id="f-min"
@@ -98,7 +98,7 @@ export function FilterBar({ countries }: { countries: string[] }) {
           />
         </div>
         <div>
-          <label htmlFor="f-max" className="mb-1 block text-xs font-medium text-muted">
+          <label htmlFor="f-max" className="eyebrow mb-1.5 block text-muted">
             Hasta (US$)
           </label>
           <input
@@ -113,7 +113,7 @@ export function FilterBar({ countries }: { countries: string[] }) {
           />
         </div>
         <div>
-          <label htmlFor="f-origen" className="mb-1 block text-xs font-medium text-muted">
+          <label htmlFor="f-origen" className="eyebrow mb-1.5 block text-muted">
             Origen
           </label>
           <select id="f-origen" value={origen} onChange={(e) => setParam("origen", e.target.value)} className={field}>
@@ -126,7 +126,7 @@ export function FilterBar({ countries }: { countries: string[] }) {
           </select>
         </div>
         <div>
-          <label htmlFor="f-orden" className="mb-1 block text-xs font-medium text-muted">
+          <label htmlFor="f-orden" className="eyebrow mb-1.5 block text-muted">
             Ordenar por
           </label>
           <select id="f-orden" value={orden} onChange={(e) => setParam("orden", e.target.value)} className={field}>

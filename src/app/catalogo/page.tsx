@@ -88,9 +88,9 @@ export default async function CatalogoPage({
     <div className="py-6">
       <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-semibold">{title}</h1>
-          <p className="text-sm text-muted">
-            {total} {total === 1 ? "producto" : "productos"} · precio final, nada más que pagar
+          <h1 className="text-2xl font-black tracking-tight">{title}</h1>
+          <p className="eyebrow mt-1.5 text-muted">
+            {total} {total === 1 ? "producto" : "productos"} · precio final
           </p>
         </div>
       </div>

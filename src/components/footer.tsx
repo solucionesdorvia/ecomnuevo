@@ -1,20 +1,24 @@
 import Link from "next/link";
+import { Isologo } from "@/components/isologo";
 
 export function Footer() {
   return (
     <footer className="mt-16 border-t border-border bg-surface">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-3">
         <div>
-          <p className="text-xl font-black lowercase tracking-tight text-foreground">
-            traelo<span className="text-accent">.</span>
+          <p className="flex items-center gap-2 text-xl font-black lowercase tracking-tight text-foreground">
+            <Isologo className="size-7" />
+            <span>
+              traelo<span className="text-accent">.</span>
+            </span>
           </p>
-          <p className="mt-2 text-sm text-muted">
-            Comprá directo a proveedores del exterior, con precio final sin sorpresas.
-            Tu compra viaja en barco y entra al país a tu nombre. Lo viste afuera, traelo.
+          <p className="mt-3 text-sm text-muted">
+            Comprá directo de fábrica, con precio final sin sorpresas. Tu compra viaja
+            en barco y entra al país a tu nombre. Lo viste en la fábrica, traelo.
           </p>
         </div>
         <div className="text-sm">
-          <p className="mb-2 font-semibold text-foreground">Cómo funciona</p>
+          <p className="eyebrow mb-3 text-muted">Cómo funciona</p>
           <ol className="space-y-1 text-muted">
             <li>1. Elegís y pagás el precio final en dólares.</li>
             <li>2. Compramos tu pedido al proveedor y lo embarcamos.</li>
@@ -22,7 +26,7 @@ export function Footer() {
           </ol>
         </div>
         <div className="text-sm">
-          <p className="mb-2 font-semibold text-foreground">Ayuda</p>
+          <p className="eyebrow mb-3 text-muted">Ayuda</p>
           <ul className="space-y-1">
             <li>
               <Link href="/mis-pedidos" className="text-muted hover:text-primary">

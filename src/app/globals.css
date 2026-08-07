@@ -26,6 +26,7 @@
   --color-success: var(--success);
   --color-border: var(--border);
   --font-sans: var(--font-outfit);
+  --font-mono: var(--font-space-mono);
 }
 
 body {
@@ -38,6 +39,52 @@ body {
 .tabular-nums,
 [data-price] {
   font-variant-numeric: tabular-nums;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Sistema de diseño "traelo. v1" — utilidades del look & feel
+   (mono técnico, eyebrows, chips, isologo animado)
+   ───────────────────────────────────────────────────────────── */
+
+/* Eyebrow / label técnico: mono, mayúscula, tracking amplio.
+   Se usa para meta ("PRECIO FINAL", "128 PRODUCTOS · ORDENADO POR AHORRO"),
+   secciones y datos. Es la firma tipográfica del sistema. */
+.eyebrow {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.font-mono-ui {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+/* Chip / pill de filtro: mayúscula, tracking, mono. Activo = tinta relleno. */
+.chip {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+  border-radius: 9999px;
+  padding: 0.4rem 0.9rem;
+  transition: colors 0.15s ease;
+}
+
+/* Isologo: la ruta punteada naranja (fábrica → tu casa) es el único elemento
+   en movimiento de todo el sistema (nota del board). Los puntos fluyen hacia
+   el destino animando el dash-offset. */
+@keyframes traelo-route {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+.isologo-route {
+  animation: traelo-route 3.5s linear infinite;
 }
 
 /* Foco visible para navegación por teclado (accesibilidad). Especificidad 0

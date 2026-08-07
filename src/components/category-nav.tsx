@@ -29,9 +29,9 @@ function CategoryNavInner() {
             href={`/catalogo?categoria=${c.key}`}
             aria-current={isActive ? "page" : undefined}
             className={cn(
-              "whitespace-nowrap rounded-full px-3 py-1 text-sm transition-colors",
+              "chip",
               isActive
-                ? "bg-primary font-medium text-white"
+                ? "bg-primary text-white"
                 : "text-muted hover:bg-foreground/5 hover:text-foreground",
             )}
           >
@@ -44,9 +44,9 @@ function CategoryNavInner() {
         href="/fabricas"
         aria-current={enFabricas ? "page" : undefined}
         className={cn(
-          "whitespace-nowrap rounded-full px-3 py-1 text-sm transition-colors",
+          "chip",
           enFabricas
-            ? "bg-primary font-medium text-white"
+            ? "bg-primary text-white"
             : "text-muted hover:bg-foreground/5 hover:text-foreground",
         )}
       >

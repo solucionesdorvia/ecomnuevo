@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit } from "next/font/google";
+import { Outfit, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { getCurrentUser } from "@/lib/auth";
 import { getCart } from "@/lib/cart";
@@ -11,14 +11,22 @@ const outfit = Outfit({
   subsets: ["latin"],
 });
 
+// Mono técnico/editorial para eyebrows, meta y datos (precio final, estados, contadores).
+// Es la contraparte de Outfit en el sistema de diseño "traelo. v1".
+const spaceMono = Space_Mono({
+  variable: "--font-space-mono",
+  subsets: ["latin"],
+  weight: ["400", "700"],
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
   title: {
-    default: "Traelo — Comprá afuera, recibí en tu casa",
+    default: "Traelo — Comprá directo de fábrica, recibí en tu casa",
     template: "%s — Traelo",
   },
   description:
-    "Comprá directo a proveedores del exterior, con precio final sin sorpresas, y recibilo en tu casa. Lo viste afuera, traelo.",
+    "Comprá directo de fábrica en China, con precio final sin sorpresas, y recibilo en tu casa. Lo viste en la fábrica, traelo.",
 };
 
 export const viewport: Viewport = {
@@ -32,7 +40,7 @@ export default async function RootLayout({
 }>) {
   const [user, cart] = await Promise.all([getCurrentUser(), getCart()]);
   return (
-    <html lang="es-AR" className={`${outfit.variable} h-full antialiased`}>
+    <html lang="es-AR" className={`${outfit.variable} ${spaceMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <a
           href="#contenido"

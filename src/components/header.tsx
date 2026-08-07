@@ -4,6 +4,7 @@ import type { User } from "@prisma/client";
 import { logout } from "@/actions/auth";
 import { SearchBox } from "@/components/search-box";
 import { CategoryNav } from "@/components/category-nav";
+import { Isologo } from "@/components/isologo";
 
 export function Header({ user, cartCount }: { user: User | null; cartCount: number }) {
   return (
@@ -11,10 +12,13 @@ export function Header({ user, cartCount }: { user: User | null; cartCount: numb
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
         <Link
           href="/"
-          className="shrink-0 text-2xl font-black lowercase tracking-tight text-foreground"
+          className="flex shrink-0 items-center gap-2 text-2xl font-black lowercase tracking-tight text-foreground"
           aria-label="Traelo — inicio"
         >
-          traelo<span className="text-accent">.</span>
+          <Isologo className="size-8" />
+          <span>
+            traelo<span className="text-accent">.</span>
+          </span>
         </Link>
 
         <SearchBox className="hidden flex-1 sm:block" />

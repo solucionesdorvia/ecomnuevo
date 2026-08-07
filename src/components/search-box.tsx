@@ -158,13 +158,13 @@ function SearchBoxInner({ className }: { className?: string }) {
           setOpen(true);
         }}
         onKeyDown={onKeyDown}
-        placeholder="Buscar productos…"
+        placeholder="Buscá lo que traés…"
         aria-label="Buscar productos"
         role="combobox"
         aria-expanded={open}
         aria-controls="search-suggestions"
         autoComplete="off"
-        className="h-10 w-full rounded-full border border-border bg-surface pl-9 pr-9 text-sm outline-none transition-colors focus:border-primary [&::-webkit-search-cancel-button]:hidden"
+        className="h-10 w-full rounded-full border border-border bg-surface pl-9 pr-9 text-sm outline-none transition-colors focus:border-primary placeholder:font-mono-ui placeholder:text-xs placeholder:tracking-wide [&::-webkit-search-cancel-button]:hidden"
       />
       {value && (
         <button
