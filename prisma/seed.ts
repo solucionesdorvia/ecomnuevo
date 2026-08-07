@@ -206,6 +206,41 @@ async function main() {
     productIds[p.slug] = created.id;
   }
 
+  // ── Proveedor real: Sellers Union Online (Ningbo, China) ──────────────────
+  console.log("Sellers Union…");
+  const sellersUnion: UnionHomeProduct[] = req("./sellers-union.json");
+  const su = await db.supplier.create({
+    data: {
+      name: "Sellers Union",
+      country: "China",
+      depot: "Depósito Ningbo",
+      contactUrl: "https://www.sellersuniononline.com",
+      notes: "Agencia de comercio exterior en Ningbo. Catálogo importado de su directorio B2B.",
+    },
+  });
+  for (const p of sellersUnion) {
+    const created = await db.product.create({
+      data: {
+        slug: p.slug,
+        title: p.title,
+        description: p.description,
+        category: p.category,
+        images: imagesFor(p.slug),
+        supplierId: su.id,
+        weightKg: p.weightKg,
+        volumeM3: p.volumeM3,
+        costUsd: p.costUsd,
+        freightUsd: p.freightUsd,
+        taxesUsd: p.taxesUsd,
+        marginUsd: p.marginUsd,
+        priceUsd: p.priceUsd,
+        referencePriceUsd: p.referencePriceUsd,
+        featured: false,
+      },
+    });
+    productIds[p.slug] = created.id;
+  }
+
   console.log("Usuarios…");
   const password = await hashPassword("ecomex123");
   const [ana, bruno, carla, operador] = await Promise.all(

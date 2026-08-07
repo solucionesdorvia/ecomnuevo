@@ -15,6 +15,8 @@ export function supplierSlug(name: string): string {
 const BIOS: Record<string, string> = {
   "union-home":
     "Agencia de sourcing en el corazón de Yiwu, China — el mercado de commodities más grande del mundo. Conecta negocios internacionales con productos de calidad a buen precio.",
+  "sellers-union":
+    "Agencia de comercio exterior en Ningbo, China, con un directorio B2B enorme: cocina, bazar, accesorios y más. Reúne fábricas verificadas y despacha consolidado al mundo.",
   "shenzhen-tech-trading-co":
     "Trading de electrónica de consumo en Shenzhen, el polo tecnológico de China.",
   "guangzhou-home-living-ltd":
