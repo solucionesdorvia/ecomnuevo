@@ -8,6 +8,7 @@ import { CATEGORY_BY_KEY, CATEGORY_LABEL } from "@/lib/categorias";
 import { cn } from "@/lib/utils";
 import { ProductCard } from "@/components/product-card";
 import { FilterBar } from "@/components/filter-bar";
+import { EmptyState } from "@/components/empty-state";
 
 export const metadata: Metadata = { title: "Catálogo" };
 
@@ -138,17 +139,12 @@ export default async function CatalogoPage({
       </div>
 
       {products.length === 0 ? (
-        <div className="rounded-xl border border-border bg-surface py-16 text-center">
-          <p className="font-medium">No encontramos productos para esta búsqueda.</p>
-          <p className="mx-auto mt-1 max-w-sm text-sm text-muted">
-            Probá con menos filtros o con otra palabra — todo el catálogo tiene precio final.
-          </p>
-          <Link
-            href="/catalogo"
-            className="mt-4 inline-block rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90"
-          >
-            Ver todo el catálogo
-          </Link>
+        <div className="mt-6">
+          <EmptyState
+            title="Nada con ese nombre."
+            subtitle="Probá con otra palabra o menos filtros, o escribinos y lo buscamos en fábrica."
+            cta={{ label: "Ver todo el catálogo →", href: "/catalogo" }}
+          />
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">

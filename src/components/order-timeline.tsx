@@ -40,7 +40,7 @@ export function OrderTimeline({
               <span
                 className={cn(
                   "absolute left-[11px] top-6 h-full w-0.5",
-                  done && !isCurrent ? "bg-success/50" : "bg-border",
+                  done && !isCurrent ? "bg-accent/50" : "bg-border",
                 )}
               />
             )}
@@ -49,27 +49,35 @@ export function OrderTimeline({
                 "relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full border-2",
                 isCancel
                   ? "border-red-500 bg-red-500 text-white"
-                  : done
-                    ? "border-success bg-success text-white"
-                    : "border-border bg-surface text-muted",
+                  : isCurrent
+                    ? "border-accent bg-surface text-accent"
+                    : done
+                      ? "border-accent bg-accent text-white"
+                      : "border-border bg-surface text-muted",
               )}
             >
-              {isCancel ? <X className="size-3.5" /> : done ? <Check className="size-3.5" /> : <Circle className="size-2" />}
+              {isCancel ? <X className="size-3.5" /> : done && !isCurrent ? <Check className="size-3.5" /> : <Circle className="size-2 fill-current" />}
             </span>
             <div className={cn("-mt-0.5", !done && "opacity-50")}>
-              <p className={cn("text-sm font-medium", isCurrent && !isCancel && "text-success", isCancel && "text-red-600")}>
+              <p
+                className={cn(
+                  "font-mono-ui text-xs font-bold uppercase tracking-[0.08em]",
+                  isCurrent && !isCancel && "text-accent",
+                  isCancel && "text-red-600",
+                )}
+              >
                 {STATE_LABEL[state]}
               </p>
               {event ? (
                 <>
-                  <p className="text-xs text-muted">{formatDateTime(event.createdAt)}</p>
+                  <p className="mt-1 font-mono-ui text-[11px] text-muted">{formatDateTime(event.createdAt)}</p>
                   {isCurrent && <p className="mt-1 max-w-md text-xs text-muted">{STATE_DESCRIPTION[state]}</p>}
                   {event.note && state !== "PAGADO" && (
                     <p className="mt-1 max-w-md text-xs italic text-muted">“{event.note}”</p>
                   )}
                 </>
               ) : (
-                <p className="text-xs text-muted">Pendiente</p>
+                <p className="mt-1 font-mono-ui text-[11px] text-muted">PENDIENTE</p>
               )}
             </div>
           </li>
