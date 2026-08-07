@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Price } from "@/components/price";
 import { FavButton } from "@/components/fav-button";
 import { formatUsd } from "@/lib/format";
+import { esNuevo } from "@/lib/nuevo";
 
 export type ProductCardData = {
   id: string;
@@ -16,8 +17,6 @@ export type ProductCardData = {
   deliveryDaysMax: number;
   createdAt?: Date;
 };
-
-const NEW_DAYS = 30;
 
 function toNum(v: number | { toNumber(): number }): number {
   return typeof v === "object" ? v.toNumber() : v;
@@ -38,14 +37,15 @@ export function savingsPct(
 export function ProductCard({
   product,
   isFav = false,
+  priority = false,
 }: {
   product: ProductCardData;
   isFav?: boolean;
+  /** Carga prioritaria (LCP): usar solo en las primeras imágenes visibles. */
+  priority?: boolean;
 }) {
   const pct = savingsPct(product.priceUsd, product.referencePriceUsd);
-  const isNew =
-    product.createdAt != null &&
-    Date.now() - product.createdAt.getTime() < NEW_DAYS * 24 * 60 * 60 * 1000;
+  const isNew = esNuevo(product.createdAt);
 
   return (
     <Link
@@ -58,6 +58,7 @@ export function ProductCard({
           alt={product.title}
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          priority={priority}
           className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
         />
         {isNew && (
@@ -76,7 +77,7 @@ export function ProductCard({
               <span className="text-xs text-muted line-through">
                 {formatUsd(product.referencePriceUsd!)}
               </span>
-              <span className="rounded bg-accent/10 px-1 py-0.5 text-[11px] font-bold text-accent">
+              <span className="rounded bg-accent px-1.5 py-0.5 text-[11px] font-bold text-white">
                 -{pct}%
               </span>
             </>

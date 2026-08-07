@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { X } from "lucide-react";
 import { CATEGORY_BY_KEY, CATEGORY_LABEL } from "@/lib/categorias";
@@ -25,13 +25,18 @@ export function FilterBar({ countries }: { countries: string[] }) {
   const origen = params.get("origen") ?? "";
   const orden = params.get("orden") ?? "novedad";
 
-  // Los precios se editan local y navegan con debounce
-  const [min, setMin] = useState(params.get("precio_min") ?? "");
-  const [max, setMax] = useState(params.get("precio_max") ?? "");
-  useEffect(() => {
-    setMin(params.get("precio_min") ?? "");
-    setMax(params.get("precio_max") ?? "");
-  }, [params]);
+  // Los precios se editan local y navegan con debounce. Se re-sincronizan con la
+  // URL (back/forward, "limpiar filtros") vía estado derivado — sin efecto.
+  const urlMin = params.get("precio_min") ?? "";
+  const urlMax = params.get("precio_max") ?? "";
+  const [min, setMin] = useState(urlMin);
+  const [max, setMax] = useState(urlMax);
+  const [syncedKey, setSyncedKey] = useState(`${urlMin}|${urlMax}`);
+  if (syncedKey !== `${urlMin}|${urlMax}`) {
+    setSyncedKey(`${urlMin}|${urlMax}`);
+    setMin(urlMin);
+    setMax(urlMax);
+  }
 
   const navigate = (mutate: (p: URLSearchParams) => void) => {
     const next = new URLSearchParams(params.toString());

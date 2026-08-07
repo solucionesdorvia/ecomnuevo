@@ -17,8 +17,10 @@ function CategoryNavInner() {
   const params = useSearchParams();
   const active = pathname === "/catalogo" ? params.get("categoria") : null;
 
+  const enFabricas = pathname.startsWith("/fabricas");
+
   return (
-    <nav aria-label="Categorías" className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4 pb-2">
+    <nav aria-label="Categorías" className="mx-auto flex max-w-6xl items-center gap-1 overflow-x-auto px-4 pb-2">
       {CATEGORIES.map((c) => {
         const isActive = active === c.key;
         return (
@@ -37,6 +39,19 @@ function CategoryNavInner() {
           </Link>
         );
       })}
+      <span className="mx-1 h-4 w-px shrink-0 bg-border" aria-hidden="true" />
+      <Link
+        href="/fabricas"
+        aria-current={enFabricas ? "page" : undefined}
+        className={cn(
+          "whitespace-nowrap rounded-full px-3 py-1 text-sm transition-colors",
+          enFabricas
+            ? "bg-primary font-medium text-white"
+            : "text-muted hover:bg-foreground/5 hover:text-foreground",
+        )}
+      >
+        Fábricas
+      </Link>
     </nav>
   );
 }

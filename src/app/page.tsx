@@ -4,12 +4,13 @@ import { db } from "@/lib/db";
 import { getFavoriteIds } from "@/lib/favoritos";
 import { getRecentlyViewedSlugs } from "@/lib/vistos";
 import { ProductCard } from "@/components/product-card";
+import { CategoryIcon } from "@/components/category-icon";
 
 const CATEGORIES = [
-  { key: "electronica", label: "Electrónica", emoji: "🎧" },
-  { key: "hogar", label: "Hogar", emoji: "🏠" },
-  { key: "indumentaria", label: "Indumentaria", emoji: "🧥" },
-  { key: "herramientas", label: "Herramientas", emoji: "🔧" },
+  { key: "electronica", label: "Electrónica" },
+  { key: "hogar", label: "Hogar" },
+  { key: "indumentaria", label: "Indumentaria" },
+  { key: "herramientas", label: "Herramientas" },
 ];
 
 export default async function Home() {
@@ -76,10 +77,11 @@ export default async function Home() {
           </Link>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
-          {featured.map((p) => (
+          {featured.map((p, i) => (
             <ProductCard
               key={p.id}
               isFav={favIds.has(p.id)}
+              priority={i < 4}
               product={{
                 id: p.id,
                 slug: p.slug,
@@ -132,9 +134,14 @@ export default async function Home() {
             <Link
               key={c.key}
               href={`/catalogo?categoria=${c.key}`}
-              className="flex items-center gap-3 rounded-xl border border-border bg-surface p-4 transition-shadow hover:shadow-md"
+              className="group flex flex-col items-center gap-3 rounded-2xl border border-border bg-surface p-5 text-center transition-all hover:-translate-y-0.5 hover:border-celeste hover:shadow-md"
             >
-              <span className="text-2xl">{c.emoji}</span>
+              <span
+                className="flex size-16 items-center justify-center rounded-2xl transition-colors group-hover:brightness-95"
+                style={{ background: "color-mix(in srgb, var(--celeste) 22%, white)" }}
+              >
+                <CategoryIcon k={c.key} className="size-9 text-foreground" />
+              </span>
               <span className="font-medium">{c.label}</span>
             </Link>
           ))}

@@ -11,6 +11,8 @@ import { BuyBox } from "@/components/buy-box";
 import { FavButton } from "@/components/fav-button";
 import { Price } from "@/components/price";
 import { ProductCard, savingsPct } from "@/components/product-card";
+import { ProductJsonLd } from "@/components/product-jsonld";
+import { TrustStrip } from "@/components/trust-strip";
 import { TrackView } from "@/components/track-view";
 
 // Talles con orden natural (S < M < L…), el resto alfanumérico
@@ -43,7 +45,8 @@ export async function generateMetadata({
   return {
     title: product.title,
     description: product.description.slice(0, 160),
-    openGraph: { images: [product.images[0]] },
+    alternates: { canonical: `/p/${slug}` },
+    openGraph: { images: [product.images[0]], type: "website" },
   };
 }
 
@@ -65,6 +68,15 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
   return (
     <div className="py-6 pb-24 md:pb-6">
+      <ProductJsonLd
+        slug={product.slug}
+        title={product.title}
+        description={product.description}
+        images={product.images}
+        priceUsd={product.priceUsd.toNumber()}
+        active={product.active}
+        category={CATEGORY_LABEL[product.category]}
+      />
       <nav className="mb-4 flex items-center gap-1 text-sm text-muted">
         <Link href="/catalogo" className="hover:text-primary">
           Catálogo
@@ -95,7 +107,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   <span className="text-base text-muted line-through">
                     {formatUsd(product.referencePriceUsd!)}
                   </span>
-                  <span className="rounded-md bg-accent/10 px-2 py-0.5 text-sm font-bold text-accent">
+                  <span className="rounded-md bg-accent px-2 py-0.5 text-sm font-bold text-white">
                     Ahorrás {pct}%
                   </span>
                 </>
@@ -138,6 +150,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               available: v.available,
             }))}
           />
+
+          <TrustStrip />
 
           <div>
             <h2 className="mb-2 font-semibold">Descripción</h2>

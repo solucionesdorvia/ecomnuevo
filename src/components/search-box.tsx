@@ -54,9 +54,11 @@ function SearchBoxInner({ className }: { className?: string }) {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  // Sincroniza con la URL (back/forward, chips), salvo mientras tipeás
+  // Sincroniza con la URL (back/forward, chips), salvo mientras tipeás.
+  // typingRef marca si el cambio viene del usuario; leerlo acá es intencional.
   if (urlQ !== prevUrlQ) {
     setPrevUrlQ(urlQ);
+    // eslint-disable-next-line react-hooks/refs
     if (!typingRef.current) setValue(urlQ);
   }
 
@@ -158,7 +160,9 @@ function SearchBoxInner({ className }: { className?: string }) {
         onKeyDown={onKeyDown}
         placeholder="Buscar productos…"
         aria-label="Buscar productos"
+        role="combobox"
         aria-expanded={open}
+        aria-controls="search-suggestions"
         autoComplete="off"
         className="h-10 w-full rounded-full border border-border bg-surface pl-9 pr-9 text-sm outline-none transition-colors focus:border-primary [&::-webkit-search-cancel-button]:hidden"
       />
@@ -179,7 +183,10 @@ function SearchBoxInner({ className }: { className?: string }) {
       )}
 
       {open && (showRecent || hasQuery) && (
-        <div className="absolute inset-x-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-border bg-surface shadow-lg">
+        <div
+          id="search-suggestions"
+          className="absolute inset-x-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-border bg-surface shadow-lg"
+        >
           {showRecent && (
             <ul>
               <li className="px-4 pb-1 pt-3 text-xs font-medium uppercase tracking-wide text-muted">

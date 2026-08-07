@@ -1,10 +1,52 @@
+import { existsSync } from "node:fs";
+import { createRequire } from "node:module";
+import { join } from "node:path";
 import { PrismaClient, type Category, type LogisticState } from "@prisma/client";
 import { hashPassword } from "../src/lib/password";
 
 const db = new PrismaClient();
+const req = createRequire(import.meta.url);
 
-// Fotos placeholder estables (picsum con seed = mismo look en cada corrida)
-const img = (slug: string, n: number) => `https://picsum.photos/seed/${slug}-${n}/800/1000`;
+// Catálogo real de Union Home, scrapeado de su Store API (scripts/scrape-unionhome.py).
+type UnionHomeProduct = {
+  slug: string;
+  title: string;
+  description: string;
+  category: Category;
+  weightKg: number;
+  volumeM3: number;
+  costUsd: number;
+  freightUsd: number;
+  taxesUsd: number;
+  marginUsd: number;
+  priceUsd: number;
+  referencePriceUsd: number | null;
+};
+
+// ─── Fotos de producto ───────────────────────────────────────────────────────
+// Fotos REALES propias: poné los archivos en `public/productos/` con el nombre
+// del slug del producto (ej. `auriculares-bt-anc-1.jpg`, `-2.jpg`, `-3.jpg`).
+// La primera es la de la grilla; las demás arman la galería. Formatos: jpg,
+// jpeg, png o webp. Si un producto todavía no tiene fotos, se usa un placeholder
+// gris neutro. Ver public/productos/README.md para la lista de nombres.
+const EXTS = ["jpg", "jpeg", "png", "webp"];
+const PUBLIC = join(process.cwd(), "public");
+
+function localPhotos(slug: string): string[] {
+  const found: string[] = [];
+  for (let n = 1; n <= 8; n++) {
+    const ext = EXTS.find((e) => existsSync(join(PUBLIC, "productos", `${slug}-${n}.${e}`)));
+    if (ext) found.push(`/productos/${slug}-${n}.${ext}`);
+  }
+  return found;
+}
+
+const imagesFor = (slug: string): string[] => {
+  const local = localPhotos(slug);
+  if (local.length > 0) return local;
+  // Placeholder neutro (gris) hasta cargar las fotos reales del proveedor.
+  return [1, 2, 3].map((n) => `https://picsum.photos/seed/${slug}-${n}/800/1000?grayscale`);
+};
 
 type ProductSeed = {
   slug: string;
@@ -108,7 +150,7 @@ async function main() {
         title: p.title,
         description: p.description,
         category: p.category,
-        images: [img(p.slug, 1), img(p.slug, 2), img(p.slug, 3)],
+        images: imagesFor(p.slug),
         supplierId: supplierIds[p.supplier],
         weightKg: p.weightKg,
         volumeM3: p.volumeM3,
@@ -124,6 +166,41 @@ async function main() {
               create: p.variants.flatMap((v) => v.values.map((value) => ({ kind: v.kind, value }))),
             }
           : undefined,
+      },
+    });
+    productIds[p.slug] = created.id;
+  }
+
+  // ── Proveedor real: Union Home (Yiwu, China) ──────────────────────────────
+  console.log("Union Home…");
+  const unionHome: UnionHomeProduct[] = req("./union-home.json");
+  const uh = await db.supplier.create({
+    data: {
+      name: "Union Home",
+      country: "China",
+      depot: "Depósito Yiwu",
+      contactUrl: "https://www.unionhome.cn",
+      notes: "Agencia de sourcing en Yiwu. Catálogo importado vía su Store API pública.",
+    },
+  });
+  for (const p of unionHome) {
+    const created = await db.product.create({
+      data: {
+        slug: p.slug,
+        title: p.title,
+        description: p.description,
+        category: p.category,
+        images: imagesFor(p.slug),
+        supplierId: uh.id,
+        weightKg: p.weightKg,
+        volumeM3: p.volumeM3,
+        costUsd: p.costUsd,
+        freightUsd: p.freightUsd,
+        taxesUsd: p.taxesUsd,
+        marginUsd: p.marginUsd,
+        priceUsd: p.priceUsd,
+        referencePriceUsd: p.referencePriceUsd,
+        featured: false,
       },
     });
     productIds[p.slug] = created.id;
