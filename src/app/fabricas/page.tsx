@@ -22,13 +22,14 @@ function avatarSrc(name: string): string | null {
 }
 
 export default async function FabricasPage() {
-  const [suppliers, catGroups] = await Promise.all([
+  const [suppliers, catGroups, totalProducts] = await Promise.all([
     db.supplier.findMany({
       where: { active: true },
       include: { _count: { select: { products: { where: { active: true } } } } },
-      orderBy: { name: "asc" },
+      orderBy: { products: { _count: "desc" } },
     }),
     db.product.groupBy({ by: ["supplierId", "category"], where: { active: true }, _count: true }),
+    db.product.count({ where: { active: true } }),
   ]);
 
   // Categorías cubiertas por cada fábrica (ordenadas por cantidad)
@@ -40,16 +41,31 @@ export default async function FabricasPage() {
   }
 
   return (
-    <div className="py-8">
-      <div className="max-w-2xl">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent">Transparencia</p>
-        <h1 className="mt-2 font-display text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">
-          De dónde viene lo que comprás.
-        </h1>
-        <p className="mt-3 text-lg text-muted">
-          Compramos directo a estas fábricas y depósitos del exterior. Sin intermediarios,
-          sin cadena de reventa: por eso el precio baja y sabés exactamente de dónde sale tu pedido.
-        </p>
+    <div className="pb-10">
+      {/* Hero navy */}
+      <div className="fullbleed bg-primary text-white">
+        <div className="mx-auto max-w-6xl px-4 py-10 lg:py-14">
+          <p className="eyebrow text-celeste">Transparencia</p>
+          <h1 className="mt-3 max-w-2xl font-display text-3xl font-extrabold tracking-[-0.03em] sm:text-5xl">
+            De dónde viene lo que comprás.
+          </h1>
+          <p className="mt-4 max-w-xl text-celeste-soft lg:text-lg">
+            Compramos directo a estas fábricas y depósitos del exterior. Sin intermediarios,
+            sin cadena de reventa: por eso el precio baja y sabés exactamente de dónde sale tu pedido.
+          </p>
+          <div className="mt-6 flex gap-8">
+            <div>
+              <p className="font-display text-3xl font-extrabold tabular-nums">{suppliers.length}</p>
+              <p className="eyebrow mt-1 text-celeste">
+                {suppliers.length === 1 ? "fábrica" : "fábricas"}
+              </p>
+            </div>
+            <div>
+              <p className="font-display text-3xl font-extrabold tabular-nums">{totalProducts}</p>
+              <p className="eyebrow mt-1 text-celeste">productos</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
