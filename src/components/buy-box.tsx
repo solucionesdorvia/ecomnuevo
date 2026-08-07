@@ -62,11 +62,12 @@ export function BuyBox({
         <>
           <Check className="size-5" /> Agregado
         </>
-      ) : (
+      ) : pending ? (
         <>
-          <ShoppingCart className="size-5" />
-          {pending ? "Agregando…" : "Agregar al carrito"}
+          <ShoppingCart className="size-5" /> Agregando…
         </>
+      ) : (
+        "Traelo →"
       )}
     </Button>
   );
@@ -88,10 +89,10 @@ export function BuyBox({
                 disabled={!v.available}
                 onClick={() => setSelected((s) => ({ ...s, [kind]: v.id }))}
                 className={cn(
-                  "cursor-pointer rounded-lg border px-3 py-1.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40",
+                  "cursor-pointer rounded-lg border px-3.5 py-2 font-mono-ui text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40",
                   selected[kind] === v.id
-                    ? "border-primary bg-primary text-white"
-                    : "border-border bg-surface hover:border-primary",
+                    ? "border-primary bg-primary font-bold text-white"
+                    : "border-border bg-surface text-primary hover:border-primary",
                 )}
               >
                 {v.value}

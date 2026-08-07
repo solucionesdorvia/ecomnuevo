@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 const DEFAULT_ITEMS = [
   "50 KG POR BULTO",
   "HASTA USD 3.000",
-  "PAGÁS EN PESOS",
+  "PRECIO FINAL SIN SORPRESAS",
   "TRACKING PUERTO A PUERTA",
 ];
 

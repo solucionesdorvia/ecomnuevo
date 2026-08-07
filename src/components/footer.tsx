@@ -6,8 +6,8 @@ export function Footer() {
     <footer className="mt-16 border-t border-border bg-surface">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-3">
         <div>
-          <p className="flex items-center gap-2 text-xl font-black lowercase tracking-tight text-foreground">
-            <Isologo className="size-7" />
+          <p className="flex items-center gap-2 font-display text-2xl font-extrabold lowercase text-foreground">
+            <Isologo className="size-8" />
             <span>
               traelo<span className="text-accent">.</span>
             </span>

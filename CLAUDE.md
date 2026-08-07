@@ -80,10 +80,10 @@ quedó archivado. Isologo = ruta punteada Shanghái→tu puerta (único motion d
 para datos duros: SKU, kg, códigos, estados, eyebrows. Tokens `--font-display`,
 `--font-sans`, `--font-mono` en globals. (Antes: Outfit única.)
 
-**Moneda:** el diseño muestra el **precio final al cliente en PESOS** (`formatArs`,
-tasa demo en `lib/format.ts`). OJO: el checkout/costeo interno sigue en USD (Stripe,
-validación USD 3.000, tests). El peso es exhibición hasta integrar MercadoPago/pesos
-de verdad — hablarlo con Andy antes de tocar el backend.
+**Moneda:** **USD** en toda la interfaz (`formatUsd`). El board de Andy estaba
+diseñado en pesos + MercadoPago, pero se decidió (7/8/2026) mantener USD/Stripe como
+está construido; se reproduce el *look* del diseño, no su moneda. Si algún día se pasa
+a pesos + MercadoPago es cambio de backend (checkout, validaciones, tests).
 
 **Estética general:** grilla de producto limpia, mucho aire, jerarquía clara entre
 precio-final / producto / CTA.

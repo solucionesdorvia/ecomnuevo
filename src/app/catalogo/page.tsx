@@ -84,18 +84,58 @@ export default async function CatalogoPage({
     return `/catalogo${s ? `?${s}` : ""}`;
   };
 
+  const orderLabel =
+    orden === "precio_asc" ? "MENOR PRECIO" : orden === "precio_desc" ? "MAYOR PRECIO" : "NOVEDAD";
+  const catChips = [
+    { key: "", label: "Todo" },
+    { key: "electronica", label: "Electrónica" },
+    { key: "hogar", label: "Hogar" },
+    { key: "indumentaria", label: "Indumentaria" },
+    { key: "herramientas", label: "Herramientas" },
+  ];
+  const chipHref = (key: string) => {
+    const p = new URLSearchParams();
+    if (q) p.set("q", q);
+    if (key) p.set("categoria", key);
+    if (origen) p.set("origen", origen);
+    if (orden !== "novedad") p.set("orden", orden);
+    const s = p.toString();
+    return `/catalogo${s ? `?${s}` : ""}`;
+  };
+  const currentCatKey = params.categoria ?? "";
+
   return (
-    <div className="py-6">
-      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
-        <div>
-          <h1 className="text-2xl font-black tracking-tight">{title}</h1>
-          <p className="eyebrow mt-1.5 text-muted">
-            {total} {total === 1 ? "producto" : "productos"} · precio final
-          </p>
-        </div>
+    <div className="py-7">
+      <h1 className="font-display text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">{title}</h1>
+      <p className="eyebrow mt-2 text-muted">
+        {total} {total === 1 ? "producto" : "productos"} · ordenado por {orderLabel}
+      </p>
+
+      {/* Chips de categoría */}
+      <div className="mt-5 flex flex-wrap gap-2">
+        {catChips.map((c) => {
+          const active = currentCatKey === c.key;
+          return (
+            <Link
+              key={c.key || "todo"}
+              href={chipHref(c.key)}
+              aria-current={active ? "page" : undefined}
+              className={cn(
+                "chip border",
+                active
+                  ? "border-primary bg-primary text-white"
+                  : "border-primary/18 bg-surface text-primary hover:border-primary/40",
+              )}
+            >
+              {c.label}
+            </Link>
+          );
+        })}
       </div>
 
-      <FilterBar countries={countries.map((c) => c.country)} />
+      <div className="mt-5">
+        <FilterBar countries={countries.map((c) => c.country)} />
+      </div>
 
       {products.length === 0 ? (
         <div className="rounded-xl border border-border bg-surface py-16 text-center">

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FavButton } from "@/components/fav-button";
-import { formatArs } from "@/lib/format";
+import { formatUsd } from "@/lib/format";
 
 export type ProductCardData = {
   id: string;
@@ -82,8 +82,8 @@ export function ProductCard({
           {product.title}
         </h3>
         <div className="mt-auto">
-          <div data-price className="font-display text-[28px] font-extrabold leading-none tracking-[-0.03em] text-primary">
-            {formatArs(product.priceUsd)}
+          <div data-price className="font-display text-[26px] font-extrabold leading-none tracking-[-0.03em] text-primary">
+            {formatUsd(product.priceUsd)}
           </div>
           <div className="mt-1.5 text-xs text-primary/60">Precio final, con impuestos y flete</div>
           <div className="mt-3 font-mono-ui text-[11px] text-primary/65">⚓ LLEGA EN ~{product.deliveryDaysMax} DÍAS</div>

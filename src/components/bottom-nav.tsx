@@ -13,8 +13,13 @@ const TABS = [
   { label: "CUENTA", href: "/favoritos", match: (p: string) => p.startsWith("/favoritos") },
 ];
 
+// En estas rutas la pantalla tiene su propia barra de acción fija (comprar / pagar),
+// así que el tab bar se oculta para no encimarse — igual que en el diseño.
+const HIDE_ON = ["/p/", "/carrito", "/checkout", "/pago"];
+
 export function BottomNav() {
   const pathname = usePathname();
+  if (HIDE_ON.some((r) => pathname.startsWith(r))) return null;
   return (
     <nav
       aria-label="Navegación principal"

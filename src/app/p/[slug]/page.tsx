@@ -9,8 +9,7 @@ import { formatKg, formatUsd } from "@/lib/format";
 import { Gallery } from "@/components/gallery";
 import { BuyBox } from "@/components/buy-box";
 import { FavButton } from "@/components/fav-button";
-import { Price } from "@/components/price";
-import { ProductCard, savingsPct } from "@/components/product-card";
+import { ProductCard, savingsPct, skuFor } from "@/components/product-card";
 import { ProductJsonLd } from "@/components/product-jsonld";
 import { TrustStrip } from "@/components/trust-strip";
 import { TrackView } from "@/components/track-view";
@@ -93,51 +92,86 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         <div className="flex flex-col gap-5">
           <div>
             <div className="flex items-start justify-between gap-3">
-              <h1 className="text-2xl font-semibold leading-snug">{product.title}</h1>
+              <div>
+                <p className="eyebrow text-muted">
+                  SKU {skuFor(product.id)} · {product.supplier.country}
+                </p>
+                <h1 className="mt-2 font-display text-3xl font-extrabold leading-[1.08] tracking-[-0.03em]">
+                  {product.title}
+                </h1>
+              </div>
               <FavButton
                 productId={product.id}
                 initialFav={favIds.has(product.id)}
                 className="shrink-0 border border-border"
               />
             </div>
-            <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <Price value={product.priceUsd} className="text-3xl" />
-              {pct !== null && (
-                <>
-                  <span className="text-base text-muted line-through">
-                    {formatUsd(product.referencePriceUsd!)}
-                  </span>
-                  <span className="rounded-md bg-accent px-2 py-0.5 text-sm font-bold text-white">
-                    Ahorrás {pct}%
-                  </span>
-                </>
-              )}
-            </div>
-            {pct !== null && (
-              <p className="mt-0.5 text-xs text-muted">
-                Contra {formatUsd(product.referencePriceUsd!)} de precio local de referencia.
-              </p>
-            )}
-            <p className="mt-1 text-sm text-muted">
-              Precio final en tu casa. Producto, envío internacional e impuestos incluidos —
-              nada más que pagar.
-            </p>
           </div>
 
-          <div className="flex flex-col gap-2 rounded-xl border border-border bg-surface p-4 text-sm">
-            <p className="flex items-center gap-2">
-              <Ship className="size-4 shrink-0 text-primary" />
-              Llega en {product.deliveryDaysMin}–{product.deliveryDaysMax} días desde{" "}
-              {product.supplier.country} — viaja en barco, por eso el precio.
-            </p>
-            <p className="flex items-center gap-2">
-              <Scale className="size-4 shrink-0 text-primary" />
-              Peso estimado: {formatKg(product.weightKg)}
-            </p>
-            <p className="flex items-center gap-2 text-success">
-              <ShieldCheck className="size-4 shrink-0" />
-              Seguimiento incluido en cada paso
-            </p>
+          {/* Precio final + desglose (datos reales de costeo) */}
+          <div className="rounded-[10px] bg-primary p-5 text-white sm:p-6">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <p className="eyebrow text-celeste">Precio final en tu casa</p>
+                <p
+                  data-price
+                  className="mt-1.5 font-display text-4xl font-extrabold tracking-[-0.03em] tabular-nums"
+                >
+                  {formatUsd(product.priceUsd)}
+                </p>
+                {pct !== null && (
+                  <p className="mt-1 font-mono-ui text-[11px] text-celeste-soft">
+                    Ahorrás {pct}% vs. {formatUsd(product.referencePriceUsd!)} local
+                  </p>
+                )}
+              </div>
+              {pct !== null && (
+                <span className="rounded-md bg-accent px-2.5 py-1 font-mono-ui text-xs font-bold">
+                  -{pct}%
+                </span>
+              )}
+            </div>
+            <div className="mt-4 flex flex-col gap-2 border-t border-dashed border-celeste/35 pt-3.5 font-mono-ui text-[13px]">
+              {[
+                { l: "Producto (fábrica)", v: product.costUsd },
+                { l: "Flete marítimo", v: product.freightUsd },
+                { l: "Impuestos y aduana", v: product.taxesUsd },
+                { l: "Servicio traelo.", v: product.marginUsd },
+              ].map((row) => (
+                <div key={row.l} className="flex justify-between">
+                  <span className="text-celeste-soft">{row.l}</span>
+                  <span className="tabular-nums">{formatUsd(row.v)}</span>
+                </div>
+              ))}
+              <div className="mt-1 flex justify-between border-t border-celeste/35 pt-2.5 font-bold">
+                <span>Total</span>
+                <span className="tabular-nums text-accent">{formatUsd(product.priceUsd)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Info de envío */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-[10px] border border-border bg-surface p-3.5">
+              <p className="eyebrow text-muted">Llega en</p>
+              <p className="mt-1.5 flex items-center gap-1.5 font-display text-lg font-extrabold text-primary">
+                <Ship className="size-4 text-accent" /> {product.deliveryDaysMin}–{product.deliveryDaysMax} días
+              </p>
+            </div>
+            <div className="rounded-[10px] border border-border bg-surface p-3.5">
+              <p className="eyebrow text-muted">Peso del bulto</p>
+              <p className="mt-1.5 flex items-center gap-1.5 font-mono-ui text-lg font-bold text-primary">
+                <Scale className="size-4 text-accent" /> {formatKg(product.weightKg)}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-2.5 rounded-[10px] bg-celeste-soft/60 p-3.5 text-[13px] leading-relaxed text-primary">
+            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
+            <span>
+              <strong>Viene por barco.</strong> Son ~{product.deliveryDaysMax} días de viaje y seguís
+              cada movimiento desde tu cuenta. Si tenés apuro, esto no es para vos.
+            </span>
           </div>
 
           <BuyBox
@@ -154,7 +188,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <TrustStrip />
 
           <div>
-            <h2 className="mb-2 font-semibold">Descripción</h2>
+            <h2 className="mb-2 font-display text-xl font-extrabold tracking-[-0.02em]">Descripción</h2>
             <p className="max-w-prose whitespace-pre-line text-sm leading-relaxed text-muted">
               {product.description}
             </p>
@@ -164,7 +198,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
       {related.length > 0 && (
         <section className="mt-14">
-          <h2 className="mb-4 text-xl font-semibold">También te puede interesar</h2>
+          <h2 className="mb-5 font-display text-2xl font-extrabold tracking-[-0.03em]">
+            También te puede interesar
+          </h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
             {related.map((p) => (
               <ProductCard

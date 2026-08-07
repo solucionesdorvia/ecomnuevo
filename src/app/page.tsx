@@ -40,7 +40,7 @@ export default async function Home() {
               <span className="text-accent">Traelo.</span>
             </h1>
             <p className="mt-5 max-w-xl text-pretty text-base leading-relaxed text-celeste-soft lg:mt-6 lg:text-[19px]">
-              Comprás directo de fábricas chinas desde el catálogo. Un solo precio final en pesos
+              Comprás directo de fábricas chinas desde el catálogo. Un solo precio final
               —producto, flete marítimo e impuestos incluidos— y te lo dejamos en la puerta.
             </p>
             <div className="mt-7 flex flex-wrap gap-3 lg:mt-8">
@@ -114,7 +114,7 @@ export default async function Home() {
               {
                 n: "01",
                 t: "Elegís y pagás el precio final",
-                d: "Un solo precio en pesos: producto, flete marítimo e impuestos incluidos. Nada extra al recibir.",
+                d: "Un solo precio en dólares: producto, flete marítimo e impuestos incluidos. Nada extra al recibir.",
               },
               {
                 n: "02",
