@@ -60,7 +60,7 @@ export default async function CatalogoPage({
     db.product.findMany({
       where,
       orderBy,
-      include: { supplier: { select: { country: true } } },
+      include: { supplier: { select: { id: true, name: true, country: true } } },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
     }),
@@ -160,6 +160,7 @@ export default async function CatalogoPage({
                 priceUsd: p.priceUsd,
                 referencePriceUsd: p.referencePriceUsd,
                 originCountry: p.supplier.country,
+                supplierName: p.supplier.name,
                 deliveryDaysMin: p.deliveryDaysMin,
                 deliveryDaysMax: p.deliveryDaysMax,
                 createdAt: p.createdAt,

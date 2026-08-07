@@ -16,11 +16,13 @@ function avatarSrc(name: string): string | null {
 }
 
 export default async function Home() {
-  const [featured, total, favIds, suppliers] = await Promise.all([
+  // "Recién embarcado": productos recientes (proveedores reales con foto real),
+  // diversificados por tipo para no repetir 8 veces el mismo producto.
+  const [recent, total, favIds, suppliers] = await Promise.all([
     db.product.findMany({
-      where: { active: true, featured: true },
-      include: { supplier: { select: { country: true } } },
-      take: 8,
+      where: { active: true },
+      include: { supplier: { select: { id: true, name: true, country: true } } },
+      take: 60,
       orderBy: { createdAt: "desc" },
     }),
     db.product.count({ where: { active: true } }),
@@ -33,16 +35,15 @@ export default async function Home() {
     }),
   ]);
 
-  // Fallback si todavía no hay destacados marcados: mostrar los más nuevos.
-  const products =
-    featured.length > 0
-      ? featured
-      : await db.product.findMany({
-          where: { active: true },
-          include: { supplier: { select: { country: true } } },
-          take: 8,
-          orderBy: { createdAt: "desc" },
-        });
+  const seenType = new Set<string>();
+  const products: typeof recent = [];
+  for (const p of recent) {
+    const key = p.title.split(" ").slice(0, 2).join(" ").toLowerCase();
+    if (seenType.has(key)) continue;
+    seenType.add(key);
+    products.push(p);
+    if (products.length >= 8) break;
+  }
 
   return (
     <div>
@@ -108,6 +109,7 @@ export default async function Home() {
                   priceUsd: p.priceUsd,
                   referencePriceUsd: p.referencePriceUsd,
                   originCountry: p.supplier.country,
+                  supplierName: p.supplier.name,
                   deliveryDaysMin: p.deliveryDaysMin,
                   deliveryDaysMax: p.deliveryDaysMax,
                   createdAt: p.createdAt,

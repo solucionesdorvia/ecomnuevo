@@ -27,7 +27,7 @@ function variantSort(a: { value: string }, b: { value: string }): number {
 async function getProduct(slug: string) {
   const product = await db.product.findUnique({
     where: { slug },
-    include: { supplier: { select: { country: true } }, variants: true },
+    include: { supplier: { select: { id: true, name: true, country: true } }, variants: true },
   });
   product?.variants.sort(variantSort);
   return product;
@@ -57,7 +57,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const [related, favIds] = await Promise.all([
     db.product.findMany({
       where: { active: true, category: product.category, id: { not: product.id } },
-      include: { supplier: { select: { country: true } } },
+      include: { supplier: { select: { id: true, name: true, country: true } } },
       orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
       take: 4,
     }),
@@ -94,7 +94,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="eyebrow text-muted">
-                  SKU {skuFor(product.id)} · {product.supplier.country}
+                  SKU {skuFor(product.id)} ·{" "}
+                  <Link href={`/fabricas/${product.supplier.id}`} className="text-accent hover:underline">
+                    {product.supplier.name}
+                  </Link>
                 </p>
                 <h1 className="mt-2 font-display text-3xl font-extrabold leading-[1.08] tracking-[-0.03em]">
                   {product.title}
@@ -214,6 +217,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   priceUsd: p.priceUsd,
                   referencePriceUsd: p.referencePriceUsd,
                   originCountry: p.supplier.country,
+                  supplierName: p.supplier.name,
                   deliveryDaysMin: p.deliveryDaysMin,
                   deliveryDaysMax: p.deliveryDaysMax,
                   createdAt: p.createdAt,

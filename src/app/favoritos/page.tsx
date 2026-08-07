@@ -11,7 +11,7 @@ export default async function FavoritosPage() {
   const user = await requireUser("/favoritos");
   const favorites = await db.favorite.findMany({
     where: { userId: user.id, product: { active: true } },
-    include: { product: { include: { supplier: { select: { country: true } } } } },
+    include: { product: { include: { supplier: { select: { id: true, name: true, country: true } } } } },
     orderBy: { createdAt: "desc" },
   });
 
@@ -52,6 +52,7 @@ export default async function FavoritosPage() {
                 priceUsd: p.priceUsd,
                 referencePriceUsd: p.referencePriceUsd,
                 originCountry: p.supplier.country,
+                supplierName: p.supplier.name,
                 deliveryDaysMin: p.deliveryDaysMin,
                 deliveryDaysMax: p.deliveryDaysMax,
                 createdAt: p.createdAt,

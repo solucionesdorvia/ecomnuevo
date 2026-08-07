@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Compass } from "lucide-react";
+
+export const metadata: Metadata = { title: "Página no encontrada" };
 
 export default function NotFound() {
   return (

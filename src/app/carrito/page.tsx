@@ -16,12 +16,14 @@ export default async function CarritoPage() {
 
   if (cart.items.length === 0) {
     return (
-      <div className="py-10">
-        <EmptyState
-          title="Todavía no zarpó nada."
-          subtitle="Buscá algo que valga el viaje. Todo lo que ves tiene precio final: producto, envío e impuestos."
-          cta={{ label: "Ver el catálogo →", href: "/catalogo" }}
-        />
+      <div className="flex min-h-[60vh] items-center py-10">
+        <div className="w-full">
+          <EmptyState
+            title="Todavía no zarpó nada."
+            subtitle="Buscá algo que valga el viaje. Todo lo que ves tiene precio final: producto, envío e impuestos."
+            cta={{ label: "Ver el catálogo →", href: "/catalogo" }}
+          />
+        </div>
       </div>
     );
   }

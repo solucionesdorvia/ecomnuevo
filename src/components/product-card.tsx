@@ -11,6 +11,7 @@ export type ProductCardData = {
   priceUsd: number | { toNumber(): number };
   referencePriceUsd?: number | { toNumber(): number } | null;
   originCountry: string;
+  supplierName?: string | null;
   deliveryDaysMin: number;
   deliveryDaysMax: number;
   createdAt?: Date;
@@ -77,7 +78,10 @@ export function ProductCard({
       </div>
 
       <div className="flex flex-1 flex-col p-4">
-        <div className="font-mono-ui text-[11px] text-primary/50">SKU {skuFor(product.id)}</div>
+        <div className="truncate font-mono-ui text-[11px] text-primary/50">
+          {product.supplierName ? `${product.supplierName} · ` : "SKU "}
+          {skuFor(product.id)}
+        </div>
         <h3 className="mb-2.5 mt-1.5 line-clamp-2 text-[15px] font-semibold leading-tight text-primary">
           {product.title}
         </h3>
