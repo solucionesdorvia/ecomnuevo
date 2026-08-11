@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BadgeCheck, ChevronLeft, MapPin, Warehouse } from "lucide-react";
+import { BadgeCheck, ChevronLeft, ChevronRight, MapPin, Warehouse } from "lucide-react";
 import type { Category } from "@prisma/client";
 import { db } from "@/lib/db";
 import { getFavoriteIds } from "@/lib/favoritos";
@@ -39,11 +39,13 @@ export default async function FabricaPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ categoria?: string }>;
+  searchParams: Promise<{ categoria?: string; pagina?: string }>;
 }) {
   const { id } = await params;
-  const { categoria } = await searchParams;
+  const { categoria, pagina } = await searchParams;
   const selectedCat = categoria ? CATEGORY_BY_KEY[categoria] : undefined;
+  const PAGE_SIZE = 24;
+  const page = Math.max(1, Number(pagina) || 1);
 
   const [supplier, counts, favIds] = await Promise.all([
     db.supplier.findUnique({ where: { id } }),
@@ -52,16 +54,30 @@ export default async function FabricaPage({
   ]);
   if (!supplier || !supplier.active) notFound();
 
-  const products = await db.product.findMany({
-    where: { supplierId: id, active: true, ...(selectedCat ? { category: selectedCat } : {}) },
-    include: { supplier: { select: { country: true } } },
-    orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
-  });
-
   const total = counts.reduce((a, c) => a + c._count, 0);
   const catCounts = counts
     .map((c) => ({ cat: c.category as Category, n: c._count }))
     .sort((a, b) => b.n - a.n);
+
+  // Total según el filtro de categoría activo (para la paginación)
+  const filteredTotal = selectedCat ? (catCounts.find((c) => c.cat === selectedCat)?.n ?? 0) : total;
+  const totalPages = Math.max(1, Math.ceil(filteredTotal / PAGE_SIZE));
+
+  const products = await db.product.findMany({
+    where: { supplierId: id, active: true, ...(selectedCat ? { category: selectedCat } : {}) },
+    include: { supplier: { select: { country: true } } },
+    orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+    skip: (page - 1) * PAGE_SIZE,
+    take: PAGE_SIZE,
+  });
+
+  const pageHref = (n: number) => {
+    const p = new URLSearchParams();
+    if (categoria) p.set("categoria", categoria);
+    if (n > 1) p.set("pagina", String(n));
+    const s = p.toString();
+    return `/fabricas/${id}${s ? `?${s}` : ""}`;
+  };
 
   return (
     <div className="py-6">
@@ -177,6 +193,47 @@ export default async function FabricaPage({
             />
           ))}
         </div>
+      )}
+
+      {/* Paginación */}
+      {totalPages > 1 && (
+        <nav aria-label="Paginación" className="mt-8 flex items-center justify-center gap-2">
+          <Link
+            href={pageHref(Math.max(1, page - 1))}
+            aria-disabled={page === 1}
+            className={cn(
+              "flex size-9 items-center justify-center rounded-lg border border-border bg-surface hover:bg-background",
+              page === 1 && "pointer-events-none opacity-40",
+            )}
+            aria-label="Página anterior"
+          >
+            <ChevronLeft className="size-4" />
+          </Link>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+            <Link
+              key={n}
+              href={pageHref(n)}
+              aria-current={n === page ? "page" : undefined}
+              className={cn(
+                "flex size-9 items-center justify-center rounded-lg border text-sm",
+                n === page ? "border-primary bg-primary text-white" : "border-border bg-surface hover:bg-background",
+              )}
+            >
+              {n}
+            </Link>
+          ))}
+          <Link
+            href={pageHref(Math.min(totalPages, page + 1))}
+            aria-disabled={page === totalPages}
+            className={cn(
+              "flex size-9 items-center justify-center rounded-lg border border-border bg-surface hover:bg-background",
+              page === totalPages && "pointer-events-none opacity-40",
+            )}
+            aria-label="Página siguiente"
+          >
+            <ChevronRight className="size-4" />
+          </Link>
+        </nav>
       )}
     </div>
   );
