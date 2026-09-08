@@ -191,7 +191,7 @@ function SearchBoxInner({ className, dark = false }: { className?: string; dark?
       {open && (showRecent || hasQuery) && (
         <div
           id="search-suggestions"
-          className="absolute inset-x-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-border bg-surface shadow-lg"
+          className="absolute inset-x-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-border bg-surface text-foreground shadow-lg"
         >
           {showRecent && (
             <ul>
