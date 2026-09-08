@@ -134,8 +134,39 @@ model Product {
   variants   ProductVariant[]
   orderItems OrderItem[]
   favorites  Favorite[]
+  groupBuys  GroupBuy[]
 
   @@index([category, active])
+}
+
+// Compra colectiva (prototipo Fase 2): un "contenedor" por producto con precio
+// escalonado. Cuanta más gente se suma, más baja el precio para todos. Cierra al
+// llenarse o al vencer. El pago es simulado en el prototipo.
+model GroupBuy {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  status    String   @default("ABIERTO") // ABIERTO | CERRADO
+  goalUnits Int // meta para "llenar" el contenedor
+  closesAt  DateTime
+  tiers     Json // [{ minUnits: number, priceUsd: number }] de mayor a menor precio
+  createdAt DateTime @default(now())
+
+  participants GroupBuyParticipant[]
+
+  @@index([status])
+}
+
+model GroupBuyParticipant {
+  id         String   @id @default(cuid())
+  groupBuyId String
+  groupBuy   GroupBuy @relation(fields: [groupBuyId], references: [id], onDelete: Cascade)
+  userId     String? // opcional en el prototipo
+  name       String
+  units      Int      @default(1)
+  joinedAt   DateTime @default(now())
+
+  @@index([groupBuyId])
 }
 
 model ProductVariant {
