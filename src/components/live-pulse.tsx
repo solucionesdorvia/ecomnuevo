@@ -2,8 +2,23 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import type { LogisticState } from "@prisma/client";
 import { showToast } from "./toast-host";
 import { formatUsd } from "@/lib/format";
+
+// Copy/icono/tono por estado: cada novedad se ve distinta según el evento real
+// (no es lo mismo un pago que una cancelación).
+const STATE_TOAST: Partial<
+  Record<LogisticState, { icon: string; title: string; body: string; tone?: "success" | "danger" }>
+> = {
+  PAGADO: { icon: "✅", title: "Pago confirmado", body: "Estamos gestionando tu compra." },
+  COMPRADO_EN_ORIGEN: { icon: "🏭", title: "Comprado en origen", body: "Ya se lo compramos al proveedor." },
+  RECIBIDO_DEPOSITO_EXTERIOR: { icon: "📥", title: "En depósito de origen", body: "Llegó a nuestro depósito." },
+  EMBARCADO: { icon: "🚢", title: "¡Embarcado!", body: "Tu carga viaja en barco hacia Argentina." },
+  EN_ADUANA: { icon: "🛃", title: "En la Aduana", body: "En la Aduana argentina, a tu nombre." },
+  ENTREGADO: { icon: "🎉", title: "¡Entregado!", body: "Tu pedido llegó. ¡Gracias por comprar!", tone: "success" },
+  CANCELADO: { icon: "⚠️", title: "Pedido cancelado", body: "Si correspondía, se reembolsó el pago.", tone: "danger" },
+};
 
 // Tiempo real por polling. Consulta /api/pulse cada 5s (se pausa cuando la
 // pestaña está oculta y vuelve a consultar al reenfocar). Al detectar un cambio
@@ -19,6 +34,7 @@ type Pulse = {
   lastOrderTotalUsd?: number | null;
   todayCount?: number;
   notifUnread?: number;
+  lastState?: LogisticState | null;
   lastLabel?: string | null;
 };
 
@@ -55,14 +71,16 @@ export function LivePulse() {
             }
           } else if (d.role === "CLIENTE") {
             if ((d.notifUnread ?? 0) > (p.notifUnread ?? 0)) {
+              const cfg = d.lastState ? STATE_TOAST[d.lastState] : undefined;
               showToast({
-                icon: "📦",
+                icon: cfg?.icon ?? "📦",
                 title:
-                  d.lastLabel && d.lastOrderNumber
-                    ? `Pedido #${d.lastOrderNumber}: ${d.lastLabel}`
+                  cfg && d.lastOrderNumber
+                    ? `Pedido #${d.lastOrderNumber}: ${cfg.title}`
                     : "Novedad en tu pedido",
-                body: "Tocá para ver el seguimiento",
+                body: cfg?.body ?? "Tocá para ver el seguimiento",
                 href: "/mis-pedidos",
+                tone: cfg?.tone,
               });
               router.refresh();
             }

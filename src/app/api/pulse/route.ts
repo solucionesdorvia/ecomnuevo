@@ -65,6 +65,7 @@ export async function GET() {
       role: user.role,
       notifUnread: unread,
       lastOrderNumber: latest?.order.number ?? null,
+      lastState: latest?.toState ?? null,
       lastLabel: latest ? STATE_LABEL[latest.toState] : null,
     },
     noStore,
