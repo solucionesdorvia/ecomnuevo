@@ -56,33 +56,40 @@ export function LivePulse() {
         if (p && p.role === d.role) {
           if (d.role === "OPERADOR" || d.role === "ADMIN") {
             if (d.lastOrderNumber && d.lastOrderNumber !== p.lastOrderNumber) {
-              showToast({
-                icon: "🛒",
-                title: `Nuevo pedido #${d.lastOrderNumber}`,
-                body:
-                  d.lastOrderTotalUsd != null
-                    ? `${formatUsd(d.lastOrderTotalUsd)} · a preparar`
-                    : "Pagado · a preparar",
-                href: "/operador",
-              });
+              const total = d.lastOrderTotalUsd;
               router.refresh();
+              // El toast se agrega DESPUÉS del refresh para que no lo pise el
+              // re-render de los server components.
+              setTimeout(
+                () =>
+                  showToast({
+                    icon: "🛒",
+                    title: `Nuevo pedido #${d.lastOrderNumber}`,
+                    body: total != null ? `${formatUsd(total)} · a preparar` : "Pagado · a preparar",
+                    href: "/operador",
+                  }),
+                250,
+              );
             } else if (d.pending !== p.pending || d.todayCount !== p.todayCount) {
               router.refresh();
             }
           } else if (d.role === "CLIENTE") {
             if ((d.notifUnread ?? 0) > (p.notifUnread ?? 0)) {
               const cfg = d.lastState ? STATE_TOAST[d.lastState] : undefined;
-              showToast({
-                icon: cfg?.icon ?? "📦",
-                title:
-                  cfg && d.lastOrderNumber
-                    ? `Pedido #${d.lastOrderNumber}: ${cfg.title}`
-                    : "Novedad en tu pedido",
-                body: cfg?.body ?? "Tocá para ver el seguimiento",
-                href: "/mis-pedidos",
-                tone: cfg?.tone,
-              });
+              const orderNumber = d.lastOrderNumber;
               router.refresh();
+              setTimeout(
+                () =>
+                  showToast({
+                    icon: cfg?.icon ?? "📦",
+                    title:
+                      cfg && orderNumber ? `Pedido #${orderNumber}: ${cfg.title}` : "Novedad en tu pedido",
+                    body: cfg?.body ?? "Tocá para ver el seguimiento",
+                    href: "/mis-pedidos",
+                    tone: cfg?.tone,
+                  }),
+                250,
+              );
             }
           }
         }
