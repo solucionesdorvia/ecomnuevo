@@ -25,7 +25,7 @@ const STATE_TOAST: Partial<
 // respecto del último snapshot: dispara un toast y refresca los server
 // components (cola de operador, dashboard, campanita) sin recargar la página.
 
-const INTERVAL = 5000;
+const INTERVAL = 4000;
 
 type Pulse = {
   role: "CLIENTE" | "OPERADOR" | "ADMIN" | null;
@@ -99,8 +99,11 @@ export function LivePulse() {
       }
     };
 
+    // Consulta SIEMPRE (aunque la pestaña esté en segundo plano) para que el
+    // operador/admin vea entrar los pedidos aunque el panel no esté enfocado.
+    // El navegador igual limita el ritmo en background; al reenfocar consulta ya.
     const tick = async () => {
-      if (!document.hidden) await poll();
+      await poll();
       timer = setTimeout(tick, INTERVAL);
     };
 
