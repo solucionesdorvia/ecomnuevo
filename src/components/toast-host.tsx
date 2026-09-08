@@ -17,10 +17,12 @@ export type ToastInput = {
 };
 type Toast = ToastInput & { id: number };
 
+// El tono se distingue por el color del chip del icono (+ el emoji), sin borde
+// lateral de color (que lee como "UI generada por IA").
 const TONE = {
-  success: { chip: "rgba(31,169,122,.20)", accent: "#1FA97A" },
-  danger: { chip: "rgba(239,68,68,.20)", accent: "#EF4444" },
-  default: { chip: "rgba(143,205,235,.16)", accent: "#8FCDEB" },
+  success: "rgba(31,169,122,.20)",
+  danger: "rgba(239,68,68,.20)",
+  default: "rgba(143,205,235,.16)",
 } as const;
 
 const EVENT = "traelo:toast";
@@ -70,21 +72,18 @@ export function ToastHost() {
   return (
     <div className="pointer-events-none fixed inset-x-4 bottom-20 z-[60] flex flex-col gap-2 sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-[22rem]">
       {store.map((t) => {
-        const tone = TONE[t.tone ?? "default"];
+        const chip = TONE[t.tone ?? "default"];
         return (
           <div
             key={t.id}
             role="status"
             className="pointer-events-auto flex items-start gap-3 rounded-2xl border border-celeste/25 bg-primary px-4 py-3 text-white shadow-xl"
-            style={{
-              animation: "toast-in .28s cubic-bezier(.16,1,.3,1)",
-              borderLeft: `3px solid ${tone.accent}`,
-            }}
+            style={{ animation: "toast-in .28s cubic-bezier(.16,1,.3,1)" }}
           >
             <span
               aria-hidden
               className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-lg text-lg"
-              style={{ background: tone.chip }}
+              style={{ background: chip }}
             >
               {t.icon ?? "🔔"}
             </span>
