@@ -185,6 +185,16 @@ body {
     transform: none;
   }
 }
+@keyframes price-pop {
+  0% {
+    opacity: 0.35;
+    transform: scale(1.14);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
 .cargo-bob {
   transform-box: fill-box;
   transform-origin: center;

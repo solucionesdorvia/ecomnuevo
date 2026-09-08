@@ -54,7 +54,6 @@ export function GroupBuyLive({
     setState(s);
   };
 
-  // Polling: ver bajar el precio cuando se suma gente (en cualquier pantalla).
   useEffect(() => {
     let alive = true;
     const poll = async () => {
@@ -71,22 +70,15 @@ export function GroupBuyLive({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initial.id]);
 
-  // Countdown vivo.
   useEffect(() => {
     const t = setInterval(() => tick((n) => n + 1), 1000);
     return () => clearInterval(t);
   }, []);
 
-  // Demo: simular que se suma gente cada ~3.5s.
   useEffect(() => {
     if (!sim) return;
     const t = setInterval(() => {
-      simularSuma(initial.id).then((s) => {
-        if (s) {
-          setNames((prev) => prev);
-          apply(s);
-        }
-      });
+      simularSuma(initial.id).then((s) => s && apply(s));
     }, 3500);
     return () => clearInterval(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -114,85 +106,119 @@ export function GroupBuyLive({
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Panel de precio en vivo */}
+      {/* HERO — el contenedor que se llena y el precio en vivo */}
       <div className="overflow-hidden rounded-2xl bg-primary p-5 text-white sm:p-6">
         <div className="flex items-center justify-between">
-          <p className="eyebrow text-celeste">Precio en vivo</p>
+          <span className="inline-flex items-center gap-2 font-mono-ui text-[11px] uppercase tracking-wide text-celeste">
+            <span className="relative flex size-2">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-70" />
+              <span className="relative inline-flex size-2 rounded-full bg-success" />
+            </span>
+            En vivo
+          </span>
           <span className="rounded-full bg-white/10 px-3 py-1 font-mono-ui text-[11px] text-celeste-soft">
             zarpa en {countdown(state.closesAt)}
           </span>
         </div>
 
-        <div className="mt-2 flex items-end gap-3">
+        {/* Precio a máxima fuerza, a todo lo ancho */}
+        <div className="mt-3">
           <span
-            className="font-display text-5xl font-extrabold tracking-[-0.04em] text-accent transition-all sm:text-6xl"
-            style={{ animation: "toast-in .3s ease-out" }}
             key={state.priceUsd}
+            className="block font-display text-5xl font-extrabold leading-[0.9] tracking-[-0.05em] text-accent sm:text-6xl"
+            style={{ animation: "price-pop .45s cubic-bezier(.16,1,.3,1)" }}
           >
             {formatUsd(state.priceUsd)}
           </span>
           {saved > 0 && (
-            <span className="mb-1.5 flex flex-col leading-tight">
+            <span className="mt-2 flex items-center gap-2">
               <span className="font-mono-ui text-sm text-celeste-soft line-through">
                 {formatUsd(state.basePriceUsd)}
               </span>
-              <span className="font-mono-ui text-[11px] text-success">
+              <span className="rounded-md bg-success/20 px-2 py-0.5 font-mono-ui text-[11px] font-bold text-success">
                 −{formatUsd(saved)} c/u
               </span>
             </span>
           )}
+          <p className="mt-3 text-sm text-celeste-soft">
+            {state.next ? (
+              <>
+                Faltan <b className="text-white">{state.next.minUnits - state.units}</b> para que baje a{" "}
+                <b className="text-accent">{formatUsd(state.next.priceUsd)}</b>.
+              </>
+            ) : (
+              "Precio mínimo desbloqueado. Sigue bajando el flete por unidad."
+            )}
+          </p>
         </div>
 
-        <p className="mt-1 text-sm text-celeste-soft">
-          {state.next
-            ? `Faltan ${state.next.minUnits - state.units} para que baje a ${formatUsd(state.next.priceUsd)}.`
-            : "¡Precio mínimo desbloqueado! Sigue bajando el flete por unidad."}
-        </p>
-
-        {/* Contenedor llenándose */}
-        <div className="mt-5">
-          <div className="mb-1.5 flex items-center justify-between font-mono-ui text-[11px] text-celeste-soft">
-            <span>Contenedor</span>
-            <span>
-              {state.units} / {state.goalUnits} unidades
-            </span>
-          </div>
-          <div className="relative h-7 overflow-hidden rounded-lg border border-celeste/30 bg-primary-2">
-            <div
-              className="h-full bg-gradient-to-r from-accent to-[#ff7a45] transition-[width] duration-700 ease-out"
-              style={{ width: `${Math.max(fill, 3)}%` }}
-            />
-            {/* marcas de los escalones */}
-            {tiers.slice(1).map((t) => (
-              <span
-                key={t.minUnits}
-                className="absolute top-0 h-full border-l border-dashed border-white/40"
-                style={{ left: `${Math.min((t.minUnits / state.goalUnits) * 100, 100)}%` }}
-                title={`${t.minUnits} → ${formatUsd(t.priceUsd)}`}
+        {/* Contenedor cargándose + quiénes se sumaron */}
+        <div className="mt-5 flex items-center gap-5 border-t border-white/10 pt-5">
+          <div className="flex shrink-0 flex-col items-center">
+            <div className="relative h-40 w-24 overflow-hidden rounded-xl border-2 border-celeste/40 bg-primary-2">
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  backgroundImage:
+                    "repeating-linear-gradient(90deg, rgba(143,205,235,.14) 0 1px, transparent 1px 11px)",
+                }}
+              />
+              <div
+                className="absolute inset-x-0 bottom-0 transition-[height] duration-700 ease-out"
+                style={{ height: `${Math.max(fill, 4)}%`, background: "linear-gradient(180deg,#ff8a5a,#FF5A1F)" }}
               >
-                <span className="absolute -top-0.5 left-1 font-mono-ui text-[9px] text-white/70">
-                  {formatUsd(t.priceUsd)}
-                </span>
-              </span>
-            ))}
+                <div className="absolute inset-x-0 -top-px h-1.5 bg-white/25" />
+              </div>
+              {tiers.slice(1).map((t) => {
+                const pos = Math.min((t.minUnits / state.goalUnits) * 100, 100);
+                const reached = fill >= pos - 0.5;
+                return (
+                  <div
+                    key={t.minUnits}
+                    className="absolute inset-x-0 flex items-center gap-1 px-1.5"
+                    style={{ bottom: `${pos}%` }}
+                  >
+                    <span
+                      className={`h-0 flex-1 border-t ${reached ? "border-white/70" : "border-dashed border-celeste/40"}`}
+                    />
+                    <span
+                      className={`font-mono-ui text-[9px] font-bold ${reached ? "text-white" : "text-celeste-soft"}`}
+                    >
+                      {formatUsd(t.priceUsd)}
+                    </span>
+                  </div>
+                );
+              })}
+              <span className="absolute left-1 top-1 size-1.5 rounded-[1px] bg-celeste/50" />
+              <span className="absolute right-1 top-1 size-1.5 rounded-[1px] bg-celeste/50" />
+            </div>
+            <p className="mt-2 font-mono-ui text-[10px] text-celeste-soft">
+              {state.units}/{state.goalUnits}
+            </p>
           </div>
-        </div>
 
-        {/* Participantes */}
-        <div className="mt-4 flex items-center gap-3">
-          <div className="flex -space-x-2">
-            {names.slice(0, 6).map((p, i) => (
-              <span
-                key={i}
-                className="grid size-7 place-items-center rounded-full border-2 border-primary bg-celeste text-[11px] font-bold text-primary"
-              >
-                {initials(p.name)}
+          <div className="min-w-0 flex-1">
+            <p className="font-mono-ui text-[11px] uppercase tracking-wide text-celeste">El contenedor</p>
+            <p className="mt-1 text-sm text-celeste-soft">
+              Se llena y zarpa. Ya viajan <b className="text-white">{state.units}</b> unidades de{" "}
+              {state.goalUnits}.
+            </p>
+            <div className="mt-3 flex items-center gap-3">
+              <div className="flex -space-x-2">
+                {names.slice(0, 5).map((p, i) => (
+                  <span
+                    key={i}
+                    className="grid size-7 place-items-center rounded-full border-2 border-primary bg-celeste text-[11px] font-bold text-primary"
+                  >
+                    {initials(p.name)}
+                  </span>
+                ))}
+              </div>
+              <span className="flex items-center gap-1.5 text-sm text-celeste-soft">
+                <Users className="size-4" /> <b className="text-white">{state.participants}</b> se sumaron
               </span>
-            ))}
+            </div>
           </div>
-          <span className="flex items-center gap-1.5 text-sm text-celeste-soft">
-            <Users className="size-4" /> {state.participants} personas ya se sumaron
-          </span>
         </div>
       </div>
 
@@ -215,7 +241,6 @@ export function GroupBuyLive({
         <p className="mt-2 text-center text-xs text-muted">
           Reservás tu lugar. Pagás recién cuando el contenedor cierra, al precio final.
         </p>
-
         <button
           type="button"
           onClick={copyLink}
@@ -226,22 +251,11 @@ export function GroupBuyLive({
         </button>
       </div>
 
-      {/* Cómo funciona */}
-      <div className="grid gap-2 sm:grid-cols-3">
-        {[
-          { t: "Más gente, más barato", d: "El flete por barco se reparte entre todos." },
-          { t: "Cerramos y zarpa", d: "Al llenarse o vencer, se fija el precio final." },
-          { t: "Cero riesgo", d: "Pagás recién cuando cierra, al precio ya desbloqueado." },
-        ].map((s, i) => (
-          <div key={i} className="rounded-xl border border-border bg-surface p-3">
-            <p className="font-mono-ui text-[11px] text-accent">0{i + 1}</p>
-            <p className="mt-1 text-sm font-semibold text-primary">{s.t}</p>
-            <p className="mt-0.5 text-xs text-muted">{s.d}</p>
-          </div>
-        ))}
-      </div>
+      <p className="text-center text-xs leading-relaxed text-muted">
+        Más gente, más barato · pagás recién cuando cierra, al precio final · viaja por barco, sin
+        sorpresas en la aduana.
+      </p>
 
-      {/* Control de demo */}
       <label className="flex cursor-pointer items-center justify-center gap-2 text-xs text-muted">
         <input type="checkbox" checked={sim} onChange={(e) => setSim(e.target.checked)} className="accent-accent" />
         Demo: simular gente sumándose (el precio baja solo)
