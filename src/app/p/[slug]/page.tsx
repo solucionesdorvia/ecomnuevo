@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronRight, Ship, ShieldCheck, Scale } from "lucide-react";
+import { ChevronRight, ShieldCheck } from "lucide-react";
+import { BrandIcon } from "@/components/brand-icon";
 import { db } from "@/lib/db";
 import { getFavoriteIds } from "@/lib/favoritos";
 import { CATEGORY_KEY, CATEGORY_LABEL } from "@/lib/categorias";
@@ -158,13 +159,13 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             <div className="rounded-[10px] border border-border bg-surface p-3.5">
               <p className="eyebrow text-muted">Llega en</p>
               <p className="mt-1.5 flex items-center gap-1.5 font-display text-lg font-extrabold text-primary">
-                <Ship className="size-4 text-accent" /> {product.deliveryDaysMin}–{product.deliveryDaysMax} días
+                <BrandIcon name="barco" className="size-[18px] shrink-0" /> {product.deliveryDaysMin}–{product.deliveryDaysMax} días
               </p>
             </div>
             <div className="rounded-[10px] border border-border bg-surface p-3.5">
               <p className="eyebrow text-muted">Peso del bulto</p>
               <p className="mt-1.5 flex items-center gap-1.5 font-mono-ui text-lg font-bold text-primary">
-                <Scale className="size-4 text-accent" /> {formatKg(product.weightKg)}
+                <BrandIcon name="peso" className="size-[18px] shrink-0" /> {formatKg(product.weightKg)}
               </p>
             </div>
           </div>

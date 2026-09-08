@@ -1,0 +1,6 @@
+.next
+.next-demo
+node_modules
+.git
+coverage
+*.log

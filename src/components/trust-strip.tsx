@@ -1,25 +1,25 @@
-import { BadgeCheck, Lock, Ship, ShieldCheck } from "lucide-react";
+import { BrandIcon, type BrandIconName } from "@/components/brand-icon";
 
 // Señales de confianza cerca del CTA: el momento donde el cliente decide
 // comprarle a una marca que no conoce. Refuerza, no decora.
-const ITEMS = [
+const ITEMS: { icon: BrandIconName; title: string; text: string }[] = [
   {
-    icon: ShieldCheck,
+    icon: "precio",
     title: "Precio final garantizado",
     text: "Sin sorpresas en Aduana. No pagás nada al recibirlo.",
   },
   {
-    icon: BadgeCheck,
+    icon: "nombre",
     title: "Entra a tu nombre",
     text: "Sos el importador: tu compra ingresa legal y transparente.",
   },
   {
-    icon: Ship,
+    icon: "track",
     title: "Seguimiento en cada paso",
     text: "Te avisamos por email desde que compramos hasta que llega.",
   },
   {
-    icon: Lock,
+    icon: "pago",
     title: "Pago seguro",
     text: "Procesado de forma segura. No guardamos tu tarjeta.",
   },
@@ -32,10 +32,10 @@ export function TrustStrip() {
         {ITEMS.map((it) => (
           <li key={it.title} className="flex gap-3">
             <span
-              className="flex size-9 shrink-0 items-center justify-center rounded-xl"
+              className="flex size-9 shrink-0 items-center justify-center rounded-xl text-primary"
               style={{ background: "color-mix(in srgb, var(--celeste) 24%, white)" }}
             >
-              <it.icon className="size-5 text-foreground" />
+              <BrandIcon name={it.icon} className="size-6" />
             </span>
             <div>
               <p className="text-sm font-semibold">{it.title}</p>

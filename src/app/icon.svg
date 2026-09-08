@@ -1,7 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="15" fill="#0C2136"/>
-  <path d="M18 45 C 26 27, 40 37, 47 20" fill="none" stroke="#FF5A1F" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="0.1 8"/>
-  <circle cx="18" cy="45" r="4.4" fill="#8FCDEB"/>
-  <circle cx="47" cy="20" r="6.6" fill="#FF5A1F"/>
-  <circle cx="47" cy="20" r="2.7" fill="#0C2136"/>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" rx="14" fill="#16324B"/>
+  <text x="30" y="33" text-anchor="middle" dominant-baseline="central" font-family="'Bricolage Grotesque', 'Arial Black', system-ui, sans-serif" font-weight="800" font-size="46" letter-spacing="-2" fill="#FFFFFF">t<tspan fill="#FF5A1F">.</tspan></text>
 </svg>

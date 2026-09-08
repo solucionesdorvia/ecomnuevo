@@ -4,17 +4,27 @@ import type { User } from "@prisma/client";
 import { logout } from "@/actions/auth";
 import { SearchBox } from "@/components/search-box";
 import { Isologo } from "@/components/isologo";
+import { NotificationBell } from "@/components/notification-bell";
+import type { NotificationItem } from "@/lib/notifications";
 
 const NAV = [
   { label: "Catálogo", href: "/catalogo" },
   { label: "Cómo funciona", href: "/#como-funciona" },
-  { label: "Para tu negocio", href: "/fabricas" },
+  { label: "Para tu negocio", href: "/para-tu-negocio" },
   { label: "Seguí tu carga", href: "/mis-pedidos" },
 ];
 
 // Header "traelo. v1": barra de tinta oceánica. Desktop: wordmark + nav + buscador
 // + carrito + ingresar. Mobile: wordmark + carrito, con el buscador debajo.
-export function Header({ user, cartCount }: { user: User | null; cartCount: number }) {
+export function Header({
+  user,
+  cartCount,
+  notifications,
+}: {
+  user: User | null;
+  cartCount: number;
+  notifications: { items: NotificationItem[]; unreadCount: number } | null;
+}) {
   return (
     <header className="sticky top-0 z-40 bg-primary text-white">
       <div className="mx-auto flex max-w-[1440px] items-center gap-6 px-4 py-3.5 lg:px-14 lg:py-5">
@@ -44,13 +54,17 @@ export function Header({ user, cartCount }: { user: User | null; cartCount: numb
             CARRITO ({cartCount})
           </Link>
 
+          {user && notifications && (
+            <NotificationBell items={notifications.items} unreadCount={notifications.unreadCount} />
+          )}
+
           {user ? (
-            <div className="group relative">
-              <button className="flex h-9 cursor-pointer items-center gap-2 rounded-lg px-2 text-sm text-white/90 hover:bg-white/10">
+            <details className="group relative [&>summary::-webkit-details-marker]:hidden">
+              <summary className="flex h-9 cursor-pointer list-none items-center gap-2 rounded-lg px-2 text-sm text-white/90 hover:bg-white/10">
                 <UserRound className="size-4" />
                 <span className="hidden max-w-24 truncate lg:inline">{user.name.split(" ")[0]}</span>
-              </button>
-              <div className="invisible absolute right-0 top-full z-50 w-48 rounded-xl border border-border bg-surface p-1 text-foreground opacity-0 shadow-lg transition-all group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+              </summary>
+              <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-xl border border-border bg-surface p-1 text-foreground shadow-lg">
                 <p className="truncate px-3 py-2 text-xs text-muted">{user.email}</p>
                 <Link href="/mis-pedidos" className="block rounded-lg px-3 py-2 text-sm hover:bg-background">
                   Seguí tu carga
@@ -74,7 +88,7 @@ export function Header({ user, cartCount }: { user: User | null; cartCount: numb
                   </button>
                 </form>
               </div>
-            </div>
+            </details>
           ) : (
             <Link
               href="/ingresar"

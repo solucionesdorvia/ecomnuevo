@@ -25,6 +25,8 @@ model User {
   docType      DocType?
   docNumber    String?
   createdAt    DateTime  @default(now())
+  // Última vez que el cliente abrió la campanita de novedades (para el contador de no leídas)
+  notificationsSeenAt DateTime?
 
   sessions       Session[]
   addresses      Address[]

@@ -4,6 +4,7 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { setLineQuantity } from "@/actions/cart";
+import { MAX_UNITS_PER_SPECIES } from "@/lib/courier";
 
 export function CartLineControls({
   productId,
@@ -37,7 +38,7 @@ export function CartLineControls({
         <span className="w-7 text-center text-sm tabular-nums">{quantity}</span>
         <button
           onClick={() => set(quantity + 1)}
-          disabled={pending || quantity >= 10}
+          disabled={pending || quantity >= MAX_UNITS_PER_SPECIES}
           className="flex size-8 cursor-pointer items-center justify-center text-muted hover:text-foreground disabled:opacity-40"
           aria-label="Sumar uno"
         >

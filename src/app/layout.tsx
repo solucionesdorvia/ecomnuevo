@@ -3,9 +3,12 @@ import { Bricolage_Grotesque, Archivo, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { getCurrentUser } from "@/lib/auth";
 import { getCart } from "@/lib/cart";
+import { getNotificationFeed } from "@/lib/notifications";
 import { Header } from "@/components/header";
 import { BottomNav } from "@/components/bottom-nav";
 import { Footer } from "@/components/footer";
+import { ToastHost } from "@/components/toast-host";
+import { LivePulse } from "@/components/live-pulse";
 
 // Sistema tipográfico "traelo. v1" (diseño de Andy):
 //  · Bricolage Grotesque 700/800 — display, títulos y precios (carácter de la marca)
@@ -47,6 +50,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const [user, cart] = await Promise.all([getCurrentUser(), getCart()]);
+  const notifications = user ? await getNotificationFeed(user) : null;
   return (
     <html lang="es-AR" className={`${bricolage.variable} ${archivo.variable} ${spaceMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col pb-16 lg:pb-0">
@@ -56,12 +60,14 @@ export default async function RootLayout({
         >
           Saltar al contenido
         </a>
-        <Header user={user} cartCount={cart.count} />
+        <Header user={user} cartCount={cart.count} notifications={notifications} />
         <main id="contenido" className="mx-auto w-full max-w-6xl flex-1 px-4">
           {children}
         </main>
         <Footer />
         <BottomNav />
+        <ToastHost />
+        {user && <LivePulse />}
       </body>
     </html>
   );

@@ -1,12 +1,18 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { db } from "@/lib/db";
-import { checkCourierLimits, type CourierCheck } from "@/lib/courier";
+import {
+  checkCourierLimits,
+  MAX_UNITS_PER_SPECIES,
+  type CourierCheck,
+  type SpeciesCount,
+} from "@/lib/courier";
 
 // Carrito en cookie (sin login): [{p: productId, v: variantId|null, q: cantidad}]
 
 const CART_COOKIE = "sp_cart";
-const MAX_QTY = 10;
+// Tope por línea = tope de unidades de la misma especie del régimen puerta a puerta.
+const MAX_QTY = MAX_UNITS_PER_SPECIES;
 
 export type CartLine = { p: string; v: string | null; q: number };
 
@@ -105,9 +111,23 @@ export async function getCart(): Promise<Cart> {
     items,
     totalUsd,
     totalWeightKg,
-    courier: checkCourierLimits(totalUsd, totalWeightKg),
+    courier: checkCourierLimits(totalUsd, totalWeightKg, speciesCounts(items)),
     count: items.reduce((a, i) => a + i.quantity, 0),
   };
+}
+
+/**
+ * Unidades por especie (= por producto), sumando variantes del mismo producto.
+ * "Misma especie" del régimen puerta a puerta se lee a nivel producto, no variante.
+ */
+export function speciesCounts(items: CartItem[]): SpeciesCount[] {
+  const byProduct = new Map<string, SpeciesCount>();
+  for (const i of items) {
+    const cur = byProduct.get(i.product.id) ?? { label: i.product.title, units: 0 };
+    cur.units += i.quantity;
+    byProduct.set(i.product.id, cur);
+  }
+  return [...byProduct.values()];
 }
 
 export async function clearCartCookie(): Promise<void> {

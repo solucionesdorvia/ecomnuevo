@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FavButton } from "@/components/fav-button";
+import { BrandIcon } from "@/components/brand-icon";
 import { formatUsd } from "@/lib/format";
 
 export type ProductCardData = {
@@ -90,7 +91,9 @@ export function ProductCard({
             {formatUsd(product.priceUsd)}
           </div>
           <div className="mt-1.5 text-xs text-primary/60">Precio final, con impuestos y flete</div>
-          <div className="mt-3 font-mono-ui text-[11px] text-primary/65">⚓ LLEGA EN ~{product.deliveryDaysMax} DÍAS</div>
+          <div className="mt-3 flex items-center gap-1.5 font-mono-ui text-[11px] text-primary/65">
+            <BrandIcon name="barco" className="size-4 shrink-0" /> LLEGA EN ~{product.deliveryDaysMax} DÍAS
+          </div>
           <div className="mt-3.5 rounded-lg bg-accent py-3 text-center text-[15px] font-bold text-white transition-transform group-hover:-translate-y-0.5">
             Traelo →
           </div>

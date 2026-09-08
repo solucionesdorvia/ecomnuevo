@@ -141,6 +141,7 @@ export default async function CatalogoPage({
       {products.length === 0 ? (
         <div className="mt-6">
           <EmptyState
+            icon="bulto"
             title="Nada con ese nombre."
             subtitle="Probá con otra palabra o menos filtros, o escribinos y lo buscamos en fábrica."
             cta={{ label: "Ver todo el catálogo →", href: "/catalogo" }}

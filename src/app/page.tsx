@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
+import { BrandIcon } from "@/components/brand-icon";
 import { db } from "@/lib/db";
 import { getFavoriteIds } from "@/lib/favoritos";
 import { supplierSlug } from "@/lib/fabricas";
@@ -174,31 +175,48 @@ export default async function Home() {
       {/* ── Cómo funciona ────────────────────────────────────── */}
       <section id="como-funciona" className="fullbleed bg-background text-foreground">
         <div className="mx-auto max-w-[1440px] px-4 py-14 lg:px-14 lg:py-16">
-          <p className="eyebrow text-accent">Cómo funciona</p>
-          <h2 className="mt-3 font-display text-3xl font-extrabold tracking-[-0.03em] lg:text-[44px]">
-            De la fábrica a tu puerta, sin sorpresas.
-          </h2>
+          <div className="max-w-2xl">
+            <p className="eyebrow text-accent">Cómo funciona</p>
+            <h2 className="mt-3 font-display text-3xl font-extrabold tracking-[-0.03em] lg:text-[44px]">
+              De la fábrica a tu puerta, sin sorpresas.
+            </h2>
+            <p className="mt-4 max-w-md text-pretty text-muted">
+              Tu carga viaja consolidada por barco, en un solo envío puerta a puerta —
+              sin costos ocultos ni sorpresas en la aduana.
+            </p>
+          </div>
           <div className="mt-10 grid gap-6 lg:grid-cols-3 lg:gap-8">
             {[
               {
                 n: "01",
+                icon: "precio" as const,
                 t: "Elegís y pagás el precio final",
                 d: "Un solo precio en dólares: producto, flete marítimo e impuestos incluidos. Nada extra al recibir.",
               },
               {
                 n: "02",
+                icon: "barco" as const,
                 t: "Compramos y embarcamos tu carga",
                 d: "La compramos en fábrica y la despachamos por barco, consolidada bajo régimen courier.",
               },
               {
                 n: "03",
+                icon: "track" as const,
                 t: "La seguís hasta tu puerta",
-                d: "~60 días de viaje, con tracking de 6 estados. Te avisamos cada movimiento por WhatsApp.",
+                d: "~60 días de viaje, con tracking de 6 estados. Seguís cada movimiento desde tu cuenta, en tiempo real.",
               },
             ].map((s) => (
               <div key={s.n} className="rounded-[10px] border border-border bg-surface p-6 lg:p-7">
-                <div className="font-mono-ui text-sm text-accent">{s.n}</div>
-                <h3 className="mt-3 font-display text-xl font-extrabold tracking-[-0.02em] lg:text-2xl">{s.t}</h3>
+                <div className="flex items-center justify-between">
+                  <span
+                    className="flex size-11 items-center justify-center rounded-xl text-primary"
+                    style={{ background: "color-mix(in srgb, var(--celeste) 24%, white)" }}
+                  >
+                    <BrandIcon name={s.icon} className="size-7" />
+                  </span>
+                  <span className="font-mono-ui text-sm text-accent">{s.n}</span>
+                </div>
+                <h3 className="mt-4 font-display text-xl font-extrabold tracking-[-0.02em] lg:text-2xl">{s.t}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted">{s.d}</p>
               </div>
             ))}

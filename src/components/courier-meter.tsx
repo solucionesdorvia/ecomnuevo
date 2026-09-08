@@ -1,4 +1,4 @@
-import { MAX_TOTAL_USD, MAX_WEIGHT_KG, type CourierCheck } from "@/lib/courier";
+import { MAX_TOTAL_USD, MAX_UNITS_PER_SPECIES, MAX_WEIGHT_KG, type CourierCheck } from "@/lib/courier";
 import { formatKg, formatUsd } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -43,7 +43,8 @@ export function CourierMeter({ check }: { check: CourierCheck }) {
       ) : (
         <p className="text-xs text-muted">
           Tu compra entra al país a tu nombre: por eso cada pedido tiene un tope de{" "}
-          {MAX_WEIGHT_KG} kg y {formatUsd(MAX_TOTAL_USD)}.
+          {MAX_WEIGHT_KG} kg, {formatUsd(MAX_TOTAL_USD)} y hasta {MAX_UNITS_PER_SPECIES} unidades por
+          producto (régimen puerta a puerta).
         </p>
       )}
     </div>

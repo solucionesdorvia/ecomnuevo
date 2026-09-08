@@ -5,6 +5,8 @@ export type Mail = {
   to: string;
   subject: string;
   text: string;
+  /** Versión HTML branded (con el GIF del estado). El texto queda como fallback. */
+  html?: string;
 };
 
 export interface Mailer {
@@ -19,6 +21,7 @@ class ConsoleMailer implements Mailer {
         "┌─ 📧 EMAIL (dev — no se envía) ─────────────────────────",
         `│ Para:    ${mail.to}`,
         `│ Asunto:  ${mail.subject}`,
+        mail.html ? "│ (incluye versión HTML branded con GIF del estado)" : "│ (texto plano)",
         "├────────────────────────────────────────────────────────",
         ...mail.text.split("\n").map((l) => `│ ${l}`),
         "└────────────────────────────────────────────────────────",

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Check, Minus, Plus, ShoppingCart } from "lucide-react";
 import { addToCart } from "@/actions/cart";
+import { MAX_UNITS_PER_SPECIES } from "@/lib/courier";
 import { Button } from "@/components/ui/button";
 import { Price } from "@/components/price";
 import { cn } from "@/lib/utils";
@@ -113,8 +114,9 @@ export function BuyBox({
           </button>
           <span className="w-8 text-center text-sm font-medium tabular-nums">{qty}</span>
           <button
-            onClick={() => setQty((q) => Math.min(10, q + 1))}
-            className="flex size-10 cursor-pointer items-center justify-center text-muted hover:text-foreground"
+            onClick={() => setQty((q) => Math.min(MAX_UNITS_PER_SPECIES, q + 1))}
+            disabled={qty >= MAX_UNITS_PER_SPECIES}
+            className="flex size-10 cursor-pointer items-center justify-center text-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
             aria-label="Sumar uno"
           >
             <Plus className="size-4" />
@@ -122,6 +124,13 @@ export function BuyBox({
         </div>
         {cta("hidden flex-1 md:inline-flex")}
       </div>
+
+      {qty >= MAX_UNITS_PER_SPECIES && (
+        <p className="text-xs text-muted">
+          Máximo {MAX_UNITS_PER_SPECIES} por producto — es el tope de unidades de la misma especie del
+          régimen puerta a puerta.
+        </p>
+      )}
 
       {kinds.length > 0 && !allChosen && (
         <p className="text-xs text-muted">Elegí {kinds.map(([k]) => k.toLowerCase()).join(" y ")} para continuar.</p>

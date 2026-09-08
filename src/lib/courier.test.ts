@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkCourierLimits, MAX_TOTAL_USD, MAX_WEIGHT_KG } from "./courier";
+import { checkCourierLimits, MAX_TOTAL_USD, MAX_UNITS_PER_SPECIES, MAX_WEIGHT_KG } from "./courier";
 
 describe("checkCourierLimits", () => {
   it("aprueba un carrito dentro de los topes", () => {
@@ -50,5 +50,30 @@ describe("checkCourierLimits", () => {
     const r = checkCourierLimits(0, 0);
     expect(r.ok).toBe(true);
     expect(r.usdRatio).toBe(0);
+  });
+
+  it("aprueba hasta 3 unidades de la misma especie (tope inclusivo)", () => {
+    const r = checkCourierLimits(100, 5, [{ label: "Reloj", units: MAX_UNITS_PER_SPECIES }]);
+    expect(r.ok).toBe(true);
+    expect(r.overSpecies).toHaveLength(0);
+  });
+
+  it("rechaza más de 3 unidades de la misma especie", () => {
+    const r = checkCourierLimits(100, 5, [{ label: "Reloj", units: 4 }]);
+    expect(r.ok).toBe(false);
+    expect(r.overSpecies).toEqual([{ label: "Reloj", units: 4 }]);
+    expect(r.errors[0]).toMatch(/hasta 3 unidades del mismo producto/);
+  });
+
+  it("suma variantes del mismo producto para el tope por especie", () => {
+    // la agregación por especie la hace el carrito; acá validamos el chequeo ya agregado
+    const r = checkCourierLimits(100, 5, [{ label: "Remera", units: 4 }]);
+    expect(r.ok).toBe(false);
+    expect(r.errors[0]).toContain("Remera");
+  });
+
+  it("acumula el error de especie con los de valor/peso", () => {
+    const r = checkCourierLimits(MAX_TOTAL_USD + 1, MAX_WEIGHT_KG + 1, [{ label: "X", units: 5 }]);
+    expect(r.errors).toHaveLength(3);
   });
 });

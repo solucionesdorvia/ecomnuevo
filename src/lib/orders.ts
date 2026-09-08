@@ -2,6 +2,7 @@ import "server-only";
 import type { DocType, LogisticState } from "@prisma/client";
 import { db } from "@/lib/db";
 import { checkCourierLimits } from "@/lib/courier";
+import { speciesCounts } from "@/lib/cart";
 import { isValidTransition } from "@/lib/estados";
 import { getMailer } from "@/lib/mailer";
 import { paymentConfirmedMail, stateChangedMail } from "@/lib/mailer/templates";
@@ -23,7 +24,7 @@ export async function createOrderFromCart(args: {
   const { cart } = args;
   if (cart.items.length === 0) throw new OrderError("El carrito está vacío.");
 
-  const courier = checkCourierLimits(cart.totalUsd, cart.totalWeightKg);
+  const courier = checkCourierLimits(cart.totalUsd, cart.totalWeightKg, speciesCounts(cart.items));
   if (!courier.ok) throw new OrderError(courier.errors.join(" "));
 
   const address = await db.address.findFirst({ where: { id: args.addressId, userId: args.userId } });

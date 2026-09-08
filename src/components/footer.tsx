@@ -38,6 +38,16 @@ export function Footer() {
                 Catálogo completo
               </Link>
             </li>
+            <li>
+              <Link href="/terminos" className="text-muted hover:text-primary">
+                Términos y condiciones
+              </Link>
+            </li>
+            <li>
+              <Link href="/privacidad" className="text-muted hover:text-primary">
+                Política de privacidad
+              </Link>
+            </li>
           </ul>
           <p className="mt-4 text-xs text-muted">
             Régimen courier: hasta 50 kg y US$ 3.000 por pedido. El comprador es el

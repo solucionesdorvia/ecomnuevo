@@ -12,7 +12,9 @@ import { Price } from "@/components/price";
 import { StateBadge } from "@/components/ui/badge";
 import { OrderTimeline } from "@/components/order-timeline";
 import { OrderProgress } from "@/components/order-progress";
-import { RouteLine } from "@/components/route-line";
+import { CargoMap } from "@/components/cargo-map";
+import { StateAnimation } from "@/components/state-animation";
+import { STATE_LABEL, STATE_DESCRIPTION } from "@/lib/estados";
 
 export const metadata: Metadata = { title: "Detalle del pedido" };
 
@@ -44,14 +46,15 @@ export default async function PedidoPage({
       </Link>
 
       {nuevo && (
-        <div className="mb-4 flex items-center gap-3 rounded-xl bg-success/10 p-4 text-success">
-          <CheckCircle2 className="size-6 shrink-0" />
-          <div>
-            <p className="font-semibold">¡Listo! Recibimos tu pago.</p>
-            <p className="text-sm">
-              Te mandamos la confirmación por email. Desde acá seguís cada paso del viaje.
-            </p>
+        <div className="mb-6 overflow-hidden rounded-2xl bg-primary p-6 text-white sm:p-7">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="size-6 shrink-0 text-success" />
+            <p className="font-display text-2xl font-extrabold tracking-[-0.02em]">¡Pago recibido!</p>
           </div>
+          <p className="mt-2 max-w-md text-celeste-soft">
+            Tu carga ya entró en viaje. Te mandamos la confirmación por email y desde acá seguís
+            cada paso, puerta a puerta.
+          </p>
         </div>
       )}
 
@@ -76,15 +79,26 @@ export default async function PedidoPage({
 
         {order.state !== "CANCELADO" && (
           <>
+            <div className="mt-7 flex flex-col items-center gap-5 sm:flex-row">
+              <StateAnimation state={order.state} className="h-36 w-36 shrink-0 sm:h-40 sm:w-40" />
+              <div className="text-center sm:text-left">
+                <p className="eyebrow text-celeste">{STATE_LABEL[order.state]}</p>
+                <p className="mt-2 text-sm text-celeste-soft sm:max-w-md">{STATE_DESCRIPTION[order.state]}</p>
+              </div>
+            </div>
             <div className="mt-8">
               <OrderProgress currentState={order.state} events={order.statusEvents} />
             </div>
-            <div className="mx-auto mt-6 max-w-md">
-              <RouteLine
-                origin="ORIGEN"
-                destination={order.state === "ENTREGADO" ? "ENTREGADA" : "EN TRÁNSITO"}
-                destinationMuted={order.state !== "ENTREGADO"}
-              />
+            <div className="mt-8">
+              {(() => {
+                const est = estimateDelivery(order.items.map((i) => i.product), order.createdAt);
+                let eta: string | undefined;
+                if (est && order.state !== "ENTREGADO") {
+                  const mid = Math.round((( est.from.getTime() + est.to.getTime()) / 2 - Date.now()) / 86400000);
+                  eta = mid > 0 ? `faltan ~${mid} días` : "llegando";
+                }
+                return <CargoMap state={order.state} eta={eta} />;
+              })()}
             </div>
           </>
         )}

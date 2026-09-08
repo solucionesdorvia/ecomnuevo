@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { clearCartCookie, getCart } from "@/lib/cart";
 import { validateDocumento } from "@/lib/documento";
+import { getTaxIdValidator } from "@/lib/tax-id";
 import { createOrderFromCart, OrderError } from "@/lib/orders";
 import { getPaymentProvider } from "@/lib/payments";
 
@@ -25,9 +26,20 @@ export async function startCheckout(_prev: CheckoutState, formData: FormData): P
   const cart = await getCart();
   if (cart.items.length === 0) redirect("/carrito");
 
-  // Documento: el comprador es el importador — obligatorio y validado
+  // Documento: el comprador es el importador — obligatorio y validado.
   const doc = validateDocumento(String(formData.get("documento") ?? ""));
   if (!doc.ok) return { error: doc.error };
+
+  // Validación del documento detrás de la interfaz TaxIdValidator:
+  //  - mock (default): solo formato (equivale a lo de arriba).
+  //  - afipsdk: consulta el padrón real de ARCA por el CUIT.
+  // Se envuelve en try/catch para que un problema del padrón no tire un 500.
+  try {
+    const taxCheck = await getTaxIdValidator().validate(doc.type, doc.normalized);
+    if (!taxCheck.valid) return { error: taxCheck.reason };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "No se pudo validar el documento." };
+  }
 
   // Dirección: una guardada o una nueva
   let addressId = String(formData.get("addressId") ?? "");

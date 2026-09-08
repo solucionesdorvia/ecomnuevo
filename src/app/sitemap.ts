@@ -4,11 +4,14 @@ import { CATEGORY_KEY } from "@/lib/categorias";
 
 const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
+// Se genera en cada request (no en build): así no necesita la DB durante el
+// build de Railway, donde la red interna de Postgres todavía no está disponible.
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const products = await db.product.findMany({
-    where: { active: true },
-    select: { slug: true, updatedAt: true },
-  });
+  const products = await db.product
+    .findMany({ where: { active: true }, select: { slug: true, updatedAt: true } })
+    .catch(() => [] as { slug: string; updatedAt: Date }[]);
   return [
     { url: base, changeFrequency: "daily", priority: 1 },
     { url: `${base}/catalogo`, changeFrequency: "daily", priority: 0.9 },

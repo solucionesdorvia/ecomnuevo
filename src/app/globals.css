@@ -116,6 +116,27 @@ body {
   animation: traelo-pulse 2.6s ease-in-out infinite;
 }
 
+/* Isologo "punto en viaje": la estela de puntos viaja hacia el destino
+   (onda de opacidad, escalonada por punto). El destino naranja queda fijo. */
+@keyframes traelo-trail {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.traelo-trail {
+  animation: traelo-trail 2.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .traelo-trail {
+    animation: none;
+    opacity: 1;
+  }
+}
+
 /* Franja naranja marquee (datos del régimen courier), scroll infinito */
 @keyframes traelo-marquee {
   to {
@@ -126,12 +147,83 @@ body {
   animation: traelo-marquee 22s linear infinite;
 }
 
+/* Escena "la carga llegando": el barco cabecea suave sobre el agua mientras
+   navega la ruta (el desplazamiento por la ruta lo hace <animateMotion>). El
+   mar respira con olas que derivan. Mismo lenguaje que la ruta punteada. */
+@keyframes traelo-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1.2deg);
+  }
+  50% {
+    transform: translateY(-2.5px) rotate(1.2deg);
+  }
+}
+@keyframes traelo-wave {
+  to {
+    transform: translateX(-48px);
+  }
+}
+@keyframes traelo-arrive {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.05;
+    transform: scale(1.7);
+  }
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.cargo-bob {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: traelo-bob 3s ease-in-out infinite;
+}
+.cargo-wave {
+  animation: traelo-wave 3.5s linear infinite;
+}
+.cargo-arrive {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: traelo-arrive 2.4s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cargo-bob,
+  .cargo-wave,
+  .cargo-arrive {
+    animation: none;
+  }
+}
+
 /* Foco visible para navegación por teclado (accesibilidad). Especificidad 0
    con :where, así los componentes pueden sobreescribirlo si hace falta. */
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 6px;
+}
+
+/* iOS Safari hace zoom automático al enfocar un input con fuente < 16px, y ese
+   zoom desborda el layout (los bordes "se cortan" a la derecha). Forzamos 16px en
+   los controles de texto en mobile para evitarlo; en desktop el diseño usa 14px. */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
 }
 
 /* Respeto de "reducir movimiento" para las transiciones/animaciones */
