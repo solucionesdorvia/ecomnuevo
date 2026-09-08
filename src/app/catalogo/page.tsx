@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
+import { searchProductIds } from "@/lib/search";
 import { getFavoriteIds } from "@/lib/favoritos";
 import { CATEGORY_BY_KEY, CATEGORY_LABEL } from "@/lib/categorias";
 import { cn } from "@/lib/utils";
@@ -38,17 +39,14 @@ export default async function CatalogoPage({
   const orden = params.orden ?? "novedad";
   const page = Math.max(1, Number(params.pagina) || 1);
 
+  // Búsqueda sin acentos: resolvemos los IDs que matchean y los componemos con
+  // el resto de los filtros.
+  const searchIds = q ? await searchProductIds(q) : null;
+
   const where: Prisma.ProductWhereInput = {
     active: true,
     ...(category ? { category } : {}),
-    ...(q
-      ? {
-          OR: [
-            { title: { contains: q, mode: "insensitive" } },
-            { description: { contains: q, mode: "insensitive" } },
-          ],
-        }
-      : {}),
+    ...(searchIds ? { id: { in: searchIds } } : {}),
     ...(origen ? { supplier: { country: origen } } : {}),
     ...(min || max ? { priceUsd: { ...(min ? { gte: min } : {}), ...(max ? { lte: max } : {}) } } : {}),
   };

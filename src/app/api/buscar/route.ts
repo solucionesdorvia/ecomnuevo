@@ -1,23 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { searchProductIds } from "@/lib/search";
 import { CATEGORY_LABEL } from "@/lib/categorias";
 
 // Sugerencias del autocomplete de búsqueda. Devuelve hasta 6 productos.
-// Cada palabra de la consulta tiene que matchear (título o descripción).
+// Búsqueda sin acentos: cada palabra tiene que matchear (título o descripción).
 export async function GET(request: NextRequest) {
   const q = (request.nextUrl.searchParams.get("q") ?? "").trim().slice(0, 60);
   if (q.length < 2) return NextResponse.json({ products: [], total: 0 });
 
-  const words = q.split(/\s+/).filter(Boolean).slice(0, 5);
-  const where = {
-    active: true,
-    AND: words.map((w) => ({
-      OR: [
-        { title: { contains: w, mode: "insensitive" as const } },
-        { description: { contains: w, mode: "insensitive" as const } },
-      ],
-    })),
-  };
+  const ids = await searchProductIds(q);
+  const where = { id: { in: ids } };
 
   const [products, total] = await Promise.all([
     db.product.findMany({
@@ -26,7 +19,7 @@ export async function GET(request: NextRequest) {
       orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
       take: 6,
     }),
-    db.product.count({ where }),
+    Promise.resolve(ids.length),
   ]);
 
   return NextResponse.json({
