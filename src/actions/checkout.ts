@@ -8,7 +8,7 @@ import { clearCartCookie, getCart } from "@/lib/cart";
 import { validateDocumento } from "@/lib/documento";
 import { getTaxIdValidator } from "@/lib/tax-id";
 import { createOrderFromCart, OrderError } from "@/lib/orders";
-import { getPaymentProvider } from "@/lib/payments";
+import { getPaymentProvider, getProviderByName } from "@/lib/payments";
 
 export type CheckoutState = { error?: string };
 
@@ -67,7 +67,9 @@ export async function startCheckout(_prev: CheckoutState, formData: FormData): P
       docNumber: doc.normalized,
       cart,
     });
-    const provider = getPaymentProvider();
+    // Método elegido en el checkout: "tarjeta" (pasarela) o "transferencia".
+    const metodo = String(formData.get("metodo") ?? "tarjeta");
+    const provider = metodo === "transferencia" ? getProviderByName("transferencia") : getPaymentProvider();
     const checkout = await provider.createCheckout({
       orderId: order.id,
       orderNumber: order.number,
@@ -85,6 +87,9 @@ export async function startCheckout(_prev: CheckoutState, formData: FormData): P
       where: { id: user.id },
       data: { docType: doc.type, docNumber: doc.normalized },
     });
+    // En transferencia el pedido ya quedó creado (PENDIENTE): el carrito no
+    // hace más falta. En tarjeta se vacía recién al confirmarse el pago.
+    if (metodo === "transferencia") await clearCartCookie();
     redirect(checkout.redirectUrl);
   } catch (e) {
     if (e instanceof OrderError) return { error: e.message };

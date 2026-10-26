@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { CheckCircle2, Lock, XCircle } from "lucide-react";
+import { Banknote, CheckCircle2, CreditCard, Lock, XCircle } from "lucide-react";
 import { startCheckout, type CheckoutState } from "@/actions/checkout";
 import { validateDocumento } from "@/lib/documento";
 import { PROVINCIAS } from "@/lib/provincias";
@@ -28,6 +28,7 @@ export function CheckoutForm({
   const [state, formAction, pending] = useActionState<CheckoutState, FormData>(startCheckout, {});
   const [addressId, setAddressId] = useState<string>(addresses[0]?.id ?? "nueva");
   const [doc, setDoc] = useState(defaultDoc);
+  const [metodo, setMetodo] = useState<"tarjeta" | "transferencia">("tarjeta");
 
   const docCheck = doc.trim() ? validateDocumento(doc) : null;
 
@@ -152,6 +153,53 @@ export function CheckoutForm({
         )}
       </section>
 
+      {/* Método de pago */}
+      <section className="rounded-xl border border-border bg-surface p-4 sm:p-5">
+        <h2 className="mb-3 font-semibold">Cómo querés pagar</h2>
+        <div className="flex flex-col gap-2">
+          <label
+            className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 text-sm ${metodo === "tarjeta" ? "border-primary bg-primary/5" : "border-border"}`}
+          >
+            <input
+              type="radio"
+              name="metodo"
+              value="tarjeta"
+              checked={metodo === "tarjeta"}
+              onChange={() => setMetodo("tarjeta")}
+              className="mt-0.5"
+            />
+            <span className="flex-1">
+              <span className="flex items-center gap-2 font-medium">
+                <CreditCard className="size-4 text-primary" /> Tarjeta de crédito
+              </span>
+              <span className="mt-0.5 block text-xs text-muted">
+                Pagás al instante y el pedido arranca solo.
+              </span>
+            </span>
+          </label>
+          <label
+            className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 text-sm ${metodo === "transferencia" ? "border-primary bg-primary/5" : "border-border"}`}
+          >
+            <input
+              type="radio"
+              name="metodo"
+              value="transferencia"
+              checked={metodo === "transferencia"}
+              onChange={() => setMetodo("transferencia")}
+              className="mt-0.5"
+            />
+            <span className="flex-1">
+              <span className="flex items-center gap-2 font-medium">
+                <Banknote className="size-4 text-primary" /> Transferencia bancaria
+              </span>
+              <span className="mt-0.5 block text-xs text-muted">
+                En pesos o dólares. El pedido arranca cuando confirmamos la transferencia.
+              </span>
+            </span>
+          </label>
+        </div>
+      </section>
+
       {state.error && (
         <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{state.error}</div>
       )}
@@ -162,11 +210,17 @@ export function CheckoutForm({
         size="lg"
         disabled={pending || (docCheck ? !docCheck.ok : false)}
       >
-        {pending ? "Preparando el pago…" : "Ir a pagar"}
+        {pending
+          ? "Preparando…"
+          : metodo === "transferencia"
+            ? "Continuar a la transferencia"
+            : "Ir a pagar"}
       </Button>
-      <p className="flex items-center justify-center gap-1.5 text-xs text-muted">
-        <Lock className="size-3.5" /> Pago procesado de forma segura. No guardamos los datos de tu
-        tarjeta.
+      <p className="flex items-center justify-center gap-1.5 text-center text-xs text-muted">
+        <Lock className="size-3.5" />
+        {metodo === "transferencia"
+          ? "Te mostramos los datos de la cuenta y un código para tu transferencia."
+          : "Pago procesado de forma segura. No guardamos los datos de tu tarjeta."}
       </p>
     </form>
   );

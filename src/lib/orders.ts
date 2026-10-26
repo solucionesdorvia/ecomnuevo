@@ -68,8 +68,9 @@ export async function confirmOrderPayment(orderId: string): Promise<{ ok: boolea
   if (order.paymentStatus === "PAGADO") return { ok: true };
   if (!order.paymentExternalId) return { ok: false, reason: "El pedido no tiene un pago iniciado." };
 
-  const { getPaymentProvider } = await import("@/lib/payments");
-  const confirmation = await getPaymentProvider().confirmPayment(order.paymentExternalId);
+  const { getProviderByName } = await import("@/lib/payments");
+  const providerName = order.paymentProvider ?? process.env.PAYMENT_PROVIDER ?? "mock";
+  const confirmation = await getProviderByName(providerName).confirmPayment(order.paymentExternalId);
   if (confirmation.status !== "approved") {
     await db.order.update({ where: { id: orderId }, data: { paymentStatus: "FALLIDO" } });
     return { ok: false, reason: confirmation.reason };

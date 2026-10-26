@@ -38,6 +38,13 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
 }
 
+/* Las secciones full-bleed usan 100vw; en navegadores con scrollbar de ancho
+   fijo eso desborda ~15px y crea scroll horizontal. `clip` lo evita sin romper
+   el sticky del header (no crea contexto de scroll, a diferencia de hidden). */
+html {
+  overflow-x: clip;
+}
+
 /* Bricolage Grotesque para display: títulos, precios, hero */
 .font-display {
   font-family: var(--font-display), var(--font-sans), sans-serif;
@@ -193,6 +200,29 @@ body {
   100% {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* Hero de deseo: la escena producto+precio entra una sola vez, coreografiada
+   (sube saliendo de un leve desenfoque). Único momento autoral del hero. */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+.hero-rise {
+  animation: hero-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-rise {
+    animation: none;
   }
 }
 .cargo-bob {
