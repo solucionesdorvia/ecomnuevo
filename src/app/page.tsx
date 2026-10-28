@@ -242,7 +242,7 @@ export default async function Home() {
                     n: "03",
                     icon: "track" as const,
                     t: "La seguís hasta tu puerta",
-                    d: "~60 días de viaje, con tracking de 6 estados, en tiempo real desde tu cuenta.",
+                    d: "45 a 60 días de viaje, con tracking de 6 estados, en tiempo real desde tu cuenta.",
                   },
                 ].map((s) => (
                   <li key={s.n} className="flex gap-4">

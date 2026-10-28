@@ -97,7 +97,7 @@ export default async function CarritoPage() {
 
           <div className="flex items-start gap-2.5 rounded-[10px] bg-celeste-soft/60 p-3 text-[13px] leading-relaxed text-primary">
             <Ship className="mt-0.5 size-4 shrink-0" />
-            <span>Confirmando aceptás que la carga viaja por barco: son ~45 a 60 días. No hay envío exprés.</span>
+            <span>Confirmando aceptás que la carga viaja por barco: son 45 a 60 días. No hay envío exprés.</span>
           </div>
 
           {cart.courier.ok ? (
