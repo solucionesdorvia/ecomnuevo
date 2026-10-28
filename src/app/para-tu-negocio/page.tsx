@@ -101,7 +101,7 @@ export default function ParaTuNegocioPage() {
             {[
               { n: "50 kg", d: "el peso máximo por pedido, por destinatario. Pensá cada compra como un bulto que entra derecho." },
               { n: "US$ 3.000", d: "el tope de valor por pedido. Por encima, se divide en varios — nosotros te lo ordenamos." },
-              { n: "~60 días", d: "lo que tarda el viaje por barco, consolidado. Planificás la reposición con tiempo." },
+              { n: "45 a 60 días", d: "lo que tarda el viaje por barco, consolidado. Planificás la reposición con tiempo." },
             ].map((s) => (
               <div key={s.n} className="border-t border-celeste/25 pt-5">
                 <p className="font-display text-5xl font-extrabold tracking-[-0.04em] text-accent lg:text-6xl">

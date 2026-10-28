@@ -6,8 +6,9 @@ import { BrandIcon } from "@/components/brand-icon";
 import { db } from "@/lib/db";
 import { getFavoriteIds } from "@/lib/favoritos";
 import { supplierSlug } from "@/lib/fabricas";
-import { ProductCard } from "@/components/product-card";
-import { RouteLine } from "@/components/route-line";
+import { ProductCard, savingsPct } from "@/components/product-card";
+import { HeroDeal } from "@/components/hero-deal";
+import { CargoMap } from "@/components/cargo-map";
 import { Marquee } from "@/components/marquee";
 import { SupplierAvatar } from "@/components/supplier-avatar";
 
@@ -19,7 +20,7 @@ function avatarSrc(name: string): string | null {
 export default async function Home() {
   // "Recién embarcado": productos recientes (proveedores reales con foto real),
   // diversificados por tipo para no repetir 8 veces el mismo producto.
-  const [recent, total, favIds, suppliers] = await Promise.all([
+  const [recent, total, favIds, suppliers, heroCandidates] = await Promise.all([
     db.product.findMany({
       where: { active: true },
       include: { supplier: { select: { id: true, name: true, country: true } } },
@@ -34,6 +35,20 @@ export default async function Home() {
       orderBy: { products: { _count: "desc" } },
       take: 4,
     }),
+    // Candidatos a héroe: productos con ahorro real contra el precio local y foto,
+    // de TODO el catálogo (no solo los recientes), para liderar con el mejor deal.
+    db.product.findMany({
+      where: { active: true, referencePriceUsd: { not: null }, images: { isEmpty: false } },
+      select: {
+        slug: true,
+        title: true,
+        images: true,
+        priceUsd: true,
+        referencePriceUsd: true,
+        deliveryDaysMax: true,
+        supplier: { select: { name: true } },
+      },
+    }),
   ]);
 
   const seenType = new Set<string>();
@@ -46,13 +61,24 @@ export default async function Home() {
     if (products.length >= 8) break;
   }
 
+  // Producto héroe: el deal más fuerte del catálogo (mayor ahorro real vs. comprarlo
+  // acá). Lidera con ganas de comprar. Cae a un reciente con foto si no hubiera.
+  const heroProduct =
+    [...heroCandidates].sort(
+      (a, b) =>
+        (savingsPct(b.priceUsd, b.referencePriceUsd) ?? 0) -
+        (savingsPct(a.priceUsd, a.referencePriceUsd) ?? 0),
+    )[0] ??
+    recent.find((p) => p.images.length > 0) ??
+    recent[0];
+
   return (
     <div>
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section className="fullbleed bg-primary text-white">
-        <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-4 py-12 lg:grid-cols-2 lg:gap-14 lg:px-14 lg:py-16">
+        <div className="mx-auto grid max-w-[1440px] items-center gap-8 px-4 py-9 lg:grid-cols-2 lg:gap-14 lg:px-14 lg:py-12">
           <div>
-            <h1 className="font-display text-[38px] font-extrabold leading-[1.0] tracking-[-0.04em] sm:text-5xl lg:text-[80px] lg:leading-[0.98]">
+            <h1 className="font-display text-[34px] font-extrabold leading-[1.02] tracking-[-0.04em] sm:text-5xl lg:text-[64px] lg:leading-[0.98]">
               Lo viste en la fábrica.
               <br />
               <span className="text-accent">Traelo.</span>
@@ -76,8 +102,20 @@ export default async function Home() {
               </Link>
             </div>
           </div>
-          <div className="lg:pl-6">
-            <RouteLine className="w-full" />
+          <div className="min-w-0 lg:pl-6">
+            {heroProduct && (
+              <HeroDeal
+                product={{
+                  slug: heroProduct.slug,
+                  title: heroProduct.title,
+                  images: heroProduct.images,
+                  priceUsd: heroProduct.priceUsd,
+                  referencePriceUsd: heroProduct.referencePriceUsd,
+                  supplierName: heroProduct.supplier.name,
+                  deliveryDaysMax: heroProduct.deliveryDaysMax,
+                }}
+              />
+            )}
           </div>
         </div>
       </section>
@@ -172,54 +210,69 @@ export default async function Home() {
         </section>
       )}
 
-      {/* ── Cómo funciona ────────────────────────────────────── */}
-      <section id="como-funciona" className="fullbleed bg-background text-foreground">
-        <div className="mx-auto max-w-[1440px] px-4 py-14 lg:px-14 lg:py-16">
-          <div className="max-w-2xl">
-            <p className="eyebrow text-accent">Cómo funciona</p>
-            <h2 className="mt-3 font-display text-3xl font-extrabold tracking-[-0.03em] lg:text-[44px]">
-              De la fábrica a tu puerta, sin sorpresas.
-            </h2>
-            <p className="mt-4 max-w-md text-pretty text-muted">
-              Tu carga viaja consolidada por barco, en un solo envío puerta a puerta —
-              sin costos ocultos ni sorpresas en la aduana.
-            </p>
-          </div>
-          <div className="mt-10 grid gap-6 lg:grid-cols-3 lg:gap-8">
-            {[
-              {
-                n: "01",
-                icon: "precio" as const,
-                t: "Elegís y pagás el precio final",
-                d: "Un solo precio en dólares: producto, flete marítimo e impuestos incluidos. Nada extra al recibir.",
-              },
-              {
-                n: "02",
-                icon: "barco" as const,
-                t: "Compramos y embarcamos tu carga",
-                d: "La compramos en fábrica y la despachamos por barco, consolidada bajo régimen courier.",
-              },
-              {
-                n: "03",
-                icon: "track" as const,
-                t: "La seguís hasta tu puerta",
-                d: "~60 días de viaje, con tracking de 6 estados. Seguís cada movimiento desde tu cuenta, en tiempo real.",
-              },
-            ].map((s) => (
-              <div key={s.n} className="rounded-[10px] border border-border bg-surface p-6 lg:p-7">
-                <div className="flex items-center justify-between">
-                  <span
-                    className="flex size-11 items-center justify-center rounded-xl text-primary"
-                    style={{ background: "color-mix(in srgb, var(--celeste) 24%, white)" }}
-                  >
-                    <BrandIcon name={s.icon} className="size-7" />
-                  </span>
-                  <span className="font-mono-ui text-sm text-accent">{s.n}</span>
-                </div>
-                <h3 className="mt-4 font-display text-xl font-extrabold tracking-[-0.02em] lg:text-2xl">{s.t}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted">{s.d}</p>
+      {/* ── Cómo funciona · el viaje real ────────────────────── */}
+      <section id="como-funciona" className="fullbleed bg-primary text-white">
+        <div className="mx-auto max-w-[1440px] px-4 py-14 lg:px-14 lg:py-20">
+          <div className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
+            <div className="min-w-0">
+              <h2 className="font-display text-3xl font-extrabold tracking-[-0.03em] lg:text-[44px]">
+                De la fábrica a tu puerta, sin sorpresas.
+              </h2>
+              <p className="mt-4 max-w-md text-pretty text-celeste-soft">
+                Tu carga viaja consolidada por barco, en un solo envío puerta a puerta —
+                sin costos ocultos ni sorpresas en la aduana. Y la seguís en el mapa, de
+                verdad, en cada tramo.
+              </p>
+
+              <ol className="mt-9 space-y-6">
+                {[
+                  {
+                    n: "01",
+                    icon: "precio" as const,
+                    t: "Elegís y pagás el precio final",
+                    d: "Un solo precio en dólares: producto, flete marítimo e impuestos incluidos. Nada extra al recibir.",
+                  },
+                  {
+                    n: "02",
+                    icon: "barco" as const,
+                    t: "Compramos y embarcamos tu carga",
+                    d: "La compramos en fábrica y la despachamos por barco, consolidada bajo régimen courier.",
+                  },
+                  {
+                    n: "03",
+                    icon: "track" as const,
+                    t: "La seguís hasta tu puerta",
+                    d: "45 a 60 días de viaje, con tracking de 6 estados, en tiempo real desde tu cuenta.",
+                  },
+                ].map((s) => (
+                  <li key={s.n} className="flex gap-4">
+                    <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary-2 text-white ring-1 ring-celeste/20">
+                      <BrandIcon name={s.icon} className="size-6" />
+                    </span>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono-ui text-xs text-accent">{s.n}</span>
+                        <h3 className="font-display text-lg font-extrabold tracking-[-0.02em] lg:text-xl">
+                          {s.t}
+                        </h3>
+                      </div>
+                      <p className="mt-1 text-sm leading-relaxed text-celeste-soft">{s.d}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            {/* el viaje real: mapa de verdad Shanghái → Argentina */}
+            <div className="min-w-0">
+              <div className="rounded-[18px] border border-celeste/15 bg-primary-2/60 p-4 sm:p-6">
+                <CargoMap state="EMBARCADO" eta="faltan ~40 días" />
+                <p className="mt-3 flex items-center gap-2 font-mono-ui text-[11px] tracking-wide text-celeste-soft">
+                  <BrandIcon name="track" className="size-4 shrink-0 text-celeste" />
+                  SEGUIMIENTO REAL · SHANGHÁI → ARGENTINA · 6 ESTADOS
+                </p>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>

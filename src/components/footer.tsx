@@ -22,7 +22,7 @@ export function Footer() {
           <ol className="space-y-1 text-muted">
             <li>1. Elegís y pagás el precio final en dólares.</li>
             <li>2. Compramos tu pedido al proveedor y lo embarcamos.</li>
-            <li>3. Te llega a tu casa en 45–60 días. Nada más que pagar.</li>
+            <li>3. Te llega a tu casa en 45 a 60 días. Nada más que pagar.</li>
           </ol>
         </div>
         <div className="text-sm">

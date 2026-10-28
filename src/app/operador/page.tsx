@@ -103,9 +103,40 @@ export default async function OperadorPage({
     return counts.find((c) => c.state === f)?._count ?? 0;
   };
 
+  const pendingTransfers = await db.order.findMany({
+    where: { paymentStatus: "PENDIENTE", paymentProvider: "transferencia" },
+    orderBy: { createdAt: "asc" },
+    select: { id: true, number: true, totalUsd: true, user: { select: { name: true } } },
+    take: 20,
+  });
+
   return (
     <div>
       <h1 className="mb-4 font-display text-2xl font-extrabold tracking-[-0.02em]">Cola de pedidos</h1>
+
+      {pendingTransfers.length > 0 && (
+        <div className="mb-4 rounded-xl border border-accent/40 bg-accent/5 p-4">
+          <h2 className="mb-2 text-sm font-semibold text-primary">
+            Transferencias por confirmar · {pendingTransfers.length}
+          </h2>
+          <ul className="flex flex-col gap-1.5">
+            {pendingTransfers.map((o) => (
+              <li key={o.id} className="flex items-center justify-between gap-3 text-sm">
+                <Link
+                  href={`/operador/pedidos/${o.id}`}
+                  className="font-medium text-primary hover:underline"
+                >
+                  #{o.number} — {o.user.name}
+                </Link>
+                <span className="flex items-center gap-3">
+                  <span className="font-mono-ui text-xs text-muted">TRAELO-{o.number}</span>
+                  <Price value={o.totalUsd} />
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <OperadorFilters suppliers={suppliers} />
 

@@ -10,6 +10,7 @@ import { formatDate, formatDateTime, formatKg, formatUsd } from "@/lib/format";
 import { Price } from "@/components/price";
 import { StateBadge } from "@/components/ui/badge";
 import { AdvanceStateForm } from "@/components/advance-state-form";
+import { confirmTransfer } from "@/actions/operador";
 import { OrderTimeline } from "@/components/order-timeline";
 
 export const metadata: Metadata = { title: "Pedido — Operador" };
@@ -132,6 +133,17 @@ export default async function OperadorPedidoPage({ params }: { params: Promise<{
             <h2 className="mb-3 font-semibold">Avanzar estado</h2>
             {canOperate ? (
               <AdvanceStateForm orderId={order.id} nextStates={validNextStates(order.state)} />
+            ) : order.paymentStatus === "PENDIENTE" && order.paymentProvider === "transferencia" ? (
+              <form action={confirmTransfer} className="flex flex-col gap-2">
+                <input type="hidden" name="orderId" value={order.id} />
+                <p className="text-sm text-muted">
+                  Pago por <b>transferencia</b>, pendiente. Confirmá cuando verifiques que la plata
+                  entró (referencia <b>TRAELO-{order.number}</b>).
+                </p>
+                <button className="h-11 w-full cursor-pointer rounded-lg bg-success font-medium text-white hover:opacity-90">
+                  Confirmar pago recibido
+                </button>
+              </form>
             ) : (
               <p className="text-sm text-muted">
                 El pago no está confirmado ({order.paymentStatus.toLowerCase()}): no se puede operar.
