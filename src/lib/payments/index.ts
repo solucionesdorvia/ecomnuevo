@@ -38,4 +38,17 @@ export function getPaymentProvider(): PaymentProvider {
   return getProviderByName(process.env.PAYMENT_PROVIDER ?? "mock");
 }
 
+/** ¿Se ofrece el pago con tarjeta? El mock aprueba sin cobrar: en producción
+ *  solo se habilita con ALLOW_MOCK_PAYMENTS=1 (si no, cualquiera "pagaría"). */
+export function mockPaymentsAllowed(): boolean {
+  return process.env.NODE_ENV !== "production" || process.env.ALLOW_MOCK_PAYMENTS === "1";
+}
+
+export function cardPaymentsEnabled(): boolean {
+  const name = process.env.PAYMENT_PROVIDER ?? "mock";
+  if (name === "transferencia") return false;
+  if (name === "mock") return mockPaymentsAllowed();
+  return true;
+}
+
 export type { PaymentProvider } from "./types";

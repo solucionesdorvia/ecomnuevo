@@ -21,14 +21,17 @@ type SavedAddress = {
 export function CheckoutForm({
   addresses,
   defaultDoc,
+  cardEnabled,
 }: {
   addresses: SavedAddress[];
   defaultDoc: string;
+  /** Sin pasarela real (o mock en producción) solo se ofrece transferencia. */
+  cardEnabled: boolean;
 }) {
   const [state, formAction, pending] = useActionState<CheckoutState, FormData>(startCheckout, {});
   const [addressId, setAddressId] = useState<string>(addresses[0]?.id ?? "nueva");
   const [doc, setDoc] = useState(defaultDoc);
-  const [metodo, setMetodo] = useState<"tarjeta" | "transferencia">("tarjeta");
+  const [metodo, setMetodo] = useState<"tarjeta" | "transferencia">(cardEnabled ? "tarjeta" : "transferencia");
 
   const docCheck = doc.trim() ? validateDocumento(doc) : null;
 
@@ -157,26 +160,28 @@ export function CheckoutForm({
       <section className="rounded-xl border border-border bg-surface p-4 sm:p-5">
         <h2 className="mb-3 font-semibold">Cómo querés pagar</h2>
         <div className="flex flex-col gap-2">
-          <label
-            className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 text-sm ${metodo === "tarjeta" ? "border-primary bg-primary/5" : "border-border"}`}
-          >
-            <input
-              type="radio"
-              name="metodo"
-              value="tarjeta"
-              checked={metodo === "tarjeta"}
-              onChange={() => setMetodo("tarjeta")}
-              className="mt-0.5"
-            />
-            <span className="flex-1">
-              <span className="flex items-center gap-2 font-medium">
-                <CreditCard className="size-4 text-primary" /> Tarjeta de crédito
+          {cardEnabled && (
+            <label
+              className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 text-sm ${metodo === "tarjeta" ? "border-primary bg-primary/5" : "border-border"}`}
+            >
+              <input
+                type="radio"
+                name="metodo"
+                value="tarjeta"
+                checked={metodo === "tarjeta"}
+                onChange={() => setMetodo("tarjeta")}
+                className="mt-0.5"
+              />
+              <span className="flex-1">
+                <span className="flex items-center gap-2 font-medium">
+                  <CreditCard className="size-4 text-primary" /> Tarjeta de crédito
+                </span>
+                <span className="mt-0.5 block text-xs text-muted">
+                  Pagás al instante y el pedido arranca solo.
+                </span>
               </span>
-              <span className="mt-0.5 block text-xs text-muted">
-                Pagás al instante y el pedido arranca solo.
-              </span>
-            </span>
-          </label>
+            </label>
+          )}
           <label
             className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 text-sm ${metodo === "transferencia" ? "border-primary bg-primary/5" : "border-border"}`}
           >

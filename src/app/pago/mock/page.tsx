@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { CreditCard } from "lucide-react";
 import { clearCartCookie } from "@/lib/cart";
 import { confirmOrderPayment } from "@/lib/orders";
 import { MockProvider } from "@/lib/payments/mock";
+import { mockPaymentsAllowed } from "@/lib/payments";
 
 export const metadata: Metadata = { title: "Pago de prueba" };
 
@@ -15,11 +16,14 @@ export default async function MockPaymentPage({
 }: {
   searchParams: Promise<{ sid?: string; oid?: string; total?: string; order?: string; cancel?: string }>;
 }) {
+  // En producción esta pantalla aprobaría pedidos sin cobrar: no existe.
+  if (!mockPaymentsAllowed()) notFound();
   const { sid, oid, total, order, cancel } = await searchParams;
   if (!sid || !oid || !cancel) redirect("/");
 
   async function approve() {
     "use server";
+    if (!mockPaymentsAllowed()) notFound();
     await MockProvider.resolve(sid!, true);
     const result = await confirmOrderPayment(oid!);
     if (!result.ok) redirect("/checkout?error=pago");

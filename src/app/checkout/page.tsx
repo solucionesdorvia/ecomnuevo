@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { getCart } from "@/lib/cart";
 import { db } from "@/lib/db";
+import { cardPaymentsEnabled } from "@/lib/payments";
 import { formatDocumento } from "@/lib/documento";
 import { formatKg } from "@/lib/format";
 import { Ship } from "lucide-react";
@@ -24,6 +25,7 @@ export default async function CheckoutPage({
   if (!cart.courier.ok) redirect("/carrito");
 
   const params = await searchParams;
+  const cardEnabled = cardPaymentsEnabled();
   const addresses = await db.address.findMany({
     where: { userId: user.id },
     orderBy: [{ isDefault: "desc" }],
@@ -36,7 +38,8 @@ export default async function CheckoutPage({
     <div className="py-6">
       <h1 className="mb-2 font-display text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">Pagar y zarpar</h1>
       <p className="mb-6 text-sm text-muted">
-        Pagás en dólares con tarjeta. El precio es final: no hay ningún costo después.
+        {cardEnabled ? "Pagás con tarjeta o transferencia." : "Pagás por transferencia, en pesos o dólares."} El
+        precio es final: no hay ningún costo después.
       </p>
 
       {params.cancelado && (
@@ -62,6 +65,7 @@ export default async function CheckoutPage({
             phone: a.phone,
           }))}
           defaultDoc={defaultDoc}
+          cardEnabled={cardEnabled}
         />
 
         <div className="flex flex-col gap-4 lg:sticky lg:top-40">
