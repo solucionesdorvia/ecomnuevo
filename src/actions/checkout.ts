@@ -8,7 +8,9 @@ import { clearCartCookie, getCart } from "@/lib/cart";
 import { validateDocumento } from "@/lib/documento";
 import { getTaxIdValidator } from "@/lib/tax-id";
 import { createOrderFromCart, OrderError } from "@/lib/orders";
-import { getPaymentProvider, getProviderByName } from "@/lib/payments";
+import { cardPaymentsEnabled, getPaymentProvider, getProviderByName } from "@/lib/payments";
+import { getMailer } from "@/lib/mailer";
+import { newOrderOpsMail, transferInstructionsMail } from "@/lib/mailer/templates";
 
 export type CheckoutState = { error?: string };
 
@@ -68,7 +70,8 @@ export async function startCheckout(_prev: CheckoutState, formData: FormData): P
       cart,
     });
     // Método elegido en el checkout: "tarjeta" (pasarela) o "transferencia".
-    const metodo = String(formData.get("metodo") ?? "tarjeta");
+    // Sin pasarela real habilitada, todo va por transferencia (no se confía en el form).
+    const metodo = cardPaymentsEnabled() ? String(formData.get("metodo") ?? "tarjeta") : "transferencia";
     const provider = metodo === "transferencia" ? getProviderByName("transferencia") : getPaymentProvider();
     const checkout = await provider.createCheckout({
       orderId: order.id,
@@ -89,7 +92,37 @@ export async function startCheckout(_prev: CheckoutState, formData: FormData): P
     });
     // En transferencia el pedido ya quedó creado (PENDIENTE): el carrito no
     // hace más falta. En tarjeta se vacía recién al confirmarse el pago.
-    if (metodo === "transferencia") await clearCartCookie();
+    if (metodo === "transferencia") {
+      await clearCartCookie();
+      // Al cliente: los datos para transferir (por si cierra la pestaña).
+      // Al equipo: aviso de pedido nuevo para estar atentos al comprobante.
+      // Un mail caído no puede dejar al cliente sin la página de pago: el pedido ya existe.
+      const mailer = getMailer();
+      const send = (m: Parameters<typeof mailer.send>[0]) =>
+        mailer.send(m).catch((e) => console.error("[checkout] no se pudo enviar el mail:", e));
+      await send(
+        transferInstructionsMail({
+          to: user.email,
+          name: user.name,
+          orderId: order.id,
+          orderNumber: order.number,
+          totalUsd: order.totalUsd.toNumber(),
+        }),
+      );
+      const ops = process.env.OPS_EMAIL;
+      if (ops) {
+        await send(
+          newOrderOpsMail({
+            to: ops,
+            orderId: order.id,
+            orderNumber: order.number,
+            totalUsd: order.totalUsd.toNumber(),
+            customer: user.name,
+            metodo: "transferencia",
+          }),
+        );
+      }
+    }
     redirect(checkout.redirectUrl);
   } catch (e) {
     if (e instanceof OrderError) return { error: e.message };

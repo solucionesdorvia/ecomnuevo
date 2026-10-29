@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { CheckCircle2, ChevronLeft } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { formatDocumento } from "@/lib/documento";
 import { estimateDelivery, formatDeliveryRange } from "@/lib/entrega";
-import { formatDate, formatKg } from "@/lib/format";
+import { formatDate, formatKg, orderCode } from "@/lib/format";
 import { Price } from "@/components/price";
 import { StateBadge } from "@/components/ui/badge";
 import { OrderTimeline } from "@/components/order-timeline";
@@ -37,7 +37,12 @@ export default async function PedidoPage({
       statusEvents: { orderBy: { createdAt: "asc" } },
     },
   });
-  if (!order || order.paymentStatus === "PENDIENTE" || order.paymentStatus === "FALLIDO") notFound();
+  if (!order) notFound();
+  // Transferencia sin confirmar: lo útil es volver a los datos para pagar.
+  if (order.paymentStatus === "PENDIENTE" && order.paymentProvider === "transferencia") {
+    redirect(`/checkout/transferencia?pedido=${order.id}`);
+  }
+  if (order.paymentStatus === "PENDIENTE" || order.paymentStatus === "FALLIDO") notFound();
 
   return (
     <div className="py-6">
@@ -68,7 +73,7 @@ export default async function PedidoPage({
           <div className="rounded-[10px] border border-celeste/30 bg-primary-2 px-4 py-3">
             <p className="eyebrow text-celeste">Código de carga</p>
             <p className="mt-1.5 font-mono-ui text-lg font-bold sm:text-2xl">
-              TRL-{formatDate(order.createdAt).replace(/\D+/g, "").slice(-4)}-{String(order.number).padStart(5, "0")}
+              {orderCode(order.number)}
             </p>
             <div className="mt-2 flex gap-4 font-mono-ui text-[11px] text-celeste-soft">
               <span>{formatKg(order.totalWeightKg).toUpperCase()}</span>

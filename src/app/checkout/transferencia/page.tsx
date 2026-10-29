@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { Landmark, MessageCircle, ShieldCheck } from "lucide-react";
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
-import { formatUsd } from "@/lib/format";
+import { formatUsd, orderCode } from "@/lib/format";
 import { getTransferConfig, arsAmount } from "@/lib/transfer";
 
 export const metadata: Metadata = { title: "Transferí para completar tu pedido" };
@@ -23,11 +23,30 @@ export default async function TransferenciaPage({
   if (!pedido) redirect("/mis-pedidos");
   const order = await db.order.findFirst({ where: { id: pedido, userId: user.id } });
   if (!order) notFound();
+  // Ya confirmada: el lugar es el seguimiento, no los datos de la cuenta.
+  if (order.paymentStatus === "PAGADO" || order.paymentStatus === "REEMBOLSADO") {
+    redirect(`/mis-pedidos/${order.id}`);
+  }
+  if (order.paymentStatus === "FALLIDO") {
+    return (
+      <div className="mx-auto max-w-xl py-12 text-center">
+        <span className="eyebrow text-muted">PEDIDO #{order.number} · ANULADO</span>
+        <h1 className="mt-2 font-display text-3xl font-extrabold tracking-[-0.03em]">Este pedido se anuló</h1>
+        <p className="mt-3 text-sm text-muted">
+          No recibimos la transferencia{order.cancelReason ? ` (${order.cancelReason})` : ""}. Si querés
+          los productos, podés volver a pedirlos.
+        </p>
+        <Link href="/catalogo" className="mt-6 inline-block text-sm font-semibold text-primary hover:underline">
+          Ir al catálogo →
+        </Link>
+      </div>
+    );
+  }
 
   const totalUsd = order.totalUsd.toNumber();
   const cfg = getTransferConfig();
   const ars = arsAmount(totalUsd, cfg.arsRate);
-  const ref = `TRAELO-${order.number}`;
+  const ref = orderCode(order.number);
   const waText = encodeURIComponent(
     `Hola! Transferí el pedido ${ref} de Traelo. Adjunto el comprobante.`,
   );
@@ -40,8 +59,8 @@ export default async function TransferenciaPage({
           Transferí para que zarpe
         </h1>
         <p className="mt-2 text-sm text-muted">
-          Tu pedido quedó reservado. En cuanto confirmemos la transferencia, empezamos a comprarlo
-          afuera y te avisamos por mail en cada paso.
+          Tu pedido quedó reservado y te mandamos estos datos por mail. En cuanto confirmemos la
+          transferencia, empezamos a comprarlo afuera y te avisamos en cada paso.
         </p>
       </div>
 
@@ -156,11 +175,8 @@ export default async function TransferenciaPage({
       </p>
 
       <div className="mt-6 flex justify-center">
-        <Link
-          href={`/mis-pedidos/${order.id}`}
-          className="text-sm font-semibold text-primary hover:underline"
-        >
-          Ver el estado de mi pedido →
+        <Link href="/mis-pedidos" className="text-sm font-semibold text-primary hover:underline">
+          Ir a mis pedidos →
         </Link>
       </div>
     </div>

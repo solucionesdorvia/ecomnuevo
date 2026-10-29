@@ -1,6 +1,7 @@
 import type { LogisticState } from "@prisma/client";
 import { STATE_DESCRIPTION, STATE_LABEL } from "@/lib/estados";
-import { formatUsd } from "@/lib/format";
+import { formatUsd, orderCode } from "@/lib/format";
+import { arsAmount, getTransferConfig } from "@/lib/transfer";
 import type { Mail } from "./index";
 
 const appUrl = () => process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
@@ -17,7 +18,7 @@ const STATE_GIF: Partial<Record<LogisticState, string>> = {
 
 // ── Layout HTML email-safe (tablas + estilos inline; sin fuentes externas) ──
 function emailLayout(a: {
-  gif: string;
+  gif?: string;
   eyebrow: string;
   heading: string;
   body: string;
@@ -43,7 +44,7 @@ function emailLayout(a: {
   <tr><td style="background:#0C2136;padding:2px 28px 32px;text-align:center;">
     <div style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#8FCDEB;">${a.eyebrow}</div>
     <div style="font-size:30px;font-weight:800;color:#ffffff;letter-spacing:-1px;line-height:1.08;margin:12px 0 0;">${a.heading}</div>
-    <img src="${a.gif}" alt="" width="200" height="200" style="display:block;margin:24px auto 0;border-radius:18px;background:#eef7fd;border:0;outline:0;" />
+    ${a.gif ? `<img src="${a.gif}" alt="" width="200" height="200" style="display:block;margin:24px auto 0;border-radius:18px;background:#eef7fd;border:0;outline:0;" />` : ""}
     <div style="font-size:15px;color:#BFE2F2;line-height:1.5;margin:20px auto 0;max-width:420px;">${a.body}</div>
   </td></tr>
   ${summaryBlock}
@@ -88,6 +89,90 @@ export function paymentConfirmedMail(args: {
       ctaUrl: `${appUrl()}/mis-pedidos`,
       reassure: "Precio final: no hay nada más que pagar al recibir.",
     }),
+  };
+}
+
+/** Al cliente que eligió transferencia: monto, código de referencia y cuentas. */
+export function transferInstructionsMail(args: {
+  to: string;
+  name: string;
+  orderId: string;
+  orderNumber: number;
+  totalUsd: number;
+}): Mail {
+  const cfg = getTransferConfig();
+  const ars = arsAmount(args.totalUsd, cfg.arsRate);
+  const ref = orderCode(args.orderNumber);
+  const url = `${appUrl()}/checkout/transferencia?pedido=${args.orderId}`;
+  const monto = formatUsd(args.totalUsd) + (ars != null ? ` (o $ ${ars.toLocaleString("es-AR")})` : "");
+  const cuentasTxt = cfg.cuentas.length
+    ? cfg.cuentas.flatMap((c) => [
+        `En ${c.moneda === "ARS" ? "pesos" : "dólares"}:`,
+        ...(c.titular ? [`  Titular: ${c.titular}`] : []),
+        ...(c.banco ? [`  Banco: ${c.banco}`] : []),
+        ...(c.alias ? [`  Alias: ${c.alias}`] : []),
+        ...(c.cbu ? [`  CBU: ${c.cbu}`] : []),
+      ])
+    : ["Los datos de la cuenta te los pasamos por este medio: respondé este mail."];
+  const summary = [
+    { k: "Monto", v: monto },
+    { k: "Referencia", v: ref },
+    ...cfg.cuentas.flatMap((c) => [
+      ...(c.alias ? [{ k: `Alias (${c.moneda})`, v: c.alias }] : []),
+      ...(c.cbu ? [{ k: `CBU (${c.moneda})`, v: c.cbu }] : []),
+    ]),
+  ];
+  return {
+    to: args.to,
+    subject: `Pedido #${args.orderNumber}: falta la transferencia — Traelo`,
+    text: [
+      `Hola ${args.name},`,
+      "",
+      `Tu pedido #${args.orderNumber} quedó reservado. Para que arranque, transferí ${monto}`,
+      `y poné este código en el concepto: ${ref}`,
+      "",
+      ...cuentasTxt,
+      "",
+      `Los datos están siempre acá: ${url}`,
+      "En cuanto confirmemos la transferencia te avisamos y empezamos a comprarlo.",
+      "",
+      "Traelo",
+    ].join("\n"),
+    html: emailLayout({
+      eyebrow: `Pedido #${args.orderNumber} · falta el pago`,
+      heading: "Transferí para que zarpe",
+      body: `Hola ${args.name}, tu pedido quedó reservado. Transferí el monto y poné el código de referencia en el concepto: así lo identificamos.`,
+      summary,
+      ctaLabel: "Ver los datos para transferir →",
+      ctaUrl: url,
+      reassure: "En cuanto confirmemos la transferencia, te avisamos y empezamos a comprarlo afuera.",
+    }),
+  };
+}
+
+/** Aviso interno al equipo (OPS_EMAIL) de un pedido nuevo. */
+export function newOrderOpsMail(args: {
+  to: string;
+  orderId: string;
+  orderNumber: number;
+  totalUsd: number;
+  customer: string;
+  metodo: "transferencia" | "tarjeta";
+}): Mail {
+  const url = `${appUrl()}/operador/pedidos/${args.orderId}`;
+  const accion =
+    args.metodo === "transferencia"
+      ? `Esperá el comprobante con referencia ${orderCode(args.orderNumber)} y confirmá el pago desde el panel.`
+      : "El pago ya está aprobado: a comprarlo al proveedor.";
+  return {
+    to: args.to,
+    subject: `Pedido nuevo #${args.orderNumber} · ${formatUsd(args.totalUsd)} · ${args.metodo}`,
+    text: [
+      `Pedido #${args.orderNumber} de ${args.customer} por ${formatUsd(args.totalUsd)} (${args.metodo}).`,
+      accion,
+      "",
+      url,
+    ].join("\n"),
   };
 }
 

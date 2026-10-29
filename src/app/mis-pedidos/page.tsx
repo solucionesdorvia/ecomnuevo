@@ -4,7 +4,7 @@ import type { LogisticState } from "@prisma/client";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { FLOW } from "@/lib/estados";
-import { formatDate } from "@/lib/format";
+import { formatDate, orderCode } from "@/lib/format";
 import { Price } from "@/components/price";
 import { EmptyState } from "@/components/empty-state";
 import { cn } from "@/lib/utils";
@@ -52,7 +52,7 @@ function OrderCard({
     >
       <div className="flex items-center justify-between">
         <span className="font-mono-ui text-xs font-bold text-primary">
-          TRL-{String(order.number).padStart(5, "0")}
+          {orderCode(order.number)}
         </span>
         <span
           className={cn(
@@ -82,6 +82,14 @@ export default async function MiCuentaPage() {
     orderBy: { createdAt: "desc" },
   });
 
+  // Transferencias elegidas pero todavía no confirmadas: el cliente tiene que
+  // poder volver a los datos de la cuenta aunque haya cerrado la pestaña.
+  const pendientes = await db.order.findMany({
+    where: { userId: user.id, paymentStatus: "PENDIENTE", paymentProvider: "transferencia" },
+    select: { id: true, number: true, totalUsd: true, createdAt: true },
+    orderBy: { createdAt: "desc" },
+  });
+
   const rows = orders.map((o) => ({
     id: o.id,
     number: o.number,
@@ -108,7 +116,35 @@ export default async function MiCuentaPage() {
       </div>
 
       <div className="mt-8">
-        {rows.length === 0 ? (
+        {pendientes.length > 0 && (
+          <section className="mb-8">
+            <p className="eyebrow mb-3 text-muted">Falta transferir · {pendientes.length}</p>
+            <div className="flex flex-col gap-3">
+              {pendientes.map((o) => (
+                <Link
+                  key={o.id}
+                  href={`/checkout/transferencia?pedido=${o.id}`}
+                  className="block rounded-[10px] border border-accent/40 bg-surface p-4 transition-shadow hover:shadow-[0_14px_30px_rgba(12,33,54,.12)]"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono-ui text-xs font-bold text-primary">
+                      {orderCode(o.number)}
+                    </span>
+                    <span className="font-mono-ui text-[11px] uppercase text-accent">Esperando tu pago</span>
+                  </div>
+                  <div className="mt-1.5 flex items-center justify-between gap-3">
+                    <p className="text-[13px] text-primary/70">
+                      {formatDate(o.createdAt)}
+                    </p>
+                    <Price value={o.totalUsd} className="font-display text-base" />
+                  </div>
+                  <p className="mt-2 text-[13px] font-semibold text-primary">Ver los datos para transferir →</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+        {rows.length === 0 && pendientes.length === 0 ? (
           <EmptyState
             title="Ninguna carga en el agua."
             subtitle="Cuando pidas algo, lo vas a ver acá desde que sale de la fábrica hasta tu puerta."

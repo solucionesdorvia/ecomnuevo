@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import type { LogisticState } from "@prisma/client";
 import { requireRole } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { advanceOrderState, confirmOrderPayment, OrderError } from "@/lib/orders";
+import { advanceOrderState, confirmOrderPayment, discardUnpaidTransfer, OrderError } from "@/lib/orders";
 
 export type AdvanceState = { error?: string; ok?: boolean };
 
@@ -32,15 +32,30 @@ export async function advanceState(_prev: AdvanceState, formData: FormData): Pro
  * proveedor, email al cliente).
  */
 export async function confirmTransfer(formData: FormData): Promise<void> {
-  await requireRole("OPERADOR", "ADMIN");
+  const actor = await requireRole("OPERADOR", "ADMIN");
   const orderId = String(formData.get("orderId") ?? "");
   const order = await db.order.findUnique({
     where: { id: orderId },
     select: { paymentProvider: true, paymentStatus: true },
   });
   if (order && order.paymentProvider === "transferencia" && order.paymentStatus !== "PAGADO") {
-    await confirmOrderPayment(orderId);
+    await confirmOrderPayment(orderId, actor.id);
   }
   revalidatePath(`/operador/pedidos/${orderId}`);
   revalidatePath("/operador");
+}
+
+/** Descarta una transferencia que nunca llegó (con motivo). */
+export async function discardTransfer(_prev: AdvanceState, formData: FormData): Promise<AdvanceState> {
+  const actor = await requireRole("OPERADOR", "ADMIN");
+  const orderId = String(formData.get("orderId") ?? "");
+  try {
+    await discardUnpaidTransfer({ orderId, actorId: actor.id, reason: String(formData.get("reason") ?? "") });
+  } catch (e) {
+    if (e instanceof OrderError) return { error: e.message };
+    throw e;
+  }
+  revalidatePath(`/operador/pedidos/${orderId}`);
+  revalidatePath("/operador");
+  return { ok: true };
 }

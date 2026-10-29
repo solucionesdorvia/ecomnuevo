@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft, ExternalLink } from "lucide-react";
+import { ChevronLeft, ExternalLink, Printer } from "lucide-react";
 import { db } from "@/lib/db";
 import { validNextStates } from "@/lib/estados";
 import { formatDocumento } from "@/lib/documento";
@@ -10,7 +10,7 @@ import { formatDate, formatDateTime, formatKg, formatUsd } from "@/lib/format";
 import { Price } from "@/components/price";
 import { StateBadge } from "@/components/ui/badge";
 import { AdvanceStateForm } from "@/components/advance-state-form";
-import { confirmTransfer } from "@/actions/operador";
+import { TransferPendingPanel } from "@/components/transfer-pending-panel";
 import { OrderTimeline } from "@/components/order-timeline";
 
 export const metadata: Metadata = { title: "Pedido — Operador" };
@@ -134,22 +134,26 @@ export default async function OperadorPedidoPage({ params }: { params: Promise<{
             {canOperate ? (
               <AdvanceStateForm orderId={order.id} nextStates={validNextStates(order.state)} />
             ) : order.paymentStatus === "PENDIENTE" && order.paymentProvider === "transferencia" ? (
-              <form action={confirmTransfer} className="flex flex-col gap-2">
-                <input type="hidden" name="orderId" value={order.id} />
-                <p className="text-sm text-muted">
-                  Pago por <b>transferencia</b>, pendiente. Confirmá cuando verifiques que la plata
-                  entró (referencia <b>TRAELO-{order.number}</b>).
-                </p>
-                <button className="h-11 w-full cursor-pointer rounded-lg bg-success font-medium text-white hover:opacity-90">
-                  Confirmar pago recibido
-                </button>
-              </form>
+              <TransferPendingPanel
+                orderId={order.id}
+                orderNumber={order.number}
+                totalUsd={order.totalUsd.toNumber()}
+              />
             ) : (
               <p className="text-sm text-muted">
                 El pago no está confirmado ({order.paymentStatus.toLowerCase()}): no se puede operar.
               </p>
             )}
           </section>
+
+          {canOperate && order.state !== "CANCELADO" && (
+            <Link
+              href={`/operador/pedidos/${order.id}/etiqueta`}
+              className="flex items-center justify-center gap-2 rounded-xl border border-border bg-surface p-3 text-sm font-medium text-primary hover:bg-background"
+            >
+              <Printer className="size-4" /> Etiqueta del bulto (10×15)
+            </Link>
+          )}
 
           {/* Comprador */}
           <section className="rounded-xl border border-border bg-surface p-4 text-sm">

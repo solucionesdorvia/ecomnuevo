@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { LogisticState, Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
-import { STATE_LABEL } from "@/lib/estados";
-import { formatDate, formatKg } from "@/lib/format";
+import { FLOW, STATE_LABEL } from "@/lib/estados";
+import { FileSpreadsheet } from "lucide-react";
+import { formatDate, formatKg, orderCode } from "@/lib/format";
 import { Price } from "@/components/price";
 import { StateBadge } from "@/components/ui/badge";
 import { OperadorFilters } from "@/components/operador-filters";
@@ -43,7 +44,7 @@ export default async function OperadorPage({
 
   // Filtros que aplican a TODOS los estados (buscador, fecha, proveedor). Se usan
   // también para los contadores de los chips, para que reflejen lo filtrado.
-  const qTrim = q.trim().replace(/^#/, "");
+  const qTrim = q.trim().replace(/^(#|TRL-|TRAELO-)/i, "");
   const qNum = /^\d+$/.test(qTrim) ? Number(qTrim) : null;
   const desde = periodStart(periodo);
 
@@ -112,7 +113,17 @@ export default async function OperadorPage({
 
   return (
     <div>
-      <h1 className="mb-4 font-display text-2xl font-extrabold tracking-[-0.02em]">Cola de pedidos</h1>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-display text-2xl font-extrabold tracking-[-0.02em]">Cola de pedidos</h1>
+        <a
+          href={`/operador/manifiesto?estado=${(FLOW as string[]).includes(estado) ? estado : "RECIBIDO_DEPOSITO_EXTERIOR"}`}
+          className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-primary hover:bg-background"
+        >
+          <FileSpreadsheet className="size-4" />
+          Parte de envío ·{" "}
+          {STATE_LABEL[((FLOW as string[]).includes(estado) ? estado : "RECIBIDO_DEPOSITO_EXTERIOR") as LogisticState]}
+        </a>
+      </div>
 
       {pendingTransfers.length > 0 && (
         <div className="mb-4 rounded-xl border border-accent/40 bg-accent/5 p-4">
@@ -129,7 +140,7 @@ export default async function OperadorPage({
                   #{o.number} — {o.user.name}
                 </Link>
                 <span className="flex items-center gap-3">
-                  <span className="font-mono-ui text-xs text-muted">TRAELO-{o.number}</span>
+                  <span className="font-mono-ui text-xs text-muted">{orderCode(o.number)}</span>
                   <Price value={o.totalUsd} />
                 </span>
               </li>

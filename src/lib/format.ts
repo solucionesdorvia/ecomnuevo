@@ -28,3 +28,8 @@ export function formatDateTime(date: Date): string {
     minute: "2-digit",
   }).format(date);
 }
+
+/** Código único del pedido de cara a todos: seguimiento, etiqueta y referencia de la transferencia. */
+export function orderCode(number: number): string {
+  return `TRL-${String(number).padStart(5, "0")}`;
+}

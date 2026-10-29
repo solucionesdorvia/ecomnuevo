@@ -2,7 +2,13 @@ import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { User, Address, Product, Supplier } from "@prisma/client";
 import { db } from "./db";
 import type { Cart } from "./cart";
-import { advanceOrderState, confirmOrderPayment, createOrderFromCart, OrderError } from "./orders";
+import {
+  advanceOrderState,
+  confirmOrderPayment,
+  createOrderFromCart,
+  discardUnpaidTransfer,
+  OrderError,
+} from "./orders";
 import { getPaymentProvider } from "./payments";
 import { MockProvider } from "./payments/mock";
 import { checkCourierLimits } from "./courier";
@@ -357,5 +363,61 @@ describe("advanceOrderState", () => {
     }
     // 1 evento de pago + 5 avances
     expect(await db.statusEvent.count({ where: { orderId: order.id } })).toBe(6);
+  });
+});
+
+/** Pedido por transferencia, todavía sin confirmar (como lo deja el checkout). */
+async function transferOrder() {
+  const order = await createOrderFromCart({
+    userId: user.id,
+    addressId: address.id,
+    docType: "DNI",
+    docNumber: "32456789",
+    cart: cartWith(1),
+  });
+  return db.order.update({
+    where: { id: order.id },
+    data: { paymentProvider: "transferencia", paymentExternalId: `transfer_${order.id}` },
+  });
+}
+
+describe("transferencia", () => {
+  it("confirmar a mano deja el pago a nombre del operador", async () => {
+    const order = await transferOrder();
+    const result = await confirmOrderPayment(order.id, otherUser.id);
+    expect(result.ok).toBe(true);
+    const ev = await db.statusEvent.findFirstOrThrow({ where: { orderId: order.id } });
+    expect(ev.toState).toBe("PAGADO");
+    expect(ev.actorId).toBe(otherUser.id);
+  });
+
+  it("cancelar una transferencia cobrada no pasa por la pasarela y anota la devolución manual", async () => {
+    const order = await transferOrder();
+    await confirmOrderPayment(order.id, otherUser.id);
+    await advanceOrderState({ orderId: order.id, toState: "CANCELADO", actorId: user.id, note: "Sin stock" });
+    const after = await db.order.findUniqueOrThrow({ where: { id: order.id } });
+    expect(after.state).toBe("CANCELADO");
+    expect(after.paymentStatus).toBe("PAGADO"); // la plata vuelve a mano, no la devolvió un procesador
+    expect(after.cancelReason).toMatch(/^Sin stock — la transferencia se devuelve a mano/);
+  });
+
+  it("descartar una transferencia que nunca llegó: FALLIDO + CANCELADO con motivo", async () => {
+    const order = await transferOrder();
+    await discardUnpaidTransfer({ orderId: order.id, actorId: otherUser.id, reason: "72 h sin comprobante" });
+    const after = await db.order.findUniqueOrThrow({ where: { id: order.id } });
+    expect(after.paymentStatus).toBe("FALLIDO");
+    expect(after.state).toBe("CANCELADO");
+    expect(after.cancelReason).toBe("72 h sin comprobante");
+  });
+
+  it("no se descarta sin motivo ni un pedido ya pagado", async () => {
+    const order = await transferOrder();
+    await expect(
+      discardUnpaidTransfer({ orderId: order.id, actorId: otherUser.id, reason: " " }),
+    ).rejects.toThrow(OrderError);
+    await confirmOrderPayment(order.id, otherUser.id);
+    await expect(
+      discardUnpaidTransfer({ orderId: order.id, actorId: otherUser.id, reason: "x" }),
+    ).rejects.toThrow(/pendientes de pago/);
   });
 });
