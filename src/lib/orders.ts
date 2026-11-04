@@ -80,6 +80,9 @@ export async function confirmOrderPayment(
   });
   if (!order) return { ok: false, reason: "Pedido inexistente." };
   if (order.paymentStatus === "PAGADO") return { ok: true };
+  // Cancelado es final: un reembolso o una transferencia descartada no vuelven a
+  // cobrarse, y el procesador puede seguir informando el cobro original como pago.
+  if (order.state === "CANCELADO") return { ok: false, reason: "El pedido está cancelado." };
   if (!order.paymentExternalId) return { ok: false, reason: "El pedido no tiene un pago iniciado." };
 
   const { getProviderByName } = await import("@/lib/payments");

@@ -38,7 +38,7 @@ export async function confirmTransfer(formData: FormData): Promise<void> {
     where: { id: orderId },
     select: { paymentProvider: true, paymentStatus: true },
   });
-  if (order && order.paymentProvider === "transferencia" && order.paymentStatus !== "PAGADO") {
+  if (order && order.paymentProvider === "transferencia" && order.paymentStatus === "PENDIENTE") {
     await confirmOrderPayment(orderId, actor.id);
   }
   revalidatePath(`/operador/pedidos/${orderId}`);

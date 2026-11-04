@@ -262,6 +262,59 @@ describe("confirmOrderPayment", () => {
     expect(await db.procurementOrder.count({ where: { orderId: order.id } })).toBe(0);
   });
 
+  it("un pedido reembolsado no se reprocesa: sigue REEMBOLSADO", async () => {
+    const order = await paidOrder();
+    await advanceOrderState({ orderId: order.id, toState: "CANCELADO", actorId: operator.id, note: "Sin stock" });
+
+    const result = await confirmOrderPayment(order.id);
+    expect(result.ok).toBe(false);
+    const after = await db.order.findUniqueOrThrow({ where: { id: order.id } });
+    expect(after.paymentStatus).toBe("REEMBOLSADO");
+    expect(after.state).toBe("CANCELADO");
+  });
+
+  it("un reembolso no se revierte aunque el procesador siga informando el pago", async () => {
+    const order = await paidOrder();
+    await advanceOrderState({ orderId: order.id, toState: "CANCELADO", actorId: operator.id, note: "Sin stock" });
+    // El cobro original sigue figurando aprobado en el procesador.
+    await MockProvider.resolve(order.paymentExternalId!, true);
+
+    const result = await confirmOrderPayment(order.id);
+    expect(result.ok).toBe(false);
+    const after = await db.order.findUniqueOrThrow({ where: { id: order.id } });
+    expect(after.paymentStatus).toBe("REEMBOLSADO");
+    expect(await db.procurementOrder.count({ where: { orderId: order.id } })).toBe(1);
+    expect(await db.statusEvent.count({ where: { orderId: order.id, toState: "PAGADO" } })).toBe(1);
+  });
+
+  it("un pago rechazado que después se aprueba todavía se confirma", async () => {
+    const order = await createOrderFromCart({
+      userId: user.id,
+      addressId: address.id,
+      docType: "DNI",
+      docNumber: "32456789",
+      cart: cartWith(1),
+    });
+    const checkout = await getPaymentProvider().createCheckout({
+      orderId: order.id,
+      orderNumber: order.number,
+      totalUsd: 100,
+      customerEmail: user.email,
+      successUrl: "/x",
+      cancelUrl: "/y",
+    });
+    await db.order.update({
+      where: { id: order.id },
+      data: { paymentProvider: "mock", paymentExternalId: checkout.externalId },
+    });
+    expect((await confirmOrderPayment(order.id)).ok).toBe(false);
+    await MockProvider.resolve(checkout.externalId, true);
+
+    expect((await confirmOrderPayment(order.id)).ok).toBe(true);
+    const after = await db.order.findUniqueOrThrow({ where: { id: order.id } });
+    expect(after.paymentStatus).toBe("PAGADO");
+  });
+
   it("pedido sin pago iniciado no se confirma", async () => {
     const order = await createOrderFromCart({
       userId: user.id,
@@ -462,6 +515,19 @@ describe("transferencia", () => {
     expect(after.paymentStatus).toBe("FALLIDO");
     expect(after.state).toBe("CANCELADO");
     expect(after.cancelReason).toBe("72 h sin comprobante");
+  });
+
+  it("una transferencia descartada no se confirma después, ni con un operador", async () => {
+    const order = await transferOrder();
+    await discardUnpaidTransfer({ orderId: order.id, actorId: operator.id, reason: "72 h sin comprobante" });
+
+    const result = await confirmOrderPayment(order.id, operator.id);
+    expect(result.ok).toBe(false);
+    const after = await db.order.findUniqueOrThrow({ where: { id: order.id } });
+    expect(after.paymentStatus).toBe("FALLIDO");
+    expect(after.state).toBe("CANCELADO");
+    expect(await db.statusEvent.count({ where: { orderId: order.id, toState: "PAGADO" } })).toBe(0);
+    expect(await db.procurementOrder.count({ where: { orderId: order.id } })).toBe(0);
   });
 
   it("no se descarta sin motivo ni un pedido ya pagado", async () => {
