@@ -84,6 +84,16 @@ export async function confirmOrderPayment(
 
   const { getProviderByName } = await import("@/lib/payments");
   const providerName = order.paymentProvider ?? process.env.PAYMENT_PROVIDER ?? "mock";
+  // TransferProvider aprueba siempre porque el chequeo es humano: sin un operador
+  // no hubo chequeo. Se corta antes de consultarlo y sin tocar el pedido.
+  if (providerName === "transferencia") {
+    const actor = actorId
+      ? await db.user.findUnique({ where: { id: actorId }, select: { role: true } })
+      : null;
+    if (actor?.role !== "OPERADOR" && actor?.role !== "ADMIN") {
+      return { ok: false, reason: "La transferencia la confirma un operador." };
+    }
+  }
   const confirmation = await getProviderByName(providerName).confirmPayment(order.paymentExternalId);
   if (confirmation.status !== "approved") {
     await db.order.update({ where: { id: orderId }, data: { paymentStatus: "FALLIDO" } });

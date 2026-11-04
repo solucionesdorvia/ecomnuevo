@@ -1,12 +1,24 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { CreditCard } from "lucide-react";
+import { requireUser } from "@/lib/auth";
 import { clearCartCookie } from "@/lib/cart";
+import { db } from "@/lib/db";
 import { confirmOrderPayment } from "@/lib/orders";
 import { MockProvider } from "@/lib/payments/mock";
 import { mockPaymentsAllowed } from "@/lib/payments";
 
 export const metadata: Metadata = { title: "Pago de prueba" };
+
+/** Solo el dueño resuelve su pago, y solo con la sesión de pago de ese pedido. */
+async function requireOwnPayment(orderId: string, externalId: string): Promise<void> {
+  const user = await requireUser();
+  const order = await db.order.findFirst({
+    where: { id: orderId, userId: user.id, paymentExternalId: externalId },
+    select: { id: true },
+  });
+  if (!order) notFound();
+}
 
 // Pantalla del procesador SIMULADO (solo dev). Reemplaza a la página de pago
 // de Stripe/Mercado Pago cuando PAYMENT_PROVIDER=mock. El resultado se
@@ -20,10 +32,12 @@ export default async function MockPaymentPage({
   if (!mockPaymentsAllowed()) notFound();
   const { sid, oid, total, order, cancel } = await searchParams;
   if (!sid || !oid || !cancel) redirect("/");
+  await requireOwnPayment(oid, sid);
 
   async function approve() {
     "use server";
     if (!mockPaymentsAllowed()) notFound();
+    await requireOwnPayment(oid!, sid!);
     await MockProvider.resolve(sid!, true);
     const result = await confirmOrderPayment(oid!);
     if (!result.ok) redirect("/checkout?error=pago");
@@ -32,6 +46,8 @@ export default async function MockPaymentPage({
   }
   async function reject() {
     "use server";
+    if (!mockPaymentsAllowed()) notFound();
+    await requireOwnPayment(oid!, sid!);
     await MockProvider.resolve(sid!, false);
     await confirmOrderPayment(oid!); // deja el pedido como FALLIDO
     redirect("/checkout?error=pago");

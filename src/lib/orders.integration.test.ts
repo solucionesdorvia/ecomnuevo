@@ -21,6 +21,8 @@ if (!process.env.DATABASE_URL?.includes("superplataforma_test")) {
 
 let user: User;
 let otherUser: User;
+let operator: User;
+let admin: User;
 let address: Address;
 let supplier: Supplier;
 let product: Product;
@@ -103,6 +105,12 @@ beforeAll(async () => {
   });
   otherUser = await db.user.create({
     data: { email: "otro@cliente.demo", name: "Otro Cliente", passwordHash: "x:y", role: "CLIENTE" },
+  });
+  operator = await db.user.create({
+    data: { email: "operador@test.demo", name: "Operador Test", passwordHash: "x:y", role: "OPERADOR" },
+  });
+  admin = await db.user.create({
+    data: { email: "admin@test.demo", name: "Admin Test", passwordHash: "x:y", role: "ADMIN" },
   });
   address = await db.address.create({
     data: { userId: user.id, street: "Calle 1", city: "CABA", province: "CABA", zipCode: "C1000", phone: "11" },
@@ -381,19 +389,65 @@ async function transferOrder() {
   });
 }
 
+/** La transferencia no se pagó: sigue PENDIENTE y sin ningún efecto del pago. */
+async function expectTransferUntouched(orderId: string) {
+  const after = await db.order.findUniqueOrThrow({ where: { id: orderId } });
+  expect(after.paymentStatus).toBe("PENDIENTE");
+  expect(await db.statusEvent.count({ where: { orderId } })).toBe(0);
+  expect(await db.shipment.count({ where: { orderId } })).toBe(0);
+  expect(await db.procurementOrder.count({ where: { orderId } })).toBe(0);
+}
+
 describe("transferencia", () => {
   it("confirmar a mano deja el pago a nombre del operador", async () => {
     const order = await transferOrder();
-    const result = await confirmOrderPayment(order.id, otherUser.id);
+    const result = await confirmOrderPayment(order.id, operator.id);
     expect(result.ok).toBe(true);
     const ev = await db.statusEvent.findFirstOrThrow({ where: { orderId: order.id } });
     expect(ev.toState).toBe("PAGADO");
-    expect(ev.actorId).toBe(otherUser.id);
+    expect(ev.actorId).toBe(operator.id);
+  });
+
+  it("un ADMIN también la confirma", async () => {
+    const order = await transferOrder();
+    expect((await confirmOrderPayment(order.id, admin.id)).ok).toBe(true);
+  });
+
+  it("sin actor no se confirma: abrir /checkout/confirmacion no la paga", async () => {
+    const order = await transferOrder();
+    const result = await confirmOrderPayment(order.id);
+    expect(result.ok).toBe(false);
+    await expectTransferUntouched(order.id);
+  });
+
+  it("un cliente no la confirma, ni siendo el dueño del pedido", async () => {
+    const order = await transferOrder();
+    expect((await confirmOrderPayment(order.id, user.id)).ok).toBe(false);
+    expect((await confirmOrderPayment(order.id, otherUser.id)).ok).toBe(false);
+    await expectTransferUntouched(order.id);
+  });
+
+  it("un actor inexistente no la confirma", async () => {
+    const order = await transferOrder();
+    expect((await confirmOrderPayment(order.id, "no-existe")).ok).toBe(false);
+    await expectTransferUntouched(order.id);
+  });
+
+  it("vale también si la transferencia viene del proveedor por defecto", async () => {
+    const order = await transferOrder();
+    await db.order.update({ where: { id: order.id }, data: { paymentProvider: null } });
+    process.env.PAYMENT_PROVIDER = "transferencia";
+    try {
+      expect((await confirmOrderPayment(order.id)).ok).toBe(false);
+    } finally {
+      process.env.PAYMENT_PROVIDER = "mock";
+    }
+    await expectTransferUntouched(order.id);
   });
 
   it("cancelar una transferencia cobrada no pasa por la pasarela y anota la devolución manual", async () => {
     const order = await transferOrder();
-    await confirmOrderPayment(order.id, otherUser.id);
+    await confirmOrderPayment(order.id, operator.id);
     await advanceOrderState({ orderId: order.id, toState: "CANCELADO", actorId: user.id, note: "Sin stock" });
     const after = await db.order.findUniqueOrThrow({ where: { id: order.id } });
     expect(after.state).toBe("CANCELADO");
@@ -415,7 +469,7 @@ describe("transferencia", () => {
     await expect(
       discardUnpaidTransfer({ orderId: order.id, actorId: otherUser.id, reason: " " }),
     ).rejects.toThrow(OrderError);
-    await confirmOrderPayment(order.id, otherUser.id);
+    await confirmOrderPayment(order.id, operator.id);
     await expect(
       discardUnpaidTransfer({ orderId: order.id, actorId: otherUser.id, reason: "x" }),
     ).rejects.toThrow(/pendientes de pago/);
