@@ -7,6 +7,9 @@ import { db } from "@/lib/db";
 import { createSession, destroySession, hashPassword, verifyPassword } from "@/lib/auth";
 import { getMailer } from "@/lib/mailer";
 import { passwordResetMail } from "@/lib/mailer/templates";
+import { clientIp, hit, TOO_MANY } from "@/lib/rate-limit";
+
+const MIN = 60 * 1000;
 
 export type FormState = { error?: string; ok?: boolean };
 
@@ -28,6 +31,7 @@ export async function register(_prev: FormState, formData: FormData): Promise<Fo
     password: formData.get("password"),
   });
   if (!parsed.success) return { error: parsed.error.issues[0].message };
+  if (!hit(`register:${await clientIp()}`, 5, 60 * MIN)) return { error: TOO_MANY };
 
   const { name, email, password } = parsed.data;
   const exists = await db.user.findUnique({ where: { email } });
@@ -44,9 +48,16 @@ export async function login(_prev: FormState, formData: FormData): Promise<FormS
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
   if (!email || !password) return { error: "Completá email y contraseña." };
+  const ip = await clientIp();
+  if (!hit(`login:${ip}`, 20, 15 * MIN) || !hit(`login:${ip}:${email}`, 8, 15 * MIN)) return { error: TOO_MANY };
 
   const user = await db.user.findUnique({ where: { email } });
-  if (!user || !(await verifyPassword(password, user.passwordHash))) {
+  if (user && !user.passwordHash) {
+    return {
+      error: "Esa cuenta se creó con Google. Ingresá con Google, o creá una contraseña desde “Me olvidé la contraseña”.",
+    };
+  }
+  if (!user || !user.passwordHash || !(await verifyPassword(password, user.passwordHash))) {
     return { error: "Email o contraseña incorrectos." };
   }
   await createSession(user.id);
@@ -62,6 +73,7 @@ export async function logout(): Promise<void> {
 export async function requestPasswordReset(_prev: FormState, formData: FormData): Promise<FormState> {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   if (!email) return { error: "Ingresá tu email." };
+  if (!hit(`reset:${await clientIp()}`, 5, 60 * MIN) || !hit(`reset:${email}`, 3, 60 * MIN)) return { error: TOO_MANY };
   const user = await db.user.findUnique({ where: { email } });
   // Siempre la misma respuesta: no revelamos si el email existe
   if (user) {
@@ -83,6 +95,7 @@ export async function resetPassword(_prev: FormState, formData: FormData): Promi
   const password = String(formData.get("password") ?? "");
   if (password.length < 8) return { error: "La contraseña tiene que tener al menos 8 caracteres." };
 
+  if (!hit(`reset-confirm:${await clientIp()}`, 10, 15 * MIN)) return { error: TOO_MANY };
   const tokenHash = createHash("sha256").update(token).digest("hex");
   const reset = await db.passwordReset.findUnique({ where: { tokenHash } });
   if (!reset || reset.usedAt || reset.expiresAt < new Date()) {

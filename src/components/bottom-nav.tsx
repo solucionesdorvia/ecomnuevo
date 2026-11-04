@@ -10,7 +10,7 @@ const TABS = [
   { label: "INICIO", href: "/", match: (p: string) => p === "/" },
   { label: "CATÁLOGO", href: "/catalogo", match: (p: string) => p.startsWith("/catalogo") || p.startsWith("/p/") },
   { label: "CARGA", href: "/mis-pedidos", match: (p: string) => p.startsWith("/mis-pedidos") },
-  { label: "CUENTA", href: "/favoritos", match: (p: string) => p.startsWith("/favoritos") },
+  { label: "CUENTA", href: "/cuenta", match: (p: string) => p.startsWith("/cuenta") || p.startsWith("/favoritos") || p.startsWith("/ingresar") || p.startsWith("/registrarme") },
 ];
 
 // En estas rutas la pantalla tiene su propia barra de acción fija (comprar / pagar),

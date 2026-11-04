@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
+import { GoogleButton } from "@/components/google-button";
 import { RegisterForm } from "./register-form";
 
 export const metadata: Metadata = { title: "Crear cuenta" };
@@ -19,6 +20,7 @@ export default async function RegistrarmePage({
       <p className="mb-6 text-sm text-muted">
         La necesitás para comprar: tus pedidos entran al país a tu nombre y los seguís desde acá.
       </p>
+      <GoogleButton volver={volver} />
       <RegisterForm volver={volver} />
       <p className="mt-4 text-sm text-muted">
         ¿Ya tenés cuenta?{" "}

@@ -66,6 +66,9 @@ export function Header({
               </summary>
               <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-xl border border-border bg-surface p-1 text-foreground shadow-lg">
                 <p className="truncate px-3 py-2 text-xs text-muted">{user.email}</p>
+                <Link href="/cuenta" className="block rounded-lg px-3 py-2 text-sm hover:bg-background">
+                  Mi cuenta
+                </Link>
                 <Link href="/mis-pedidos" className="block rounded-lg px-3 py-2 text-sm hover:bg-background">
                   Seguí tu carga
                 </Link>
