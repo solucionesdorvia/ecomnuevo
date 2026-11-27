@@ -51,8 +51,12 @@ npm run dev
 |---|---|---|
 | `DATABASE_URL` | Conexión Postgres | apunta al Docker local |
 | `SESSION_SECRET` | Secreto de sesiones | cambiar en producción |
-| `PAYMENT_PROVIDER` | `mock` o `stripe` | `mock` (pantalla de pago simulada en `/pago/mock`) |
+| `PAYMENT_PROVIDER` | `mock`, `stripe`, `getnet` o `transferencia` | `mock` (pantalla de pago simulada en `/pago/mock`) |
 | `STRIPE_SECRET_KEY` | Clave test de Stripe | solo si `PAYMENT_PROVIDER=stripe` |
+| `GETNET_CLIENT_ID` / `GETNET_CLIENT_SECRET` | Credenciales de Getnet Web Checkout (Portal → Productos Digitales → Integraciones) | solo si `PAYMENT_PROVIDER=getnet` |
+| `GETNET_ENV` | `sandbox`, `pre` o `produccion` | `sandbox` |
+| `GETNET_ARS_RATE` | Pesos por dólar para cobrar en ARS (si falta usa `TRANSFER_ARS_RATE`) | sin cotización no se puede pagar con Getnet |
+| `GETNET_WEBHOOK_USER` / `GETNET_WEBHOOK_PASSWORD` | Usuario y clave del aviso de pago (los mismos que se cargan en el Portal; URL `/api/pagos/getnet`) | sin esto el aviso se rechaza y solo confirma la vuelta del cliente |
 | `MAILER` | `console` (log) | `console` — los emails se ven en la consola del server |
 | `NEXT_PUBLIC_APP_URL` | URL pública (links de emails y Stripe) | `http://localhost:3000` |
 

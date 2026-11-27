@@ -3,6 +3,7 @@ import { MockProvider } from "./mock";
 import { StripeProvider } from "./stripe";
 import { MercadoPagoProvider } from "./mercadopago";
 import { TransferProvider } from "./transfer";
+import { GetnetProvider } from "./getnet";
 
 const cache = new Map<string, PaymentProvider>();
 
@@ -12,13 +13,15 @@ function build(name: string): PaymentProvider {
       return new StripeProvider();
     case "mercadopago":
       return new MercadoPagoProvider();
+    case "getnet":
+      return new GetnetProvider();
     case "transferencia":
       return new TransferProvider();
     case "mock":
       return new MockProvider();
     default:
       throw new Error(
-        `Proveedor de pago desconocido: "${name}" (soportados: mock, stripe, mercadopago, transferencia)`,
+        `Proveedor de pago desconocido: "${name}" (soportados: mock, stripe, mercadopago, getnet, transferencia)`,
       );
   }
 }
@@ -49,6 +52,11 @@ export function cardPaymentsEnabled(): boolean {
   if (name === "transferencia") return false;
   if (name === "mock") return mockPaymentsAllowed();
   return true;
+}
+
+/** Nombre del proveedor de tarjeta configurado. */
+export function cardProviderName(): string {
+  return process.env.PAYMENT_PROVIDER ?? "mock";
 }
 
 export type { PaymentProvider } from "./types";

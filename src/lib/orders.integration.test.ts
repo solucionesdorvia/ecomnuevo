@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { User, Address, Product, Supplier } from "@prisma/client";
 import { db } from "./db";
 import type { Cart } from "./cart";
@@ -11,6 +11,7 @@ import {
 } from "./orders";
 import { getPaymentProvider } from "./payments";
 import { MockProvider } from "./payments/mock";
+import { resetGetnetTokenCache } from "./payments/getnet";
 import { checkCourierLimits } from "./courier";
 
 // Corre contra la DB de test (ver script "test" en package.json).
@@ -32,6 +33,8 @@ function cartWith(quantity: number, p: Product = product): Cart {
   const weightKg = p.weightKg.toNumber();
   const totalUsd = priceUsd * quantity;
   const totalWeightKg = weightKg * quantity;
+  const volumeM3 = p.volumeM3.toNumber();
+  const totalVolumeM3 = volumeM3 * quantity;
   return {
     items: [
       {
@@ -42,6 +45,7 @@ function cartWith(quantity: number, p: Product = product): Cart {
           images: p.images,
           priceUsd,
           weightKg,
+          volumeM3,
           active: p.active,
           deliveryDaysMin: p.deliveryDaysMin,
           deliveryDaysMax: p.deliveryDaysMax,
@@ -50,11 +54,13 @@ function cartWith(quantity: number, p: Product = product): Cart {
         quantity,
         lineTotalUsd: totalUsd,
         lineWeightKg: totalWeightKg,
+        lineVolumeM3: totalVolumeM3,
       },
     ],
     totalUsd,
     totalWeightKg,
-    courier: checkCourierLimits(totalUsd, totalWeightKg),
+    totalVolumeM3,
+    courier: checkCourierLimits(totalUsd, totalWeightKg, [], totalVolumeM3),
     count: quantity,
   };
 }
@@ -173,6 +179,19 @@ describe("createOrderFromCart", () => {
     ).rejects.toThrow(/supera el tope/);
   });
 
+  it("rechaza un carrito que supera 1 m³ (revalidación en servidor)", async () => {
+    const bulky = await db.product.update({ where: { id: product.id }, data: { volumeM3: 0.4 } });
+    try {
+      const cart = cartWith(3, bulky); // 3 × 0,4 = 1,2 m³ (30 kg, US$ 300: dentro de los otros topes)
+      cart.courier.ok = true; // cliente malicioso
+      await expect(
+        createOrderFromCart({ userId: user.id, addressId: address.id, docType: "DNI", docNumber: "1", cart }),
+      ).rejects.toThrow(/1 m³/);
+    } finally {
+      await db.product.update({ where: { id: product.id }, data: { volumeM3: 0.01 } });
+    }
+  });
+
   it("rechaza un carrito que supera 50 kg", async () => {
     await expect(
       createOrderFromCart({
@@ -198,7 +217,14 @@ describe("createOrderFromCart", () => {
   });
 
   it("rechaza carrito vacío", async () => {
-    const empty: Cart = { items: [], totalUsd: 0, totalWeightKg: 0, courier: checkCourierLimits(0, 0), count: 0 };
+    const empty: Cart = {
+      items: [],
+      totalUsd: 0,
+      totalWeightKg: 0,
+      totalVolumeM3: 0,
+      courier: checkCourierLimits(0, 0),
+      count: 0,
+    };
     await expect(
       createOrderFromCart({ userId: user.id, addressId: address.id, docType: "DNI", docNumber: "1", cart: empty }),
     ).rejects.toThrow(/vacío/);
@@ -313,6 +339,80 @@ describe("confirmOrderPayment", () => {
     expect((await confirmOrderPayment(order.id)).ok).toBe(true);
     const after = await db.order.findUniqueOrThrow({ where: { id: order.id } });
     expect(after.paymentStatus).toBe("PAGADO");
+  });
+
+  it("confirmaciones simultáneas (aviso + vuelta del cliente) no duplican nada", async () => {
+    const order = await createOrderFromCart({
+      userId: user.id,
+      addressId: address.id,
+      docType: "DNI",
+      docNumber: "32456789",
+      cart: cartWith(1),
+    });
+    const checkout = await getPaymentProvider().createCheckout({
+      orderId: order.id,
+      orderNumber: order.number,
+      totalUsd: 100,
+      customerEmail: user.email,
+      successUrl: "/x",
+      cancelUrl: "/y",
+    });
+    await db.order.update({
+      where: { id: order.id },
+      data: { paymentProvider: "mock", paymentExternalId: checkout.externalId },
+    });
+    await MockProvider.resolve(checkout.externalId, true);
+
+    const results = await Promise.all([confirmOrderPayment(order.id), confirmOrderPayment(order.id)]);
+    expect(results.every((r) => r.ok)).toBe(true);
+    expect(await db.statusEvent.count({ where: { orderId: order.id } })).toBe(1);
+    expect(await db.procurementOrder.count({ where: { orderId: order.id } })).toBe(1);
+  });
+
+  it("Getnet todavía sin resolver: queda PENDIENTE, no FALLIDO", async () => {
+    vi.stubEnv("GETNET_CLIENT_ID", "cid");
+    vi.stubEnv("GETNET_CLIENT_SECRET", "cs");
+    vi.stubEnv("GETNET_ENV", "sandbox");
+    resetGetnetTokenCache();
+    let intentStatus = "pending";
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) =>
+        url.endsWith("/access_token")
+          ? new Response(JSON.stringify({ access_token: "t", expires_in: 3599 }))
+          : new Response(
+              JSON.stringify({
+                status: intentStatus,
+                records:
+                  intentStatus === "paid" ? [{ payment: { result: { payment_id: "p", status: "Authorized" } } }] : [],
+              }),
+            ),
+      ),
+    );
+    try {
+      const order = await createOrderFromCart({
+        userId: user.id,
+        addressId: address.id,
+        docType: "DNI",
+        docNumber: "32456789",
+        cart: cartWith(1),
+      });
+      await db.order.update({
+        where: { id: order.id },
+        data: { paymentProvider: "getnet", paymentExternalId: "pi_test" },
+      });
+
+      const pending = await confirmOrderPayment(order.id);
+      expect(pending).toMatchObject({ ok: false, pending: true });
+      expect((await db.order.findUniqueOrThrow({ where: { id: order.id } })).paymentStatus).toBe("PENDIENTE");
+
+      intentStatus = "paid";
+      expect((await confirmOrderPayment(order.id)).ok).toBe(true);
+      expect((await db.order.findUniqueOrThrow({ where: { id: order.id } })).paymentStatus).toBe("PAGADO");
+    } finally {
+      vi.unstubAllGlobals();
+      vi.unstubAllEnvs();
+    }
   });
 
   it("pedido sin pago iniciado no se confirma", async () => {

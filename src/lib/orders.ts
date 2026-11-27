@@ -34,7 +34,12 @@ export async function createOrderFromCart(args: {
   const { cart } = args;
   if (cart.items.length === 0) throw new OrderError("El carrito está vacío.");
 
-  const courier = checkCourierLimits(cart.totalUsd, cart.totalWeightKg, speciesCounts(cart.items));
+  const courier = checkCourierLimits(
+    cart.totalUsd,
+    cart.totalWeightKg,
+    speciesCounts(cart.items),
+    cart.totalVolumeM3,
+  );
   if (!courier.ok) throw new OrderError(courier.errors.join(" "));
 
   const address = await db.address.findFirst({ where: { id: args.addressId, userId: args.userId } });
@@ -73,7 +78,7 @@ export async function confirmOrderPayment(
   orderId: string,
   /** Quién la confirmó a mano (transferencia). Sin actor = la pasarela. */
   actorId?: string,
-): Promise<{ ok: boolean; reason?: string }> {
+): Promise<{ ok: boolean; reason?: string; pending?: boolean }> {
   const order = await db.order.findUnique({
     where: { id: orderId },
     include: { user: true, items: { include: { product: true } } },
@@ -98,15 +103,25 @@ export async function confirmOrderPayment(
     }
   }
   const confirmation = await getProviderByName(providerName).confirmPayment(order.paymentExternalId);
+  // Todavía sin resultado (el banco no contestó o el webhook no llegó): no se
+  // toca el pedido; se vuelve a consultar más tarde.
+  if (confirmation.status === "pending") return { ok: false, pending: true, reason: confirmation.reason };
   if (confirmation.status !== "approved") {
     await db.order.update({ where: { id: orderId }, data: { paymentStatus: "FALLIDO" } });
     return { ok: false, reason: confirmation.reason };
   }
 
   const suppliers = [...new Set(order.items.map((i) => i.product.supplierId))];
-  await db.$transaction([
-    db.order.update({ where: { id: orderId }, data: { paymentStatus: "PAGADO" } }),
-    db.statusEvent.create({
+  // El webhook de la pasarela y la vuelta del cliente pueden llegar al mismo
+  // tiempo: solo el primero que pasa el pedido a PAGADO arma la operación (y
+  // manda los mails); el otro ve count 0 y sale sin duplicar nada.
+  const won = await db.$transaction(async (tx) => {
+    const { count } = await tx.order.updateMany({
+      where: { id: orderId, paymentStatus: { not: "PAGADO" } },
+      data: { paymentStatus: "PAGADO" },
+    });
+    if (count === 0) return false;
+    await tx.statusEvent.create({
       data: {
         orderId,
         fromState: null,
@@ -114,12 +129,14 @@ export async function confirmOrderPayment(
         note: actorId ? "Transferencia verificada" : "Pago confirmado",
         actorId: actorId ?? null,
       },
-    }),
-    db.shipment.upsert({ where: { orderId }, create: { orderId }, update: {} }),
-    ...suppliers.map((supplierId) =>
-      db.procurementOrder.create({ data: { orderId, supplierId } }),
-    ),
-  ]);
+    });
+    await tx.shipment.upsert({ where: { orderId }, create: { orderId }, update: {} });
+    for (const supplierId of suppliers) {
+      await tx.procurementOrder.create({ data: { orderId, supplierId } });
+    }
+    return true;
+  });
+  if (!won) return { ok: true };
 
   await sendSafe(
     paymentConfirmedMail({

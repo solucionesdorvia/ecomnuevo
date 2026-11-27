@@ -52,6 +52,7 @@ export type CartItem = {
     images: string[];
     priceUsd: number;
     weightKg: number;
+    volumeM3: number;
     active: boolean;
     deliveryDaysMin: number;
     deliveryDaysMax: number;
@@ -60,12 +61,14 @@ export type CartItem = {
   quantity: number;
   lineTotalUsd: number;
   lineWeightKg: number;
+  lineVolumeM3: number;
 };
 
 export type Cart = {
   items: CartItem[];
   totalUsd: number;
   totalWeightKg: number;
+  totalVolumeM3: number;
   courier: CourierCheck;
   count: number;
 };
@@ -86,6 +89,7 @@ export async function getCart(): Promise<Cart> {
       if (line.v && !variant) continue;
       const priceUsd = product.priceUsd.toNumber();
       const weightKg = product.weightKg.toNumber();
+      const volumeM3 = product.volumeM3.toNumber();
       items.push({
         product: {
           id: product.id,
@@ -94,6 +98,7 @@ export async function getCart(): Promise<Cart> {
           images: product.images,
           priceUsd,
           weightKg,
+          volumeM3,
           active: product.active,
           deliveryDaysMin: product.deliveryDaysMin,
           deliveryDaysMax: product.deliveryDaysMax,
@@ -102,16 +107,19 @@ export async function getCart(): Promise<Cart> {
         quantity: line.q,
         lineTotalUsd: priceUsd * line.q,
         lineWeightKg: weightKg * line.q,
+        lineVolumeM3: volumeM3 * line.q,
       });
     }
   }
   const totalUsd = items.reduce((a, i) => a + i.lineTotalUsd, 0);
   const totalWeightKg = items.reduce((a, i) => a + i.lineWeightKg, 0);
+  const totalVolumeM3 = items.reduce((a, i) => a + i.lineVolumeM3, 0);
   return {
     items,
     totalUsd,
     totalWeightKg,
-    courier: checkCourierLimits(totalUsd, totalWeightKg, speciesCounts(items)),
+    totalVolumeM3,
+    courier: checkCourierLimits(totalUsd, totalWeightKg, speciesCounts(items), totalVolumeM3),
     count: items.reduce((a, i) => a + i.quantity, 0),
   };
 }

@@ -18,15 +18,21 @@ type SavedAddress = {
   phone: string;
 };
 
+const ars = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 });
+const formatArs = (n: number) => ars.format(n);
+
 export function CheckoutForm({
   addresses,
   defaultDoc,
   cardEnabled,
+  cardArsTotal = null,
 }: {
   addresses: SavedAddress[];
   defaultDoc: string;
   /** Sin pasarela real (o mock en producción) solo se ofrece transferencia. */
   cardEnabled: boolean;
+  /** Si la tarjeta se cobra en pesos (Getnet): el total en ARS ya convertido. */
+  cardArsTotal?: number | null;
 }) {
   const [state, formAction, pending] = useActionState<CheckoutState, FormData>(startCheckout, {});
   const [addressId, setAddressId] = useState<string>(addresses[0]?.id ?? "nueva");
@@ -174,11 +180,19 @@ export function CheckoutForm({
               />
               <span className="flex-1">
                 <span className="flex items-center gap-2 font-medium">
-                  <CreditCard className="size-4 text-primary" /> Tarjeta de crédito
+                  <CreditCard className="size-4 text-primary" />{" "}
+                  {cardArsTotal != null ? "Tarjeta de crédito o débito" : "Tarjeta de crédito"}
                 </span>
-                <span className="mt-0.5 block text-xs text-muted">
-                  Pagás al instante y el pedido arranca solo.
-                </span>
+                {cardArsTotal != null ? (
+                  <span className="mt-0.5 block text-xs text-muted">
+                    En pesos: <span className="font-semibold text-foreground">{formatArs(cardArsTotal)}</span>. Las cuotas
+                    las elegís al pagar, según tu tarjeta. El pedido arranca solo.
+                  </span>
+                ) : (
+                  <span className="mt-0.5 block text-xs text-muted">
+                    Pagás al instante y el pedido arranca solo.
+                  </span>
+                )}
               </span>
             </label>
           )}

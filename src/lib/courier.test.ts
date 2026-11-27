@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkCourierLimits, MAX_TOTAL_USD, MAX_UNITS_PER_SPECIES, MAX_WEIGHT_KG } from "./courier";
+import { checkCourierLimits, MAX_TOTAL_USD, MAX_UNITS_PER_SPECIES, MAX_VOLUME_M3, MAX_WEIGHT_KG } from "./courier";
 
 describe("checkCourierLimits", () => {
   it("aprueba un carrito dentro de los topes", () => {
@@ -19,6 +19,17 @@ describe("checkCourierLimits", () => {
     expect(r.errors).toHaveLength(1);
     expect(r.errors[0].replace(/ /g, " ")).toMatch(/supera el tope de US\$ 3\.000/);
     expect(r.errors[0]).toMatch(/Dividí la compra/);
+  });
+
+  it("volumen: 1 m³ entra justo, más no", () => {
+    expect(checkCourierLimits(100, 5, [], MAX_VOLUME_M3).ok).toBe(true);
+    const r = checkCourierLimits(100, 5, [], 1.2);
+    expect(r.ok).toBe(false);
+    expect(r.errors).toHaveLength(1);
+    expect(r.errors[0]).toMatch(/1,2 m³/);
+    expect(r.errors[0]).toMatch(/otro pedido/);
+    expect(r.volumeRatio).toBe(1);
+    expect(checkCourierLimits(100, 5, [], 0.25).volumeRatio).toBe(0.25);
   });
 
   it("rechaza por peso", () => {
