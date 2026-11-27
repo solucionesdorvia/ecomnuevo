@@ -27,10 +27,12 @@ import type {
 //   GETNET_ARS_RATE   pesos por dólar (si falta, usa TRANSFER_ARS_RATE)
 //   GETNET_API_BASE   opcional: pisa la URL base del Web Checkout API
 
+// Ruta verificada en producción el 26-nov-2026 (la de /digital-checkout/v1
+// para payment intents devuelve 403 de política).
 const HOSTS = {
   sandbox: { api: "https://api-sbx.globalgetnet.com", checkout: "/dpy/web-checkout/v1" },
-  pre: { api: "https://api.pre.globalgetnet.com", checkout: "/digital-checkout/v1" },
-  produccion: { api: "https://api.globalgetnet.com", checkout: "/digital-checkout/v1" },
+  pre: { api: "https://api.pre.globalgetnet.com", checkout: "/dpy/web-checkout/v1" },
+  produccion: { api: "https://api.globalgetnet.com", checkout: "/dpy/web-checkout/v1" },
 } as const;
 
 type Env = keyof typeof HOSTS;
@@ -312,7 +314,12 @@ export class GetnetProvider implements PaymentProvider {
       body: JSON.stringify({}),
     });
     if (r.status >= 300 || r.body?.status?.toLowerCase() !== "refunded") {
-      throw new Error(`Getnet no aceptó la devolución (HTTP ${r.status}${r.body?.message ? `: ${r.body.message}` : ""}).`);
+      // 403 = la cuenta no tiene habilitadas las devoluciones por API (lo
+      // habilita Getnet). El pedido no se cancela hasta que la devolución pase.
+      const hint = r.status === 403 ? " La cuenta no tiene habilitadas las devoluciones por API: pedíselas a Getnet o devolvé desde su Portal." : "";
+      throw new Error(
+        `Getnet no aceptó la devolución (HTTP ${r.status}${r.body?.message ? `: ${r.body.message}` : ""}).${hint}`,
+      );
     }
   }
 }
