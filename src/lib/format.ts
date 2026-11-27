@@ -10,6 +10,13 @@ export function formatUsd(value: number | string | { toNumber(): number }): stri
   return usd.format(n).replace("USD", "US$").trim();
 }
 
+/** Volumen en metros cúbicos: "0,25 m³". */
+export function formatM3(value: number): string {
+  // Los productos sueltos ocupan milésimas: con 2 decimales se verían como "0 m³".
+  const digits = value > 0 && value < 0.1 ? 3 : 2;
+  return `${new Intl.NumberFormat("es-AR", { maximumFractionDigits: digits }).format(value)} m³`;
+}
+
 export function formatKg(value: number | string | { toNumber(): number }): string {
   const n = typeof value === "object" ? value.toNumber() : Number(value);
   return `${new Intl.NumberFormat("es-AR", { maximumFractionDigits: 2 }).format(n)} kg`;

@@ -73,6 +73,7 @@ export async function startCheckout(_prev: CheckoutState, formData: FormData): P
     // Sin pasarela real habilitada, todo va por transferencia (no se confía en el form).
     const metodo = cardPaymentsEnabled() ? String(formData.get("metodo") ?? "tarjeta") : "transferencia";
     const provider = metodo === "transferencia" ? getProviderByName("transferencia") : getPaymentProvider();
+    const address = await db.address.findUniqueOrThrow({ where: { id: addressId } });
     const checkout = await provider.createCheckout({
       orderId: order.id,
       orderNumber: order.number,
@@ -80,6 +81,20 @@ export async function startCheckout(_prev: CheckoutState, formData: FormData): P
       customerEmail: user.email,
       successUrl: `/checkout/confirmacion?pedido=${order.id}`,
       cancelUrl: `/checkout?cancelado=1`,
+      errorUrl: `/checkout?error=pago`,
+      customer: {
+        name: user.name,
+        docType: doc.type,
+        docNumber: doc.normalized,
+        address: {
+          street: address.street,
+          apartment: address.apartment,
+          city: address.city,
+          province: address.province,
+          zipCode: address.zipCode,
+          phone: address.phone,
+        },
+      },
     });
     await db.order.update({
       where: { id: order.id },

@@ -3,7 +3,8 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { getCart } from "@/lib/cart";
 import { db } from "@/lib/db";
-import { cardPaymentsEnabled } from "@/lib/payments";
+import { cardPaymentsEnabled, cardProviderName } from "@/lib/payments";
+import { getnetArsTotal } from "@/lib/payments/getnet";
 import { formatDocumento } from "@/lib/documento";
 import { formatKg } from "@/lib/format";
 import { Ship } from "lucide-react";
@@ -26,6 +27,8 @@ export default async function CheckoutPage({
 
   const params = await searchParams;
   const cardEnabled = cardPaymentsEnabled();
+  // Getnet cobra en pesos: se muestra el total convertido antes de ir a pagar.
+  const cardArsTotal = cardEnabled && cardProviderName() === "getnet" ? getnetArsTotal(cart.totalUsd) : null;
   const addresses = await db.address.findMany({
     where: { userId: user.id },
     orderBy: [{ isDefault: "desc" }],
@@ -66,6 +69,7 @@ export default async function CheckoutPage({
           }))}
           defaultDoc={defaultDoc}
           cardEnabled={cardEnabled}
+          cardArsTotal={cardArsTotal}
         />
 
         <div className="flex flex-col gap-4 lg:sticky lg:top-40">
